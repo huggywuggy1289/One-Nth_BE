@@ -17,7 +17,7 @@ public class AuthCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id; // 인증번호 ID
+    private Long id; // 인증번호ID
 
     @Column(name = "phone_number")
     private String phoneNumber; // 인증 대상 휴대폰 번호
