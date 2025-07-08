@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.product.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
+import com.onenth.OneNth.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,4 +27,8 @@ public class SharingReview extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sharing_item_id", nullable = false)
     private SharingItem sharingItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Member member;
 }
