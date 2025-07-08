@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.product.entity;
 import com.onenth.OneNth.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import com.onenth.OneNth.domain.member.entity.Member; //+
 
 import java.math.BigDecimal;
 
@@ -26,4 +27,9 @@ public class PurchaseReview extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_item_id", nullable = false)
     private PurchaseItem purchaseItem;
+
+    // +
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 }
