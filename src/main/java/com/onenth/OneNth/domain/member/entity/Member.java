@@ -26,6 +26,9 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length=10, nullable=false)
+    private String name;
+
     @Column(length=254, nullable=false, unique = true)
     private String email;
 
@@ -42,11 +45,13 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private LoginType loginType;
 
-    @Column(nullable=false)
-    private boolean marketingAgree = false;
+    private LocalDate inactiveDate;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private MemberRegion memberRegion;
+//    @Column(nullable=false)
+//    private boolean marketingAgree = false;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberRegion> memberRegions = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alert> alerts = new ArrayList<>();
@@ -68,4 +73,8 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseItem> purchaseItems = new ArrayList<>();
+
+    public void encodePassword(String password) {
+        this.password = password;
+    }
 }
