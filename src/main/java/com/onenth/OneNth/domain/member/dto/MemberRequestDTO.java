@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
@@ -34,24 +36,36 @@ public class MemberRequestDTO {
         @NotBlank
         String name;
 
-        @Email
-        @NotBlank
-        String email;
+        @NotBlank(message = "이메일은 필수입니다.")
+        @Email(message = "올바른 이메일 형식이어야 합니다.")
+        private String email;
 
         @NotBlank
-        String password;
+        private String password;
 
         @NotBlank
-        String nickname;
+        private String nickname;
 
         @NotBlank
-        String regionName;
+        private String regionName;
 
-        @NotNull
-        private LocalDate birthday;
+//        @NotNull
+//        private LocalDate birthday;
 
         @NotNull
         private Boolean marketingAgree;
 
+    }
+
+    // 로그인 요청 dto
+    @Getter
+    @Setter
+    public static class LoginRequestDTO {
+        @NotBlank(message = "이메일은 필수입니다.")
+        @Email(message = "올바른 이메일 형식이어야 합니다.")
+        private String email;
+
+        @NotBlank(message = "패스워드는 필수입니다.")
+        private String password;
     }
 }

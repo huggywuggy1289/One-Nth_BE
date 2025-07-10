@@ -13,4 +13,6 @@ public interface MemberCommandService {
     //회원가입 로직 구현
     MemberResponseDTO.SignupResultDTO signupMember(MemberRequestDTO.SignupDTO request);
 
+    //일반로그인 로직 구현
+    MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.LoginRequestDTO request);
 }

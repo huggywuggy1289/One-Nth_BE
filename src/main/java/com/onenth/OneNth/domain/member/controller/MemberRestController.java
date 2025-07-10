@@ -18,8 +18,15 @@ public class MemberRestController {
 
     private final MemberCommandService memberCommandService;
 
+    // 일반 회원가입 API 구현
     @PostMapping("/signup")
     public ApiResponse<MemberResponseDTO.SignupResultDTO> signup(@RequestBody @Valid MemberRequestDTO.SignupDTO request) {
         return ApiResponse.onSuccess(memberCommandService.signupMember(request));
+    }
+
+    // 일반 로그인 API 구현
+    @PostMapping("/login")
+    public ApiResponse<MemberResponseDTO.LoginResultDTO> login(@RequestBody @Valid MemberRequestDTO.LoginRequestDTO request) {
+        return ApiResponse.onSuccess(memberCommandService.loginMember(request));
     }
 }

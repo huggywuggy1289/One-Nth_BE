@@ -19,7 +19,6 @@ public class MemberConverter {
                 .email(request.getEmail())
                 .password(request.getPassword())
                 .nickname(request.getNickname())
-                .birthday(request.getBirthday())
                 .loginType(LoginType.NORMAL)
                 .memberRegions(new ArrayList<>())
                 .marketingAgree(request.getMarketingAgree())
@@ -42,5 +41,13 @@ public class MemberConverter {
                 .memberId(member.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+
+    //로그인 결과 dto로 변환
+    public static MemberResponseDTO.LoginResultDTO toLoginResultDTO(Long memberId, String accessToken) {
+       return MemberResponseDTO.LoginResultDTO.builder()
+               .memberId(memberId)
+               .accessToken(accessToken)
+               .build();
     }
 }
