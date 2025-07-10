@@ -13,7 +13,7 @@ public class EmailService {
 
     public void sendVerificationEmail(String to, String code) {
         String subject = "[N분의1] 이메일 인증번호입니다.";
-        String content = "인증번호는 다음과 같습니다.\n" + code + "\n 코드 유효시간은 5분입니다.";
+        String content = "**인증번호는 다음과 같습니다.**\n" + code + "\n **코드 유효시간은 5분입니다.**";
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

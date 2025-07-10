@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -17,11 +18,17 @@ public class EmailVerificationService {
     private final EmailVerificationCodeRepository codeRepository;
     private final EmailService emailService;
     private final MemberRepository memberRepository;
-
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    );
     public void sendCode(String email) {
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw new RuntimeException("올바르지 않은 이메일 형식입니다.");
+        }
+
         if (memberRepository.existsByEmail(email)) {
             // 이메일 중복 검증 (회원가입 DB와 연결 필요)
-            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+            throw new RuntimeException("이미 가입된 이메일입니다.");
         }
 
         String code = generateCode();
