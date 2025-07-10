@@ -41,9 +41,19 @@ public class PurchaseItemService {
             Long userId
     ) {
         System.out.println(itemCategory);
-        // 식품 카테고리라면 소비기한이 있어야 함
-        if (ItemCategory.valueOf(itemCategory) == ItemCategory.FOOD && expirationDate == null) {
-            throw new IllegalArgumentException("식품 카테고리 상품은 소비기한을 입력해야 합니다.");
+
+        // 카테고리 파싱
+        ItemCategory category = ItemCategory.valueOf(itemCategory.trim());
+
+        // 소비기한 유효성 체크
+        if (category == ItemCategory.FOOD) {
+            if (expirationDate == null || expirationDate.trim().isEmpty()) {
+                throw new IllegalArgumentException("식품 카테고리 상품은 소비기한을 입력해야 합니다.");
+            }
+        } else {
+            if (expirationDate != null && !expirationDate.trim().isEmpty()) {
+                throw new IllegalArgumentException("식품 이외의 상품은 소비기한을 입력할 수 없습니다.");
+            }
         }
 
         // 임시 회원 객체
@@ -54,9 +64,11 @@ public class PurchaseItemService {
         PurchaseItem purchaseItem = PurchaseItem.builder()
                 .name(title)
                 .purchaseMethod(PurchaseMethod.valueOf(purchaseMethod))
-                .itemCategory(ItemCategory.valueOf(itemCategory.trim().replace(",","")))
+                .itemCategory(ItemCategory.valueOf(itemCategory.trim().replace(",", "")))
                 .purchaseLocation(purchaseUrl)
-                .expirationDate(expirationDate != null ? LocalDate.parse(expirationDate) : null)
+                .expirationDate(expirationDate != null && !expirationDate.trim().isEmpty()
+                        ? LocalDate.parse(expirationDate)
+                        : null)
                 .price(originPrice)
                 .status(Status.DEFAULT)
                 .member(dummy)                // 임시로 아이디 강제 주입
@@ -67,38 +79,53 @@ public class PurchaseItemService {
 
         purchaseItemRepository.save(purchaseItem);
 
-        // 이미지 업로드 처리
-        if (imageFiles != null && !imageFiles.isEmpty()) {
-            if (imageFiles.size() > 3) {
-                throw new IllegalArgumentException("이미지는 최대 3장까지 업로드할 수 있습니다.");
-            }
-
-            imageFiles.forEach(file -> {
-                try {
-                    String uploadDir = "/tmp/uploads"; // 임시 저장 경로
-                    File dir = new File(uploadDir);
-                    if (!dir.exists()) dir.mkdirs();
-
-                    String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-                    String filePath = uploadDir + "/" + filename;
-
-                    // 실제 파일 저장
-                    file.transferTo(new File(filePath));
-
-                    ItemImage image = ItemImage.builder()
-                            .purchaseItem(purchaseItem)
-                            .url(filePath) // 임시로 파일 경로를 저장
-                            .itemType(ItemType.PURCHASE)
-                            .build();
-
-                    itemImageRepository.save(image);
-                } catch (IOException e) {
-                    throw new RuntimeException("파일 저장 실패: " + e.getMessage());
-                }
-            });
+        // 이미지 유효성 검사
+        if (imageFiles == null || imageFiles.isEmpty()) {
+            throw new IllegalArgumentException("상품 이미지는 최소 1장 이상 첨부해야 합니다.");
         }
+
+// 유효한 파일만 개수 체크
+        long validFileCount = imageFiles.stream()
+                .filter(f -> f != null && !f.isEmpty())
+                .count();
+
+        if (validFileCount == 0) {
+            throw new IllegalArgumentException("상품 이미지는 최소 1장 이상 첨부해야 합니다.");
+        }
+
+        if (validFileCount > 3) {
+            throw new IllegalArgumentException("이미지는 최대 3장까지 업로드할 수 있습니다.");
+        }
+
+// 이미지 업로드 처리
+        imageFiles.stream()
+                .filter(f -> f != null && !f.isEmpty())
+                .forEach(file -> {
+                    try {
+                        String uploadDir = "/tmp/uploads"; // 임시 저장 경로
+                        File dir = new File(uploadDir);
+                        if (!dir.exists()) dir.mkdirs();
+
+                        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                        String filePath = uploadDir + "/" + filename;
+
+                        // 실제 파일 저장
+                        file.transferTo(new File(filePath));
+
+                        ItemImage image = ItemImage.builder()
+                                .purchaseItem(purchaseItem)
+                                .url(filePath) // 임시로 파일 경로를 저장
+                                .itemType(ItemType.PURCHASE)
+                                .build();
+
+                        itemImageRepository.save(image);
+                    } catch (IOException e) {
+                        throw new RuntimeException("파일 저장 실패: " + e.getMessage());
+                    }
+                });
 
         return purchaseItem.getId();
     }
+
 
 }

@@ -25,7 +25,7 @@ public class PurchaseItemController {
             @RequestParam("purchaseMethod") String purchaseMethod,
             @RequestParam("itemCategory") String itemCategory,
             @RequestParam("purchaseUrl") String purchaseUrl,
-            @RequestParam("expirationDate") String expirationDate,
+            @RequestParam(value = "expirationDate", required = false) String expirationDate, // 필수 여부 X
             @RequestParam("originPrice") Integer originPrice,
             @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles
     ) {
@@ -37,6 +37,7 @@ public class PurchaseItemController {
 
         return ResponseEntity.ok(savedItemId);
     }
+
 
 
 }
