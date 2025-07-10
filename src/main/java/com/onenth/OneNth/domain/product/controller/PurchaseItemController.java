@@ -5,8 +5,12 @@ import com.onenth.OneNth.domain.product.DTO.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/group-purchases")
@@ -15,15 +19,25 @@ public class PurchaseItemController {
 
     private final PurchaseItemService purchaseItemService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Long> registerPurchaseItem(
-            @Valid @RequestBody PurchaseItemRequestDTO dto) {
-
-        // TODO: 실제 유저 ID는 인증 구현 후 SecurityContext 등에서 가져와야함.
+            @RequestParam("title") String title,
+            @RequestParam("purchaseMethod") String purchaseMethod,
+            @RequestParam("itemCategory") String itemCategory,
+            @RequestParam("purchaseUrl") String purchaseUrl,
+            @RequestParam("expirationDate") String expirationDate,
+            @RequestParam("originPrice") Integer originPrice,
+            @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles
+    ) {
         Long dummyUserId = 1L;
-        Long savedItemId = purchaseItemService.registerItem(dto, dummyUserId);
+
+        Long savedItemId = purchaseItemService.registerItem(
+                title, purchaseMethod, itemCategory, purchaseUrl,
+                expirationDate, originPrice, imageFiles, dummyUserId);
+
         return ResponseEntity.ok(savedItemId);
     }
+
 
 }
 

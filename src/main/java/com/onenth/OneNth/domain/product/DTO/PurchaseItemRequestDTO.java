@@ -3,10 +3,7 @@ package com.onenth.OneNth.domain.product.DTO;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.TradeMethod;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,4 +25,6 @@ public class PurchaseItemRequestDTO {
     private LocalDate expirationDate; // 소비기한
     @NotNull
     private Integer originPrice; // 상품 원가
+    @Size(max = 3)
+    private List<@NotBlank String> imageUrls; // 이미지 등록
 }
