@@ -22,6 +22,7 @@ public class MemberConverter {
                 .birthday(request.getBirthday())
                 .loginType(LoginType.NORMAL)
                 .memberRegions(new ArrayList<>())
+                .marketingAgree(request.getMarketingAgree())
                 .build();
 
         //회원가입시에는 지역 한개만 매핑

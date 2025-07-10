@@ -47,8 +47,13 @@ public class Member extends BaseEntity {
 
     private LocalDate inactiveDate;
 
-//    @Column(nullable=false)
-//    private boolean marketingAgree = false;
+    @Column(nullable=false)
+    private boolean marketingAgree = false;
+
+    //비밀번호 salt 암호화 메서드
+    public void encodePassword(String password) {
+        this.password = password;
+    }
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberRegion> memberRegions = new ArrayList<>();
@@ -74,7 +79,4 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseItem> purchaseItems = new ArrayList<>();
 
-    public void encodePassword(String password) {
-        this.password = password;
-    }
 }
