@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.onenth.OneNth.domain.product.entity.QSharingItem.sharingItem;
+
 @Service
 @RequiredArgsConstructor
 public class PurchaseItemService {
@@ -34,7 +36,7 @@ public class PurchaseItemService {
     private final RegionRepository regionRepository;
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
 
-    // 상품 등록 조건
+    // 같이사요 상품 등록
     @Transactional
     public long registerItem(
             String title,
@@ -81,7 +83,7 @@ public class PurchaseItemService {
                 .price(originPrice)
                 .status(Status.DEFAULT)
                 .member(member)             // 회원 연동 시 주석 해제
-                //.region(region)             // 지역 연동 시 주석 해제
+                .region(region)             // 지역 연동 시 주석 해제
                 .build();
 
         purchaseItemRepository.save(purchaseItem);
@@ -104,12 +106,17 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("이미지는 최대 3장까지 업로드할 수 있습니다.");
         }
 
+        // nullable true로 하는 대신에 폼에 맞는 쪽 값 검증
+        if (purchaseItem == null){
+            throw new IllegalArgumentException("같이사요는 PurchaseItem 반드시 지정하세요.");
+        }
+
         // 이미지 업로드 처리
         imageFiles.stream()
                 .filter(f -> f != null && !f.isEmpty())
                 .forEach(file -> {
                     try {
-                        String uploadDir = "/tmp/uploads"; // 임시 저장 경로이니 수정요함.
+                        String uploadDir = "C:\\Users\\손재윤\\OneDrive\\바탕 화면\\uploads"; // 임시 저장 경로이니 수정요함.
                         File dir = new File(uploadDir);
                         if (!dir.exists()) dir.mkdirs();
 
