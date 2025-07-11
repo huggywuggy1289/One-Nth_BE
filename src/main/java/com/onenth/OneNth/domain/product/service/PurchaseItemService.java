@@ -40,7 +40,6 @@ public class PurchaseItemService {
             List<MultipartFile> imageFiles,
             Long userId
     ) {
-        System.out.println(itemCategory);
 
         // 카테고리 파싱
         ItemCategory category = ItemCategory.valueOf(itemCategory.trim());
@@ -97,12 +96,12 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("이미지는 최대 3장까지 업로드할 수 있습니다.");
         }
 
-// 이미지 업로드 처리
+        // 이미지 업로드 처리
         imageFiles.stream()
                 .filter(f -> f != null && !f.isEmpty())
                 .forEach(file -> {
                     try {
-                        String uploadDir = "/tmp/uploads"; // 임시 저장 경로
+                        String uploadDir = "/tmp/uploads"; // 임시 저장 경로이니 수정요함.
                         File dir = new File(uploadDir);
                         if (!dir.exists()) dir.mkdirs();
 
@@ -127,5 +126,7 @@ public class PurchaseItemService {
         return purchaseItem.getId();
     }
 
+    // 전체 상품 리스트 조회
+    // 단일 상품 리스트 조회
 
 }
