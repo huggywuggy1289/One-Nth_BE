@@ -26,6 +26,9 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length=10, nullable=false)
+    private String name;
+
     @Column(length=254, nullable=false, unique = true)
     private String email;
 
@@ -35,18 +38,25 @@ public class Member extends BaseEntity {
     @Column(length=10, nullable=false)
     private String nickname;
 
-    @Column(nullable=false)
-    private LocalDate birthday;
+//    @Column(nullable=false)
+//    private LocalDate birthday;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LoginType loginType;
 
+    private LocalDate inactiveDate;
+
     @Column(nullable=false)
     private boolean marketingAgree = false;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private MemberRegion memberRegion;
+    //비밀번호 salt 암호화 메서드
+    public void encodePassword(String password) {
+        this.password = password;
+    }
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberRegion> memberRegions = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alert> alerts = new ArrayList<>();
@@ -68,4 +78,5 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseItem> purchaseItems = new ArrayList<>();
+
 }

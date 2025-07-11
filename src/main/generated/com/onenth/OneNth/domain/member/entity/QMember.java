@@ -18,15 +18,11 @@ public class QMember extends EntityPathBase<Member> {
 
     private static final long serialVersionUID = -1798981170L;
 
-    private static final PathInits INITS = PathInits.DIRECT2;
-
     public static final QMember member = new QMember("member1");
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
     public final ListPath<com.onenth.OneNth.domain.alert.entity.Alert, com.onenth.OneNth.domain.alert.entity.QAlert> alerts = this.<com.onenth.OneNth.domain.alert.entity.Alert, com.onenth.OneNth.domain.alert.entity.QAlert>createList("alerts", com.onenth.OneNth.domain.alert.entity.Alert.class, com.onenth.OneNth.domain.alert.entity.QAlert.class, PathInits.DIRECT2);
-
-    public final DatePath<java.time.LocalDate> birthday = createDate("birthday", java.time.LocalDate.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
@@ -35,11 +31,15 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final DatePath<java.time.LocalDate> inactiveDate = createDate("inactiveDate", java.time.LocalDate.class);
+
     public final EnumPath<com.onenth.OneNth.domain.member.entity.enums.LoginType> loginType = createEnum("loginType", com.onenth.OneNth.domain.member.entity.enums.LoginType.class);
 
     public final BooleanPath marketingAgree = createBoolean("marketingAgree");
 
-    public final QMemberRegion memberRegion;
+    public final ListPath<MemberRegion, QMemberRegion> memberRegions = this.<MemberRegion, QMemberRegion>createList("memberRegions", MemberRegion.class, QMemberRegion.class, PathInits.DIRECT2);
+
+    public final StringPath name = createString("name");
 
     public final StringPath nickname = createString("nickname");
 
@@ -61,24 +61,15 @@ public class QMember extends EntityPathBase<Member> {
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QMember(String variable) {
-        this(Member.class, forVariable(variable), INITS);
+        super(Member.class, forVariable(variable));
     }
 
     public QMember(Path<? extends Member> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+        super(path.getType(), path.getMetadata());
     }
 
     public QMember(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QMember(PathMetadata metadata, PathInits inits) {
-        this(Member.class, metadata, inits);
-    }
-
-    public QMember(Class<? extends Member> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.memberRegion = inits.isInitialized("memberRegion") ? new QMemberRegion(forProperty("memberRegion"), inits.get("memberRegion")) : null;
+        super(Member.class, metadata);
     }
 
 }

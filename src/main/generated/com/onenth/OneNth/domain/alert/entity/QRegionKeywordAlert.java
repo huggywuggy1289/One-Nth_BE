@@ -56,7 +56,7 @@ public class QRegionKeywordAlert extends EntityPathBase<RegionKeywordAlert> {
 
     public QRegionKeywordAlert(Class<? extends RegionKeywordAlert> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.member = inits.isInitialized("member") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("member"), inits.get("member")) : null;
+        this.member = inits.isInitialized("member") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("member")) : null;
     }
 
 }
