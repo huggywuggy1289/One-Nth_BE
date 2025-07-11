@@ -32,10 +32,10 @@ public class JwtTokenProvider {
 
     //메소드는 인증 정보를 받아서, JWT Access Token을 생성하고 반환
     public String generateToken(Authentication authentication) {
-        String email = authentication.getName();
+        String userId = authentication.getName();
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration().getAccess()))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -64,9 +64,9 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
-        String email = claims.getSubject();
+        String userId = claims.getSubject();
 
-        User principal = new User(email, "", Collections.emptyList());
+        User principal = new User(userId, "", Collections.emptyList());
         return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
     }
 

@@ -61,7 +61,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                member.getEmail(), null,
+                member.getId().toString(),
+                null,
                 Collections.emptyList()
         );
 
