@@ -37,17 +37,23 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         if (!emailVerificationService.isVerified(request.getEmail())) {
             throw new RuntimeException("이메일 인증을 먼저 완료해주세요");
         }
-        // 1. 지역명으로 Region 조회
+
+        // 1. Password 와 confirmPassword 값 일치 확인
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new RuntimeException("Password 와 ConfirmPassword 의 값이 일치하지 않습니다.");
+        }
+
+        // 2. 지역명으로 Region 조회
         Region region = regionRepository.findByRegionName(request.getRegionName())
                 .orElseThrow(() -> new RuntimeException("해당 지역이 존재하지 않습니다."));
 
-        // 2. Member + MemberRegion 생성
+        // 3. Member + MemberRegion 생성
         Member member = MemberConverter.toMember(request, region);
 
-        //3. 비밀번호 암호화
+        // 4. 비밀번호 암호화
         member.encodePassword(passwordEncoder.encode(request.getPassword()));
 
-        //4. 회원 저장
+        // 5. 회원 저장
         return MemberConverter.toSignupResultDTO(memberRepository.save(member));
     }
 

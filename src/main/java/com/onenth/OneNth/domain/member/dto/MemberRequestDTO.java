@@ -44,6 +44,9 @@ public class MemberRequestDTO {
         private String password;
 
         @NotBlank
+        private String confirmPassword;
+
+        @NotBlank
         private String nickname;
 
         @NotBlank
