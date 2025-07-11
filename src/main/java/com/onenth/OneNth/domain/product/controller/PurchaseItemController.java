@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
+import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -44,12 +45,10 @@ public class PurchaseItemController {
     @GetMapping
     public ResponseEntity<List<PurchaseItemListDTO>> searchItems(
             @RequestParam String keyword,
-            @RequestParam List<Long> myRegionIds
+            @AuthUser Long userId
     ) {
-        List<PurchaseItemListDTO> result = purchaseItemService.searchItems(keyword, myRegionIds);
+        List<PurchaseItemListDTO> result = purchaseItemService.searchItems(keyword, userId);
         return ResponseEntity.ok(result);
     }
-
-
 }
 

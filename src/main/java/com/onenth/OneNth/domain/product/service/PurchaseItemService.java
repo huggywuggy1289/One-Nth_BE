@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.product.service;
 
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
@@ -31,6 +32,7 @@ public class PurchaseItemService {
     private final PurchaseItemRepository purchaseItemRepository;
     private final ItemImageRepository itemImageRepository;
     private final RegionRepository regionRepository;
+    private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
 
     // 상품 등록 조건
     @Transactional
@@ -59,10 +61,14 @@ public class PurchaseItemService {
             }
         }
 
-        // 임시 회원 객체
-        Member dummy = Member.builder().id(userId).build();
-        // 임시 지역 객체
-        Region dummyRegion = Region.builder().id(1).build();
+        // feature/#1병합 후 회원연동
+        Member member = Member.builder().id(userId).build();
+        // 이어서 회원가입시 등록된 대표지역도 주입
+        Region region = memberRegionRepository.findByMemberId(userId)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
+                .getRegion();
 
         PurchaseItem purchaseItem = PurchaseItem.builder()
                 .name(title)
@@ -74,9 +80,7 @@ public class PurchaseItemService {
                         : null)
                 .price(originPrice)
                 .status(Status.DEFAULT)
-                .member(dummy)                // 임시로 아이디 강제 주입
-                .region(dummyRegion)         // 임시로 지역 강제 주입
-                //.member(member)             // 회원 연동 시 주석 해제
+                .member(member)             // 회원 연동 시 주석 해제
                 //.region(region)             // 지역 연동 시 주석 해제
                 .build();
 
@@ -87,7 +91,7 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("상품 이미지는 최소 1장 이상 첨부해야 합니다.");
         }
 
-// 유효한 파일만 개수 체크
+        // 유효한 파일만 개수 체크
         long validFileCount = imageFiles.stream()
                 .filter(f -> f != null && !f.isEmpty())
                 .count();
@@ -132,10 +136,42 @@ public class PurchaseItemService {
 
     // 전체 상품 리스트 조회 - 지역명, 카테고리명 , 태그명(보류)
     @Transactional(readOnly = true)
-    public List<PurchaseItemListDTO> searchItems(String keyword, List<Long> myRegionIds) {
-        // TODO : 계정설정의 회원의 우리 동네 지역목록(최대3개) 기능 완성되면 지역&카테고리&태그별 필터링 로직 구현 예정
-        throw new UnsupportedOperationException("조회 로직은 회원/지역 설정 로직이 완료된 뒤 구현됩니다.");
-    }
-    // 단일 상품 리스트 조회
+    public List<PurchaseItemListDTO> searchItems(String keyword, Long userId) {
+        // 대표 지역 1개 가져오기
+        Region region = memberRegionRepository.findByMemberId(userId)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("회원의 지역이 설정되지 않았습니다."))
+                .getRegion();
 
-}
+        // QueryDSL 조회 조건
+        List<PurchaseItem> items;
+
+        if (keyword.startsWith("#")) {
+            // 태그 검색은 미구현
+            throw new UnsupportedOperationException("태그 검색은 현재 지원되지 않습니다.");
+        } else if (isCategory(keyword)) {
+            // 카테고리 검색 (대표 지역 내)
+            items = purchaseItemRepository.findByRegionAndCategory(region.getId(), keyword);
+        } else {
+            // 지역명 검색 (모든 지역 대상)
+            items = purchaseItemRepository.findByRegionName(keyword);
+        }
+
+        // DTO 변환
+        return items.stream()
+                .map(PurchaseItemListDTO::fromEntity)
+                .toList();
+    }
+
+    private boolean isCategory(String keyword) {
+        try {
+            ItemCategory.valueOf(keyword.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+            }
+        }
+
+    // 단일 상품 리스트 조회
+    }

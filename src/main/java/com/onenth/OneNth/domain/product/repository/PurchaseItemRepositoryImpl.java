@@ -1,7 +1,9 @@
 package com.onenth.OneNth.domain.product.repository;
 
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.QPurchaseItem;
+import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.region.entity.QRegion;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -18,41 +20,28 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
 
     private final JPAQueryFactory queryFactory;
 
-    @Override
-    public List<PurchaseItemListDTO> findByRegion(Integer regionId) {
-        QPurchaseItem item = QPurchaseItem.purchaseItem;
-        QRegion region = QRegion.region;
+    // PurchaseItemRepositoryCustom의 findByRegionAndTag 주석해제시 같이 해제
+//    @Override
+//    public List<PurchaseItem> findByRegionAndTag(Integer regionId, String tag) {
+//        throw new UnsupportedOperationException("태그 검색 기능은 아직 미구현 상태입니다.");
+//    }
 
-        return queryFactory
-                .select(Projections.constructor(
-                        PurchaseItemListDTO.class,
-                        item.id,
-                        item.itemCategory.stringValue(),
-                        item.name,
-                        item.price.stringValue(),
-                        Expressions.constant("") // 썸네일 URL 추후 추가
-                ))
-                .from(item)
-                .join(item.region, region)
-                .where(item.region.id.eq(regionId.intValue()))
+    @Override
+    public List<PurchaseItem> findByRegionAndCategory(Integer regionId, String category) {
+        QPurchaseItem item = QPurchaseItem.purchaseItem;
+        return queryFactory.selectFrom(item)
+                .where(item.region.id.eq(regionId)
+                        .and(item.itemCategory.eq(ItemCategory.valueOf(category.toUpperCase()))))
                 .fetch();
     }
 
     @Override
-    public List<PurchaseItemListDTO> findByCategoryAndRegions(String category, List<Long> regionIds) {
+    public List<PurchaseItem> findByRegionName(String regionName) {
         QPurchaseItem item = QPurchaseItem.purchaseItem;
-
-        return queryFactory
-                .select(Projections.constructor(
-                        PurchaseItemListDTO.class,
-                        item.id,
-                        item.itemCategory.stringValue(),
-                        item.name,
-                        item.price.stringValue(),
-                        Expressions.constant("") // 썸네일 URL 추후 추가
-                ))
-                .from(item)
-                .where(item.region.id.in(regionIds.stream().map(Long::intValue).toList()))
+        return queryFactory.selectFrom(item)
+                .where(item.region.regionName.eq(regionName))
                 .fetch();
     }
+
+
 }
