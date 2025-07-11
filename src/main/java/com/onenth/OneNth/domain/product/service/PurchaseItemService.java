@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.product.service;
 
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
@@ -10,6 +11,7 @@ import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.repository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.PurchaseItemRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
+import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,6 +30,7 @@ public class PurchaseItemService {
 
     private final PurchaseItemRepository purchaseItemRepository;
     private final ItemImageRepository itemImageRepository;
+    private final RegionRepository regionRepository;
 
     // 상품 등록 조건
     @Transactional
@@ -126,7 +130,12 @@ public class PurchaseItemService {
         return purchaseItem.getId();
     }
 
-    // 전체 상품 리스트 조회
+    // 전체 상품 리스트 조회 - 지역명, 카테고리명 , 태그명(보류)
+    @Transactional(readOnly = true)
+    public List<PurchaseItemListDTO> searchItems(String keyword, List<Long> myRegionIds) {
+        // TODO : 계정설정의 회원의 우리 동네 지역목록(최대3개) 기능 완성되면 지역&카테고리&태그별 필터링 로직 구현 예정
+        throw new UnsupportedOperationException("조회 로직은 회원/지역 설정 로직이 완료된 뒤 구현됩니다.");
+    }
     // 단일 상품 리스트 조회
 
 }

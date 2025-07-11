@@ -19,7 +19,7 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<PurchaseItemListDTO> findByRegion(Long regionId) {
+    public List<PurchaseItemListDTO> findByRegion(Integer regionId) {
         QPurchaseItem item = QPurchaseItem.purchaseItem;
         QRegion region = QRegion.region;
 

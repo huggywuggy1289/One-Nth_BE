@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.product.controller;
 
+import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
@@ -19,6 +20,7 @@ public class PurchaseItemController {
 
     private final PurchaseItemService purchaseItemService;
 
+    // 상품등록
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Long> registerPurchaseItem(
             @RequestParam("title") String title,
@@ -38,6 +40,15 @@ public class PurchaseItemController {
         return ResponseEntity.ok(savedItemId);
     }
 
+    // 상품 검색(지역명 or 카테고리명 or 태그명) 역시 우리동네 지역추가로직 완성후 개발예정
+    @GetMapping
+    public ResponseEntity<List<PurchaseItemListDTO>> searchItems(
+            @RequestParam String keyword,
+            @RequestParam List<Long> myRegionIds
+    ) {
+        List<PurchaseItemListDTO> result = purchaseItemService.searchItems(keyword, myRegionIds);
+        return ResponseEntity.ok(result);
+    }
 
 
 }
