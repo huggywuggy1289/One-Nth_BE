@@ -35,3 +35,24 @@ jwt:
     expiration:
       access: 14400000 # 4시간
       refresh: 1209600000 # 2주 (예시)
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+      path:
+        chat : chats
+        discount : discounts
+        life-tip : life-tips
+        local-food : local-foods
+        profile : profiles
+        review : reviews
+        purchase : purchase
+        share : share
+    region:
+      static: ${AWS_REGION}
+    stack:
+      auto: false
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY_ID}
+      secretKey: ${AWS_SECRET_ACCESS_KEY}
