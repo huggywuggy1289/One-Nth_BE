@@ -1,5 +1,7 @@
 package com.onenth.OneNth.domain.product.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
@@ -35,6 +37,10 @@ public class PurchaseItemService {
     private final ItemImageRepository itemImageRepository;
     private final RegionRepository regionRepository;
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
+
+    //s3 연동
+    private final AmazonS3 amazonS3;
+    private final String bucketName = "nbunii-bucket";
 
     // 같이사요 상품 등록
     @Transactional
@@ -111,32 +117,43 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("같이사요는 PurchaseItem 반드시 지정하세요.");
         }
 
-        // 이미지 업로드 처리
+        // 이미지 업로드 처리 (S3 업로드로 변경)
         imageFiles.stream()
                 .filter(f -> f != null && !f.isEmpty())
                 .forEach(file -> {
                     try {
-                        String uploadDir = "C:\\Users\\손재윤\\OneDrive\\바탕 화면\\uploads"; // 임시 저장 경로이니 수정요함.
-                        File dir = new File(uploadDir);
-                        if (!dir.exists()) dir.mkdirs();
-
                         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-                        String filePath = uploadDir + "/" + filename;
+                        String s3Key = "purchase/" + filename;
 
-                        // 실제 파일 저장
-                        file.transferTo(new File(filePath));
+                        ObjectMetadata metadata = new ObjectMetadata();
+                        metadata.setContentLength(file.getSize());
+                        metadata.setContentType(file.getContentType());
 
+                        amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
+
+                        String s3Url = amazonS3.getUrl(bucketName, s3Key).toString();
+
+                        // 디버깅
+                        boolean exists = amazonS3.doesObjectExist(bucketName, s3Key);
+                        if (!exists) {
+                            throw new RuntimeException("S3에 파일이 존재하지 않습니다: " + s3Key);
+                        } else {
+                            System.out.println(s3Key + " : 존재합니다");
+                        }
+
+                        // DB저장
                         ItemImage image = ItemImage.builder()
                                 .purchaseItem(purchaseItem)
-                                .url(filePath) // 임시로 파일 경로를 저장
+                                .url(s3Url) // S3 URL을 저장
                                 .itemType(ItemType.PURCHASE)
                                 .build();
 
                         itemImageRepository.save(image);
                     } catch (IOException e) {
-                        throw new RuntimeException("파일 저장 실패: " + e.getMessage());
+                        throw new RuntimeException("S3 파일 업로드 실패: " + e.getMessage());
                     }
                 });
+
 
         return purchaseItem.getId();
     }
