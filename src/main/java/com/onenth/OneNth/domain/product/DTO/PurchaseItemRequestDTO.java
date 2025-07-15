@@ -27,4 +27,6 @@ public class PurchaseItemRequestDTO {
     private Integer originPrice; // 상품 원가
     @Size(max = 3)
     private List<@NotBlank String> imageUrls; // 이미지 등록
+    @NotEmpty
+    private List<String> tags; // 태그입력란 (예: "#핸드폰 #배터리")
 }

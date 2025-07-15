@@ -57,4 +57,12 @@ public class PurchaseItem extends BaseEntity {
 
     @OneToMany(mappedBy = "purchaseItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemImage> itemImages = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "purchase_item_tag",
+            joinColumns = @JoinColumn(name = "purchase_item_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags = new ArrayList<>();// +
 }

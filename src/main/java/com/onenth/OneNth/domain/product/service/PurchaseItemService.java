@@ -7,12 +7,14 @@ import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionR
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
+import com.onenth.OneNth.domain.product.entity.Tag;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.repository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.PurchaseItemRepository;
+import com.onenth.OneNth.domain.product.repository.TagRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +40,7 @@ public class PurchaseItemService {
     private final ItemImageRepository itemImageRepository;
     private final RegionRepository regionRepository;
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
+    private  final TagRepository tagRepository; // +
 
     //s3 연동
     private final AmazonS3 amazonS3;
@@ -52,6 +56,7 @@ public class PurchaseItemService {
             String expirationDate,
             Integer originPrice,
             List<MultipartFile> imageFiles,
+            List<String> tags, // +
             Long userId
     ) {
 
@@ -78,6 +83,18 @@ public class PurchaseItemService {
                 .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
                 .getRegion();
 
+        // 태그 필드추가 + #조건 추가
+        List<Tag> tagEntities = tags.stream()
+                .peek(tagName -> {
+                    if (!tagName.startsWith("#")) {
+                        throw new IllegalArgumentException("태그는 반드시 #으로 시작해야 합니다: " + tagName);
+                    }
+                })
+                .map(tagName -> tagRepository.findByName(tagName)
+                        .orElseGet(() -> tagRepository.save(Tag.builder().name(tagName).build())))
+                .toList();
+
+
         PurchaseItem purchaseItem = PurchaseItem.builder()
                 .name(title)
                 .purchaseMethod(PurchaseMethod.valueOf(purchaseMethod))
@@ -90,8 +107,9 @@ public class PurchaseItemService {
                 .status(Status.DEFAULT)
                 .member(member)             // 회원 연동 시 주석 해제
                 .region(region)             // 지역 연동 시 주석 해제
+                .tags(new ArrayList<>()) // +
                 .build();
-
+        purchaseItem.getTags().addAll(tagEntities); // +
         purchaseItemRepository.save(purchaseItem);
 
         // 이미지 유효성 검사

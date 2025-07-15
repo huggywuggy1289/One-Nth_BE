@@ -49,6 +49,8 @@ public class QPurchaseItem extends EntityPathBase<PurchaseItem> {
 
     public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.Status> status = createEnum("status", com.onenth.OneNth.domain.product.entity.enums.Status.class);
 
+    public final ListPath<Tag, QTag> tags = this.<Tag, QTag>createList("tags", Tag.class, QTag.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 

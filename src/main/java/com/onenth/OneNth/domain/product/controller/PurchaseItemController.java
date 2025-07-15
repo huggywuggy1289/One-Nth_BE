@@ -30,13 +30,13 @@ public class PurchaseItemController {
             @RequestParam("purchaseUrl") String purchaseUrl,
             @RequestParam(value = "expirationDate", required = false) String expirationDate, // 필수 여부 X
             @RequestParam("originPrice") Integer originPrice,
-            @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles
-    ) {
-        Long dummyUserId = 1L;
+            @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+            @RequestParam("tags") List<String> tags,
+            @AuthUser Long userId) {
 
         Long savedItemId = purchaseItemService.registerItem(
                 title, purchaseMethod, itemCategory, purchaseUrl,
-                expirationDate, originPrice, imageFiles, dummyUserId);
+                expirationDate, originPrice, imageFiles, tags, userId);
 
         return ResponseEntity.ok(savedItemId);
     }
