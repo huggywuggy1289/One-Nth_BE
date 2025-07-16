@@ -1,7 +1,10 @@
 package com.onenth.OneNth.domain.product.controller;
 
+import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
+import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
+import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +28,7 @@ public class PurchaseItemController {
             description = "같이 사요 상품을 등록합니다."
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Long> registerPurchaseItem(
+    public ApiResponse<PurchaseItemResponseDTO.registerPurchaseItemResponseDTO> registerPurchaseItem(
             @RequestParam("title") String title,
             @RequestParam("purchaseMethod") String purchaseMethod,
             @RequestParam("itemCategory") String itemCategory,
@@ -40,7 +43,7 @@ public class PurchaseItemController {
                 title, purchaseMethod, itemCategory, purchaseUrl,
                 expirationDate, originPrice, imageFiles, tags, userId);
 
-        return ResponseEntity.ok(savedItemId);
+        return ApiResponse.onSuccess(PurchaseItemConverter.toRegisterPurchaseItemResponseDTO(savedItemId));
     }
 
     // 상품 검색(지역명 or 카테고리명 or 태그명) 역시 우리동네 지역추가로직 완성후 개발예정
