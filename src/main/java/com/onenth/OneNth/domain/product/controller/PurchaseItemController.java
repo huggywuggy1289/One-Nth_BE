@@ -1,11 +1,9 @@
 package com.onenth.OneNth.domain.product.controller;
 
 import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
-import com.onenth.OneNth.domain.product.DTO.PurchaseItemRequestDTO;
-import com.onenth.OneNth.domain.product.DTO.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +20,10 @@ public class PurchaseItemController {
     private final PurchaseItemService purchaseItemService;
 
     // 상품등록
+    @Operation(
+            summary = "같이 사요 상품 등록 API",
+            description = "같이 사요 상품을 등록합니다."
+    )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Long> registerPurchaseItem(
             @RequestParam("title") String title,
