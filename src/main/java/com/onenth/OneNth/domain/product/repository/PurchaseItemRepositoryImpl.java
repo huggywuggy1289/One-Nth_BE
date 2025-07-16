@@ -1,12 +1,8 @@
 package com.onenth.OneNth.domain.product.repository;
 
-import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.QPurchaseItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
-import com.onenth.OneNth.domain.region.entity.QRegion;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

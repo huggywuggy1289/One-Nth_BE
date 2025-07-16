@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.product.DTO;
+package com.onenth.OneNth.domain.product.dto;
 
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import lombok.AllArgsConstructor;

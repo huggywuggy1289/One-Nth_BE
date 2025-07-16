@@ -1,6 +1,6 @@
 package com.onenth.OneNth.domain.product.controller;
 
-import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
+import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;

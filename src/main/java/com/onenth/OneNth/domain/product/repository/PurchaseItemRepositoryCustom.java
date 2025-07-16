@@ -1,6 +1,5 @@
 package com.onenth.OneNth.domain.product.repository;
 
-import com.onenth.OneNth.domain.product.DTO.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 
 import java.util.List;

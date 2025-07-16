@@ -1,8 +1,7 @@
-package com.onenth.OneNth.domain.product.DTO;
+package com.onenth.OneNth.domain.product.dto;
 
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
-import com.onenth.OneNth.domain.product.entity.enums.TradeMethod;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
