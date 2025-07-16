@@ -16,21 +16,17 @@ import com.onenth.OneNth.domain.product.repository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.TagRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
-import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-
-import static com.onenth.OneNth.domain.product.entity.QSharingItem.sharingItem;
 
 @Service
 @RequiredArgsConstructor
@@ -38,13 +34,14 @@ public class PurchaseItemService {
 
     private final PurchaseItemRepository purchaseItemRepository;
     private final ItemImageRepository itemImageRepository;
-    private final RegionRepository regionRepository;
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
     private  final TagRepository tagRepository; // +
 
     //s3 연동
     private final AmazonS3 amazonS3;
-    private final String bucketName = "nbunii-bucket";
+
+    @Value("${AWS_S3_BUCKET}")
+    private String bucketName;
 
     // 같이사요 상품 등록
     @Transactional
