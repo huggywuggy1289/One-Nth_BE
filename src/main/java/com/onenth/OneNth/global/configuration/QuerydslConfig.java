@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.product.config;
+package com.onenth.OneNth.global.configuration;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
