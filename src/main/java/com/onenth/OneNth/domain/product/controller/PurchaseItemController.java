@@ -48,12 +48,12 @@ public class PurchaseItemController {
 
     // 상품 검색(지역명 or 카테고리명 or 태그명) 역시 우리동네 지역추가로직 완성후 개발예정
     @GetMapping
-    public ResponseEntity<List<PurchaseItemListDTO>> searchItems(
+    public ResponseEntity<ApiResponse<List<PurchaseItemListDTO>>> searchItems(
             @RequestParam String keyword,
             @AuthUser Long userId
     ) {
         List<PurchaseItemListDTO> result = purchaseItemService.searchItems(keyword, userId);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(ApiResponse.onSuccess(result));
     }
 }
 

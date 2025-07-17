@@ -12,20 +12,20 @@ import java.util.List;
 @Getter @Setter
 public class PurchaseItemRequestDTO {
     @NotBlank
-    private String title; // 상품명
+    private String title;
     @NotNull
-    private PurchaseMethod purchaseMethod; // 온라인구매 & 오프라인 구매
+    private PurchaseMethod purchaseMethod;
     @NotNull
-    private ItemCategory itemCategory; // 카테고리
+    private ItemCategory itemCategory;
     @NotBlank
-    private String purchaseUrl; // 구매링크
+    private String purchaseUrl;
     @NotBlank
-    private String purchaseLocation; // 구매처
-    private LocalDate expirationDate; // 소비기한
+    private String purchaseLocation;
+    private LocalDate expirationDate;
     @NotNull
-    private Integer originPrice; // 상품 원가
+    private Integer originPrice;
     @Size(max = 3)
-    private List<@NotBlank String> imageUrls; // 이미지 등록
+    private List<@NotBlank String> imageUrls;
     @NotEmpty
-    private List<String> tags; // 태그입력란 (예: "#핸드폰 #배터리")
+    private List<String> tags;
 }

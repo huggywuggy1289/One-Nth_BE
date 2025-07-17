@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
+import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.Tag;
@@ -173,7 +174,7 @@ public class PurchaseItemService {
         return purchaseItem.getId();
     }
 
-    // 전체 상품 리스트 조회 - 지역명, 카테고리명 , 태그명(보류)
+    // 전체 상품 리스트 조회
     @Transactional(readOnly = true)
     public List<PurchaseItemListDTO> searchItems(String keyword, Long userId) {
         // 대표 지역 1개 가져오기
@@ -183,24 +184,19 @@ public class PurchaseItemService {
                 .orElseThrow(() -> new IllegalStateException("회원의 지역이 설정되지 않았습니다."))
                 .getRegion();
 
-        // QueryDSL 조회 조건
-        List<PurchaseItem> items;
-
+        List<PurchaseItem> items = new ArrayList<>();
+            // 태그 검색 (설정 지역 내)
         if (keyword.startsWith("#")) {
-            // 태그 검색은 미구현
-            throw new UnsupportedOperationException("태그 검색은 현재 지원되지 않습니다.");
+            String tag = keyword.substring(1); // #제거
         } else if (isCategory(keyword)) {
-            // 카테고리 검색 (대표 지역 내)
+            // 카테고리 검색 (설정 지역 내)
             items = purchaseItemRepository.findByRegionAndCategory(region.getId(), keyword);
         } else {
-            // 지역명 검색 (모든 지역 대상)
+            // 지역명 검색 (모든 지역)
             items = purchaseItemRepository.findByRegionName(keyword);
         }
 
-        // DTO 변환
-        return items.stream()
-                .map(PurchaseItemListDTO::fromEntity)
-                .toList();
+        return PurchaseItemConverter.toPurchaseItemListDTOs(items);
     }
 
     private boolean isCategory(String keyword) {
