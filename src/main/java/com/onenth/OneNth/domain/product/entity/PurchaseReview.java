@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import com.onenth.OneNth.domain.member.entity.Member; //+
 
 import java.math.BigDecimal;
 
