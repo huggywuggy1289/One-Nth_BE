@@ -7,8 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class KakaoUserInfo {
     private String email;
-    // 이름으로 사용
     private String nickname;
-    // 카카오 사용자 고유 아이디
     private String id;
 }
