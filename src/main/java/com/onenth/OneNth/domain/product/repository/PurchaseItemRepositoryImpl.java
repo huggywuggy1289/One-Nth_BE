@@ -19,7 +19,7 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<PurchaseItem> findByRegionAndTag(Integer regionId, String tag) {
+    public List<PurchaseItem> findByRegionsAndTag(List<Integer> regionIds, String tag) {
         QPurchaseItem item = QPurchaseItem.purchaseItem;
         QTag qTag = QTag.tag;
 
@@ -27,17 +27,17 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
                 .selectFrom(item)
                 .join(item.tags, qTag)
                 .where(
-                        item.region.id.eq(regionId)
+                        item.region.id.in(regionIds)
                                 .and(qTag.name.eq(tag))
                 )
                 .fetch();
     }
 
     @Override
-    public List<PurchaseItem> findByRegionAndCategory(Integer regionId, String category) {
+    public List<PurchaseItem> findByRegionsAndCategory(List<Integer> regionIds, String category) {
         QPurchaseItem item = QPurchaseItem.purchaseItem;
         return queryFactory.selectFrom(item)
-                .where(item.region.id.eq(regionId)
+                .where(item.region.id.in(regionIds)
                         .and(item.itemCategory.eq(ItemCategory.valueOf(category.toUpperCase()))))
                 .fetch();
     }

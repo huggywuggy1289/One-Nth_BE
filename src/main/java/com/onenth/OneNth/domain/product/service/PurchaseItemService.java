@@ -178,19 +178,24 @@ public class PurchaseItemService {
     @Transactional(readOnly = true)
     public List<PurchaseItemListDTO> searchItems(String keyword, Long userId) {
         // 대표 지역 1개 가져오기
-        Region region = memberRegionRepository.findByMemberId(userId)
+//        Region region = memberRegionRepository.findByMemberId(userId)
+//                .stream()
+//                .findFirst()
+//                .orElseThrow(() -> new IllegalStateException("회원의 지역이 설정되지 않았습니다."))
+//                .getRegion();
+        List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
                 .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("회원의 지역이 설정되지 않았습니다."))
-                .getRegion();
+                .map(r -> r.getRegion().getId())
+                .toList();
 
         List<PurchaseItem> items = new ArrayList<>();
             // 태그 검색 (설정 지역 내)
         if (keyword.startsWith("#")) {
-            String tag = keyword.substring(1); // #제거
+            String tag = keyword;
+            items = purchaseItemRepository.findByRegionsAndTag(regionIds, tag);
         } else if (isCategory(keyword)) {
             // 카테고리 검색 (설정 지역 내)
-            items = purchaseItemRepository.findByRegionAndCategory(region.getId(), keyword);
+            items = purchaseItemRepository.findByRegionsAndCategory(regionIds, keyword);
         } else {
             // 지역명 검색 (모든 지역)
             items = purchaseItemRepository.findByRegionName(keyword);
