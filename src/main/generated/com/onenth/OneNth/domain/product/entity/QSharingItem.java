@@ -1,0 +1,84 @@
+package com.onenth.OneNth.domain.product.entity;
+
+import static com.querydsl.core.types.PathMetadataFactory.*;
+
+import com.querydsl.core.types.dsl.*;
+
+import com.querydsl.core.types.PathMetadata;
+import javax.annotation.processing.Generated;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
+
+
+/**
+ * QSharingItem is a Querydsl query type for SharingItem
+ */
+@Generated("com.querydsl.codegen.DefaultEntitySerializer")
+public class QSharingItem extends EntityPathBase<SharingItem> {
+
+    private static final long serialVersionUID = 602141952L;
+
+    private static final PathInits INITS = PathInits.DIRECT2;
+
+    public static final QSharingItem sharingItem = new QSharingItem("sharingItem");
+
+    public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
+
+    public final StringPath category = createString("category");
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
+    public final DatePath<java.time.LocalDate> expirationDate = createDate("expirationDate", java.time.LocalDate.class);
+
+    public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final BooleanPath isVerified = createBoolean("isVerified");
+
+    public final ListPath<ItemImage, QItemImage> itemImages = this.<ItemImage, QItemImage>createList("itemImages", ItemImage.class, QItemImage.class, PathInits.DIRECT2);
+
+    public final com.onenth.OneNth.domain.member.entity.QMember member;
+
+    public final StringPath name = createString("name");
+
+    public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
+
+    public final com.onenth.OneNth.domain.region.entity.QRegion region;
+
+    public final NumberPath<Integer> salesPrice = createNumber("salesPrice", Integer.class);
+
+    public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.Status> status = createEnum("status", com.onenth.OneNth.domain.product.entity.enums.Status.class);
+
+    public final StringPath storageWay = createString("storageWay");
+
+    public final StringPath tradeLocation = createString("tradeLocation");
+
+    public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.TradeMethod> tradeMethod = createEnum("tradeMethod", com.onenth.OneNth.domain.product.entity.enums.TradeMethod.class);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
+
+    public QSharingItem(String variable) {
+        this(SharingItem.class, forVariable(variable), INITS);
+    }
+
+    public QSharingItem(Path<? extends SharingItem> path) {
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+    }
+
+    public QSharingItem(PathMetadata metadata) {
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QSharingItem(PathMetadata metadata, PathInits inits) {
+        this(SharingItem.class, metadata, inits);
+    }
+
+    public QSharingItem(Class<? extends SharingItem> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.member = inits.isInitialized("member") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("member")) : null;
+        this.region = inits.isInitialized("region") ? new com.onenth.OneNth.domain.region.entity.QRegion(forProperty("region")) : null;
+    }
+
+}
+
