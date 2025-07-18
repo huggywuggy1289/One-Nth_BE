@@ -177,12 +177,6 @@ public class PurchaseItemService {
     // 전체 상품 리스트 조회
     @Transactional(readOnly = true)
     public List<PurchaseItemListDTO> searchItems(String keyword, Long userId) {
-        // 대표 지역 1개 가져오기
-//        Region region = memberRegionRepository.findByMemberId(userId)
-//                .stream()
-//                .findFirst()
-//                .orElseThrow(() -> new IllegalStateException("회원의 지역이 설정되지 않았습니다."))
-//                .getRegion();
         List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
                 .stream()
                 .map(r -> r.getRegion().getId())
