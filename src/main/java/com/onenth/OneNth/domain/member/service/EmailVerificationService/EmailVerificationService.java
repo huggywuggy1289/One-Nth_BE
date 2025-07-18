@@ -26,8 +26,8 @@ public class EmailVerificationService {
             throw new RuntimeException("올바르지 않은 이메일 형식입니다.");
         }
 
+        // 이메일 중복 검증 (회원가입 DB와 연결 필요)
         if (memberRepository.existsByEmail(email)) {
-            // 이메일 중복 검증 (회원가입 DB와 연결 필요)
             throw new RuntimeException("이미 가입된 이메일입니다.");
         }
 

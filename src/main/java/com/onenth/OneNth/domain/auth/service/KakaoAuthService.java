@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-
 @Service
 @RequiredArgsConstructor
 public class KakaoAuthService {
@@ -49,7 +48,7 @@ public class KakaoAuthService {
         if (member.isPresent()) {
             //이미 가입한적 있다면 로그인 완료
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    member.get().getId(),      // Principal (User Identifier: subject에 들어감)
+                    member.get().getId(),
                     null,
                     Collections.emptyList()
             );
@@ -60,7 +59,7 @@ public class KakaoAuthService {
                     .isNew(false)
                     .build();
         }
-        //기존 가입 정보가 없는 경우 추가 정보 필요
+        //기존 가입 정보가 없는 경우 추가 정보 요청 분기로 넘어감
         else {
             return KakaoResponseDTO.KakaoLoginResponseDTO.builder()
                     .email(userInfo.getEmail())
@@ -76,7 +75,7 @@ public class KakaoAuthService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 지역 이름 입니다."));
 
         if (memberRepository.existsByEmailAndLoginType(request.getEmail(), LoginType.NORMAL)) {
-            throw new RuntimeException("이미 일반 회원가입을 진행한 사용자입니다.");
+            throw new RuntimeException("이미 일반 회원가입을 완료한 사용자입니다.");
         }
 
         Member member = MemberConverter.toMember(request, region);
@@ -84,6 +83,7 @@ public class KakaoAuthService {
 
         memberRepository.save(member);
 
+        // 소셜 회원 가입 완료 후 로그인 처리
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 member.getId(),
                 null,
@@ -98,7 +98,7 @@ public class KakaoAuthService {
                 .build();
     }
 
-    //프론트에서 받은 인가 코드로 access token 요청하는 메서드 구현
+    //프론트에서 받은 인가 코드로 access token 요청하는 메서드
     private String getKakaoAccessToken(String authorizationCode) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

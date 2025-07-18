@@ -57,6 +57,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<com.onenth.OneNth.domain.product.entity.SharingReview, com.onenth.OneNth.domain.product.entity.QSharingReview> sharingReviews = this.<com.onenth.OneNth.domain.product.entity.SharingReview, com.onenth.OneNth.domain.product.entity.QSharingReview>createList("sharingReviews", com.onenth.OneNth.domain.product.entity.SharingReview.class, com.onenth.OneNth.domain.product.entity.QSharingReview.class, PathInits.DIRECT2);
 
+    public final StringPath socialId = createString("socialId");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 

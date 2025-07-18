@@ -42,8 +42,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // 해당 JWT 토큰이 유효한지 검증해요. 파싱이 된다면 유효한 토큰이고,
-    // 토큰이 만료되었거나 (앞서 저희가 걸었던 4시간 제한을 넘어갔다거나) 혹은 위조, 형식 오류가 생기면 예외가 발생하여 false를 반환
+    // 토큰이 만료되었거나 혹은 위조, 형식 오류가 생기면 예외가 발생하여 false를 반환
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -79,8 +78,6 @@ public class JwtTokenProvider {
         return null;
     }
 
-    // resolveToken 으로 JWT Access Token 을 꺼냄 validateToken 으로 토큰의 유효성 검증
-    // 토큰이 유효하면 getAuthentication() 을 호출해서 이메일 등 사용자 정보를 꺼내고
     // Spring Security 의 Authentication 객체로 변환
     public Authentication extractAuthentication(HttpServletRequest request){
         String accessToken = resolveToken(request);

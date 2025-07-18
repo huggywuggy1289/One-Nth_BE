@@ -41,7 +41,8 @@ public class KakaoAuthController {
      */
     @Operation(
             summary = "카카오 회원가입 요청 API",
-            description = "처음 로그인 시도한 카카오 회원의 회원 정보를 등록하기 위한 API 로 카카오 로그인의 response의 isNew 값이 True 이면 해당 API 요청을 보내야합니다."
+            description = "처음 로그인 시도한 카카오 회원의 회원 정보를 등록하기 위한 API," +
+                    " 카카오 로그인의 응답 isNew 값이 True 이면 해당 API 요청을 보내야합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),

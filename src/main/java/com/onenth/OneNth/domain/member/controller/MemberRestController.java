@@ -43,7 +43,7 @@ public class MemberRestController {
      */
     @Operation(
             summary = "일반 로그인 API",
-            description = "일반 로그인을 진행합니다. 응답으로 JWT 토큰이 발급됩니다. 헤더에 담아서 사용하세요."
+            description = "일반 로그인을 진행합니다. 응답으로 JWT 토큰이 발급됩니다. 헤더에 담아서 인가에 사용하세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
