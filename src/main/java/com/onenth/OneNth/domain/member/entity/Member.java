@@ -32,7 +32,7 @@ public class Member extends BaseEntity {
     @Column(length=254, nullable=false, unique = true)
     private String email;
 
-    @Column(length=300, nullable=false)
+    //@Column(length=300, nullable=false) 소셜로그인은 NULL 가능
     private String password;
 
     @Column(length=10, nullable=false)
@@ -44,6 +44,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LoginType loginType;
+
+    private String socialId;
 
     private LocalDate inactiveDate;
 
@@ -57,6 +59,11 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberRegion> memberRegions = new ArrayList<>();
+
+    public void addMemberRegion(MemberRegion memberRegion) {
+        this.memberRegions.add(memberRegion);
+        memberRegion.setMember(this);
+    }
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alert> alerts = new ArrayList<>();
