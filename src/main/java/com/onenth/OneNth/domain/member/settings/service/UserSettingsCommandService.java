@@ -6,4 +6,6 @@ import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
 public interface UserSettingsCommandService {
 
     UserSettingsResponseDTO.AddMyRegionResponseDTO addMyRegion(Long userId, UserSettingsRequestDTO.AddMyRegionRequestDTO request);
+
+    void deleteMyRegion(Long userId, Long regionId);
 }

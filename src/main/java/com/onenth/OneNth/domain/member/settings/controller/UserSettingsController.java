@@ -5,16 +5,15 @@ import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
 import com.onenth.OneNth.domain.member.settings.service.UserSettingsCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
+import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user-settings")
@@ -37,10 +36,30 @@ public class UserSettingsController {
     })
     @PostMapping("/regions")
     public ApiResponse<UserSettingsResponseDTO.AddMyRegionResponseDTO> addMyRegion(
-            Long userId,
+            @Parameter(hidden=true) @AuthUser Long userId,
             @Valid @RequestBody UserSettingsRequestDTO.AddMyRegionRequestDTO request
     ) {
         return ApiResponse.onSuccess(userSettingsCommandService.addMyRegion(userId, request));
+    }
+
+    @Operation(
+            summary = "우리 동네 지역 삭제 API",
+            description = "사용자 설정 중 우리 동네로 등록한 지역을 삭제하는 API입니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 삭제 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER_REGION003", description = "해당 사용자가 등록하지 않은 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @DeleteMapping("/regions/{regionId}")
+    public ApiResponse<Void> deleteMyRegion(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @PathVariable Long regionId
+    ) {
+        userSettingsCommandService.deleteMyRegion(userId, regionId);
+        return ApiResponse.onSuccess(null);
     }
 
 }

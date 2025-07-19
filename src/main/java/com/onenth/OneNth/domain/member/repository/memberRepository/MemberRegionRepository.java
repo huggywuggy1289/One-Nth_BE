@@ -14,4 +14,5 @@ public interface MemberRegionRepository extends JpaRepository<MemberRegion, Long
     List<MemberRegion> findByMemberId(Long memberId);
     int countByMember(Member member);
     boolean existsByMemberAndRegion(Member member, Region region);
+    Optional<MemberRegion> findByMemberAndRegion(Member member, Region region);
 }

@@ -27,10 +27,8 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
     @Override
     public UserSettingsResponseDTO.AddMyRegionResponseDTO addMyRegion(Long userId, UserSettingsRequestDTO.AddMyRegionRequestDTO request) {
 
-        // feature/#1 병합 후 회원 연동
         Member member = memberRepository.findByIdWithRegions(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-
 
         Region region = regionRepository.findById(request.getRegionId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.REGION_NOT_FOUND));
@@ -50,5 +48,23 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
         return UserSettingsConverter.toAddMyRegionResponseDTO(memberRegion.getRegion());
     }
 
+    @Override
+    public void deleteMyRegion(Long userId, Long regionId) {
+
+        Member member = memberRepository.findByIdWithRegions(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Region region = regionRepository.findById(regionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.REGION_NOT_FOUND));
+
+        MemberRegion memberRegion = memberRegionRepository.findByMemberAndRegion(member, region)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_REGION_NOT_FOUND));
+
+        // TODO: 메인 지역 삭제 방지 로직은 추후 메인 지역 등록하는 로직 이슈에서 추가 예정
+
+        member.getMemberRegions().remove(memberRegion);
+        memberRegionRepository.delete(memberRegion);
+
+    }
 
 }
