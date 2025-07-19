@@ -46,7 +46,17 @@ public class PurchaseItemController {
         return ApiResponse.onSuccess(PurchaseItemConverter.toRegisterPurchaseItemResponseDTO(savedItemId));
     }
 
-    // 상품 검색(지역명 or 카테고리명 or 태그명) 역시 우리동네 지역추가로직 완성후 개발예정
+    // 상품 검색
+    @Operation(
+            summary = "같이사요 상품 검색",
+            description = """
+            키워드로 상품을 검색합니다.
+            
+            - `#태그명` : 설정한 3개 지역 내 태그로 검색
+            - `카테고리명` : 설정한 3개 지역 내 카테고리로 검색
+            - `지역명` : 설정과 무관하게 특정 지역명으로 검색
+            """
+    )
     @GetMapping
     public ResponseEntity<ApiResponse<List<PurchaseItemListDTO>>> searchItems(
             @RequestParam String keyword,
