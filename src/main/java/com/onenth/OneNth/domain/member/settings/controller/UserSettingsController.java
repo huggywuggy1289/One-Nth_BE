@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.member.settings.controller;
 import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
 import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
 import com.onenth.OneNth.domain.member.settings.service.UserSettingsCommandService;
+import com.onenth.OneNth.domain.member.settings.service.UserSettingsQueryService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserSettingsController {
 
     private final UserSettingsCommandService userSettingsCommandService;
+    private final UserSettingsQueryService userSettingsQueryService;
 
     @Operation(
             summary = "우리 동네 추가 API",
@@ -62,4 +64,21 @@ public class UserSettingsController {
         return ApiResponse.onSuccess(null);
     }
 
+    @Operation(
+            summary = "등록한 우리동네 지역 목록 조회 API",
+            description = "사용자 설정 중 우리 동네로 등록한 지역 목록을 조회하는 API입니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 우리 동네 지역 조회 성공", content = @Content(
+                    schema = @Schema(implementation = UserSettingsResponseDTO.MyRegionListResponseDTO.class)
+            )),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @GetMapping("/regions")
+    public ApiResponse<UserSettingsResponseDTO.MyRegionListResponseDTO> deleteMyRegions(
+            @Parameter(hidden=true) @AuthUser Long userId
+    ) {
+        return ApiResponse.onSuccess(userSettingsQueryService.getMyRegions(userId));
+    }
 }
