@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.product.controller;
 
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
+import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.service.reviewService.ReviewCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -9,6 +10,7 @@ import com.onenth.OneNth.global.apiPayload.exception.handler.PurchasingItemHandl
 import com.onenth.OneNth.global.apiPayload.exception.handler.SharingItemHandler;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -83,5 +85,22 @@ public class ReviewController {
         ReviewResponseDTO.successCreatePurchaseReviewDTO result
                 = reviewCommandService.createPurchaseItemReview(memberId,request,purchaseItemId, images);
         return ApiResponse.onSuccess(result);
+    }
+
+    @Operation(
+            summary = "내가 쓴 거래 후기 수정 API",
+            description ="사용자가 작성한 거래 후기의 '본문 내용'과 '별점(rate)'을 수정합니다. 본인이 작성한 리뷰에 대해서만 수정 권한이 있으며," +
+                    " itemType 파라미터를 통해 어떤 유형의 거래 후기인지(PURCHASE 또는 SHARE)를 구분합니다."
+    )
+    @PatchMapping(value = "/{reviewId}")
+    public ApiResponse<String> updateReview(
+            @AuthUser Long memberId,
+            @PathVariable("reviewId") Long reviewId,
+            @Parameter(description = "거래 유형 (PURCHASE: 같이 사요 후기, SHARE: 함께 나눠요 후기)")
+            @RequestParam("itemType") ItemType itemType,
+            @RequestBody ReviewRequestDTO.createReview request
+    ) {
+        reviewCommandService.updateReview(request, itemType, reviewId, memberId);
+        return ApiResponse.onSuccess("거래후기의 본문, 별점 수정이 완료되었습니다.");
     }
 }

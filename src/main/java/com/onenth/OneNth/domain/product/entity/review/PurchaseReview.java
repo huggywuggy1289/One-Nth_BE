@@ -1,10 +1,10 @@
-package com.onenth.OneNth.domain.product.entity;
+package com.onenth.OneNth.domain.product.entity.review;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import jakarta.persistence.*;
 import lombok.*;
-import com.onenth.OneNth.domain.member.entity.Member; //+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PurchaseReview extends BaseEntity {
+public class PurchaseReview extends BaseEntity implements Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,5 +41,15 @@ public class PurchaseReview extends BaseEntity {
 
     public void addReviewImage(PurchaseReviewImage image) {
         this.reviewImages.add(image);
+    }
+
+    @Override
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    @Override
+    public void setRate(BigDecimal rate) {
+        this.rate = rate;
     }
 }

@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.product.service.reviewService;
 
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
+import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface ReviewCommandService {
     ReviewResponseDTO.successCreatePurchaseReviewDTO createPurchaseItemReview(
             Long memberId, ReviewRequestDTO.createReview request,
             Long targetPurchaseItemId, List<MultipartFile> images);
+
+    void updateReview(ReviewRequestDTO.createReview request, ItemType itemType, Long reviewId, Long memberId);
 }

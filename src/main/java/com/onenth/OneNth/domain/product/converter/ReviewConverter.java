@@ -3,9 +3,9 @@ package com.onenth.OneNth.domain.product.converter;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
-import com.onenth.OneNth.domain.product.entity.PurchaseReview;
+import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
-import com.onenth.OneNth.domain.product.entity.SharingReview;
+import com.onenth.OneNth.domain.product.entity.review.SharingReview;
 
 public class ReviewConverter {
 

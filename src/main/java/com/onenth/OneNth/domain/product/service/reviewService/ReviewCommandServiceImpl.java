@@ -6,6 +6,8 @@ import com.onenth.OneNth.domain.product.converter.ReviewConverter;
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.entity.*;
+import com.onenth.OneNth.domain.product.entity.enums.ItemType;
+import com.onenth.OneNth.domain.product.entity.review.*;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
 import com.onenth.OneNth.domain.product.repository.reviewRepository.purchase.PurchaseReviewImageRepository;
@@ -14,6 +16,7 @@ import com.onenth.OneNth.domain.product.repository.reviewRepository.sharing.Shar
 import com.onenth.OneNth.domain.product.repository.reviewRepository.sharing.SharingReviewRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
+import com.onenth.OneNth.global.apiPayload.exception.handler.PurchasingItemHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.SharingItemHandler;
 import com.onenth.OneNth.global.aws.s3.AmazonS3Manager;
 import lombok.RequiredArgsConstructor;
@@ -24,18 +27,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-
 @Service
 @RequiredArgsConstructor
 public class ReviewCommandServiceImpl implements ReviewCommandService {
 
     private final MemberRepository memberRepository;
+
     private final SharingItemRepository sharingItemRepository;
     private final SharingReviewRepository sharingReviewRepository;
     private final SharingReviewImageRepository sharingReviewImageRepository;
+
     private final PurchaseItemRepository purchaseItemRepository;
     private final PurchaseReviewRepository purchaseReviewRepository;
     private final PurchaseReviewImageRepository purchaseReviewImageRepository;
+
     private final AmazonS3Manager amazonS3Manager;
 
     @Transactional
@@ -72,6 +77,26 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         saveReviewImages(images, review, ReviewType.PURCHASE);
 
         return new ReviewResponseDTO.successCreatePurchaseReviewDTO(review.getId());
+    }
+
+    @Transactional
+    @Override
+    public void updateReview(ReviewRequestDTO.createReview request, ItemType itemType, Long reviewId, Long memberId) {
+        Member member = findMemberById(memberId);
+
+        Review review = switch (itemType) {
+            case SHARE -> sharingReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new SharingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
+            case PURCHASE -> purchaseReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
+        };
+
+        if(!review.getMember().equals(member)) {
+            throw new MemberHandler(ErrorStatus._FORBIDDEN);
+        }
+
+        review.setContent(request.getContent());
+        review.setRate(request.getRate());
     }
 
     private void saveReviewImages(List<MultipartFile> images, Object review, ReviewType type) {

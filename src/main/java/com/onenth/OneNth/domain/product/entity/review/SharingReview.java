@@ -1,7 +1,8 @@
-package com.onenth.OneNth.domain.product.entity;
+package com.onenth.OneNth.domain.product.entity.review;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.product.entity.SharingItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SharingReview extends BaseEntity {
+public class SharingReview extends BaseEntity implements Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,5 +41,15 @@ public class SharingReview extends BaseEntity {
 
     public void addReviewImage(SharingReviewImage image) {
         this.reviewImages.add(image);
+    }
+
+    @Override
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    @Override
+    public void setRate(BigDecimal rate) {
+        this.rate = rate;
     }
 }

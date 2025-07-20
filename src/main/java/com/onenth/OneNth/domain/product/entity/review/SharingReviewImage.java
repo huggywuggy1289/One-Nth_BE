@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.product.entity;
+package com.onenth.OneNth.domain.product.entity.review;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import jakarta.persistence.*;
