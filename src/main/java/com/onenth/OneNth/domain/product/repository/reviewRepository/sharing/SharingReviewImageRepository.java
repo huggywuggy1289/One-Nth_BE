@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.product.repository;
+package com.onenth.OneNth.domain.product.repository.reviewRepository.sharing;
 
 import com.onenth.OneNth.domain.product.entity.SharingReviewImage;
 import org.springframework.data.jpa.repository.JpaRepository;
