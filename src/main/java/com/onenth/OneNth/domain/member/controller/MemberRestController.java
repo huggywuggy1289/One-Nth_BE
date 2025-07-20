@@ -57,20 +57,16 @@ public class MemberRestController {
     }
 
     /**
-     *  비밀번호 찾기 용 이메일 인증 번호 발송 API
+     *  이메일 인증 후 비밀번호 재설정 API
      */
-    @PostMapping("/password/request-code")
-    public ApiResponse<String> sendPasswordFindCode(@RequestBody MemberRequestDTO.PasswordFindRequestDTO request) {
-        emailVerificationService.sendCodeForPasswordReset(request);
-        return ApiResponse.onSuccess("이메일로 인증번호가 전송되었습니다.");
-    }
-
-    @PostMapping("/password/code-verify")
-    public ApiResponse<String> verifyPasswordFindCode(@RequestBody MemberRequestDTO.VerifyCodeRequestDTO request) {
-        emailVerificationService.verifyCode(request.getEmail(), request.getCode());
-        return ApiResponse.onSuccess("이메일 인증이 완료되었습니다. 비밀번호를 재설정 해주세요");
-    }
-
+    @Operation(
+            summary = "비밀번호 재설정 API",
+            description = "비밀번호를 재설정합니다. 비밀번호를 재설정하기 위해서는 이메일 인증을 우선 진행해주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
     @PostMapping("/password/reset")
     public ApiResponse<MemberResponseDTO.PasswordResetResultDTO> resetPassword(@RequestBody MemberRequestDTO.ResetPasswordRequestDTO request) {
         return ApiResponse.onSuccess(memberCommandService.resetPassword(request));

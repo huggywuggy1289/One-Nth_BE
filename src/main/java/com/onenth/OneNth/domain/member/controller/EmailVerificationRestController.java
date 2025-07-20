@@ -56,4 +56,38 @@ public class EmailVerificationRestController {
         emailVerificationService.verifyCode(request.getEmail(), request.getCode());
         return ApiResponse.onSuccess("이메일 인증이 완료되었습니다.");
     }
+
+    /**
+     *  비밀번호 찾기 용 이메일 인증번호 발송 API
+     */
+    @Operation(
+            summary = "비밀번호 찾기 용 이메일 인증번호 발송 API",
+            description = "비밀번호를 재설정하기 위해서 이메일 인증을 해야합니다. 인증번호를 요청해주세요"
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @PostMapping("/password/request-code")
+    public ApiResponse<String> sendPasswordFindCode(@RequestBody MemberRequestDTO.PasswordFindRequestDTO request) {
+        emailVerificationService.sendCodeForPasswordReset(request);
+        return ApiResponse.onSuccess("이메일로 인증번호가 전송되었습니다.");
+    }
+
+    /**
+     *  비밀번호 찾기 용 이메일 인증번호 검증 API
+     */
+    @Operation(
+            summary = "비밀번호 찾기 용 이메일 인증번호 검증 API",
+            description = "비밀번호를 재설정하기 위해서 발급받은 인증번호를 검증해주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @PostMapping("/password/code-verify")
+    public ApiResponse<String> verifyPasswordFindCode(@RequestBody MemberRequestDTO.VerifyCodeRequestDTO request) {
+        emailVerificationService.verifyCode(request.getEmail(), request.getCode());
+        return ApiResponse.onSuccess("이메일 인증이 완료되었습니다. 비밀번호를 재설정 해주세요");
+    }
 }
