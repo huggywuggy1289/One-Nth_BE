@@ -8,13 +8,14 @@ import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/group-purchases")
 @RequiredArgsConstructor
@@ -63,6 +64,7 @@ public class PurchaseItemController {
             @AuthUser Long userId
     ) {
         List<PurchaseItemListDTO> result = purchaseItemService.searchItems(keyword, userId);
+        log.info("keyword: [{}]", keyword);
         return ResponseEntity.ok(ApiResponse.onSuccess(result));
     }
 }

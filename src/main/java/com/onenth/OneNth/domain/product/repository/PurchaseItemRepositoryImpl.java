@@ -43,17 +43,16 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
     }
 
     @Override
-    public List<PurchaseItem> findByRegionName(String regionName) {
+    public List<PurchaseItem> findByRegionsName(String regionName) {
         QPurchaseItem item = QPurchaseItem.purchaseItem;
         QRegion region = QRegion.region;
+
+        String cleanKeyword = regionName.trim();
 
         return queryFactory
                 .selectFrom(item)
                 .join(item.region, region)
-                .where(region.regionName.contains(regionName))
+                .where(region.regionName.like("%" + cleanKeyword + "%"))
                 .fetch();
-
     }
-
-
 }

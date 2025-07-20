@@ -17,6 +17,7 @@ import com.onenth.OneNth.domain.product.repository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.TagRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
+import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class PurchaseItemService {
     private final ItemImageRepository itemImageRepository;
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
     private  final TagRepository tagRepository; // +
+    private final RegionRepository regionRepository;
 
     //s3 연동
     private final AmazonS3 amazonS3;
@@ -190,10 +192,11 @@ public class PurchaseItemService {
         } else if (isCategory(keyword)) {
             // 카테고리 검색 (설정 지역 내)
             items = purchaseItemRepository.findByRegionsAndCategory(regionIds, keyword);
-        } else {
+        } else if (isRegion(keyword)){
             // 지역명 검색 (모든 지역)
-            items = purchaseItemRepository.findByRegionName(keyword);
+            items = purchaseItemRepository.findByRegionsName(keyword);
         }
+        System.out.println("keyword: [" + keyword + "]");
 
         return PurchaseItemConverter.toPurchaseItemListDTOs(items);
     }
@@ -206,6 +209,11 @@ public class PurchaseItemService {
             return false;
             }
         }
+
+    private boolean isRegion(String keyword){
+        return regionRepository.findByRegionNameContaining(keyword).isPresent();
+    }
+
 
     // 단일 상품 리스트 조회
     }
