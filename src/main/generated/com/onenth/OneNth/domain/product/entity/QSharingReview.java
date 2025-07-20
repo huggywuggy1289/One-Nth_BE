@@ -35,6 +35,8 @@ public class QSharingReview extends EntityPathBase<SharingReview> {
 
     public final NumberPath<java.math.BigDecimal> rate = createNumber("rate", java.math.BigDecimal.class);
 
+    public final ListPath<SharingReviewImage, QSharingReviewImage> reviewImages = this.<SharingReviewImage, QSharingReviewImage>createList("reviewImages", SharingReviewImage.class, QSharingReviewImage.class, PathInits.DIRECT2);
+
     public final QSharingItem sharingItem;
 
     //inherited
