@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "`like`")
 public class Like extends BaseEntity {
 
     @Id
