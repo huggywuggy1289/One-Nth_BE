@@ -34,7 +34,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public MemberResponseDTO.SignupResultDTO signupMember(MemberRequestDTO.SignupDTO request) {
 
         //이메일 인증 여부 우선 확인
-        if (!emailVerificationService.isVerified(request.getEmail())) {
+        if (!emailVerificationService.isVerified(request.getEmail(), "signup")) {
             throw new RuntimeException("이메일 인증을 먼저 완료해주세요");
         }
 
@@ -78,5 +78,22 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 member.getId(),
                 accessToken
         );
+    }
+
+    @Override
+    public MemberResponseDTO.PasswordResetResultDTO resetPassword(MemberRequestDTO.ResetPasswordRequestDTO request) {
+        //이메일 인증 여부 확인
+        if (!emailVerificationService.isVerified(request.getEmail(), "reset_password")) {
+            throw new RuntimeException("이메일 인증이 완료되지 않았습니다.");
+        }
+
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+
+        // 새 비밀번호 암호화 저장
+        member.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        memberRepository.save(member);
+
+        return MemberResponseDTO.PasswordResetResultDTO.builder().isSuccess(true).build();
     }
 }

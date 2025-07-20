@@ -19,6 +19,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     boolean existsByEmailAndLoginType(String email, LoginType loginType);
 
+    Optional<Member> findByEmailAndName(String email, String name);
+
     @Query("SELECT m FROM Member m LEFT JOIN FETCH m.memberRegions WHERE m.id = :id")
     Optional<Member> findByIdWithRegions(@Param("id") Long id);
 

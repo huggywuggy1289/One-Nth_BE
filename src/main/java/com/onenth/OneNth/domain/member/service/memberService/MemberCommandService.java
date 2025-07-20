@@ -15,4 +15,7 @@ public interface MemberCommandService {
 
     //일반로그인 로직 구현
     MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.LoginRequestDTO request);
+
+    //비밀번호 재설정 로직 구현
+    MemberResponseDTO.PasswordResetResultDTO resetPassword(MemberRequestDTO.ResetPasswordRequestDTO request);
 }

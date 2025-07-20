@@ -36,6 +36,9 @@ public class SecurityConfig {
                                         "/api/auth/kakao/login",
                                         "/api/auth/kakao/signup",
                                         "/api/auth/kakao/callback",
+                                        "/api/email-auth/password/request-code",
+                                        "/api/email-auth/password/verify-code",
+                                        "/api/members/password/reset",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()

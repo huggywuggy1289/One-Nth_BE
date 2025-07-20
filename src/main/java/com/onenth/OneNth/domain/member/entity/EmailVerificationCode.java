@@ -28,6 +28,8 @@ public class EmailVerificationCode extends BaseEntity {
 
     private boolean isVerified = false;
 
+    private String purpose;
+
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiresAt);
     }
