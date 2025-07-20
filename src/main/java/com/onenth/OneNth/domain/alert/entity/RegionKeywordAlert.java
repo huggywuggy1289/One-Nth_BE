@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.alert.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.region.entity.Region;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +24,9 @@ public class RegionKeywordAlert extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
 
-    @Column(length = 20, nullable = false)
-    private String keyword;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private Region regionKeyword;
 
     @Column(nullable = false)
     private boolean enabled = true;

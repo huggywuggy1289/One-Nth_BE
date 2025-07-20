@@ -31,9 +31,9 @@ public class QRegionKeywordAlert extends EntityPathBase<RegionKeywordAlert> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath keyword = createString("keyword");
-
     public final com.onenth.OneNth.domain.member.entity.QMember member;
+
+    public final com.onenth.OneNth.domain.region.entity.QRegion regionKeyword;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
@@ -57,6 +57,7 @@ public class QRegionKeywordAlert extends EntityPathBase<RegionKeywordAlert> {
     public QRegionKeywordAlert(Class<? extends RegionKeywordAlert> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.member = inits.isInitialized("member") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("member")) : null;
+        this.regionKeyword = inits.isInitialized("regionKeyword") ? new com.onenth.OneNth.domain.region.entity.QRegion(forProperty("regionKeyword")) : null;
     }
 
 }
