@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,5 +49,5 @@ public class PostRestController {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return ApiResponse.of(SuccessStatus.POST_SAVE_SUCCESS, response);}
+        return ApiResponse.of(SuccessStatus._OK, response);}
 }
