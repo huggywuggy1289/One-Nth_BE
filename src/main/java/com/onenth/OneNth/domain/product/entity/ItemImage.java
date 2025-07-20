@@ -23,11 +23,11 @@ public class ItemImage extends BaseEntity {
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sharing_item_id", nullable = false)
+    @JoinColumn(name = "sharing_item_id", nullable = true)
     private SharingItem sharingItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchase_item_id", nullable = false)
+    @JoinColumn(name = "purchase_item_id", nullable = true)
     private PurchaseItem purchaseItem;
 
     @Enumerated(EnumType.STRING)

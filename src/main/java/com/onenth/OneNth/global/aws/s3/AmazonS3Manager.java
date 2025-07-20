@@ -73,7 +73,7 @@ public class AmazonS3Manager {
     public String generateReviewKeyName(String uuid) {
         return amazonConfig.getReview() + '/' + uuid;
     }
-    // 함께 사요 사진 저장은 해당 url 을 사용하여 저장
+    // 같이 사요 사진 저장은 해당 url 을 사용하여 저장
     public String generatePurchaseKeyName(String uuid) {
         return amazonConfig.getPurchase() + '/' + uuid;
     }
