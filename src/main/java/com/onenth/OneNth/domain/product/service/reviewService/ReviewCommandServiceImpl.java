@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.product.service;
+package com.onenth.OneNth.domain.product.service.reviewService;
 
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
@@ -24,84 +24,92 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+
 @Service
 @RequiredArgsConstructor
-public class ReviewCommandService {
+public class ReviewCommandServiceImpl implements ReviewCommandService {
 
     private final MemberRepository memberRepository;
     private final SharingItemRepository sharingItemRepository;
     private final SharingReviewRepository sharingReviewRepository;
     private final SharingReviewImageRepository sharingReviewImageRepository;
-    private final PurchaseReviewImageRepository purchaseReviewImageRepository;
     private final PurchaseItemRepository purchaseItemRepository;
     private final PurchaseReviewRepository purchaseReviewRepository;
+    private final PurchaseReviewImageRepository purchaseReviewImageRepository;
     private final AmazonS3Manager amazonS3Manager;
 
     @Transactional
-    public ReviewResponseDTO.successCreateSharingReviewDTO createsharingItemReview(
+    @Override
+    public ReviewResponseDTO.successCreateSharingReviewDTO createSharingItemReview(
             Long memberId, ReviewRequestDTO.createReview request,
             Long targetSharingItemId, List<MultipartFile> images) {
 
-        Member reviewer = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.USER_NOT_FOUND));
-
-        SharingItem sharingItem = sharingItemRepository.findById(targetSharingItemId)
+        Member reviewer = findMemberById(memberId);
+        SharingItem item = sharingItemRepository.findById(targetSharingItemId)
                 .orElseThrow(() -> new SharingItemHandler(ErrorStatus.SHARING_ITEM_NOT_FOUND));
 
-        SharingReview sharingReview = ReviewConverter.toSharingReview(request,reviewer,sharingItem);
-        sharingReviewRepository.save(sharingReview);
+        SharingReview review = ReviewConverter.toSharingReview(request, reviewer, item);
+        sharingReviewRepository.save(review);
 
-        if (images != null && !images.isEmpty()) {
-            saveReviewImages(images, sharingReview);
-        }
-        return new ReviewResponseDTO.successCreateSharingReviewDTO(sharingReview.getId());
+        saveReviewImages(images, review, ReviewType.SHARING);
+
+        return new ReviewResponseDTO.successCreateSharingReviewDTO(review.getId());
     }
 
     @Transactional
+    @Override
     public ReviewResponseDTO.successCreatePurchaseReviewDTO createPurchaseItemReview(
             Long memberId, ReviewRequestDTO.createReview request,
             Long targetPurchaseItemId, List<MultipartFile> images) {
 
-        Member reviewer = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.USER_NOT_FOUND));
-
-        PurchaseItem purchaseItem = purchaseItemRepository.findById(targetPurchaseItemId)
+        Member reviewer = findMemberById(memberId);
+        PurchaseItem item = purchaseItemRepository.findById(targetPurchaseItemId)
                 .orElseThrow(() -> new SharingItemHandler(ErrorStatus.PURCHASE_ITEM_NOT_FOUND));
 
-        PurchaseReview review = ReviewConverter.toPurchaseReview(request,reviewer,purchaseItem);
+        PurchaseReview review = ReviewConverter.toPurchaseReview(request, reviewer, item);
         purchaseReviewRepository.save(review);
 
-        if (images != null && !images.isEmpty()) {
-            for (MultipartFile image : images) {
-                String uuid = UUID.randomUUID().toString();
-                String keyName = amazonS3Manager.generateReviewKeyName(uuid);
-                String imageUrl = amazonS3Manager.uploadFile(keyName, image);
+        saveReviewImages(images, review, ReviewType.PURCHASE);
 
-                PurchaseReviewImage reviewImage = PurchaseReviewImage.builder()
-                        .imageUrl(imageUrl)
-                        .purchaseReview(review)
-                        .build();
-
-                purchaseReviewImageRepository.save(reviewImage);
-                review.addReviewImage(reviewImage);
-            }
-        }
         return new ReviewResponseDTO.successCreatePurchaseReviewDTO(review.getId());
     }
 
-    private void saveReviewImages(List<MultipartFile> images, SharingReview review) {
+    private void saveReviewImages(List<MultipartFile> images, Object review, ReviewType type) {
+        if (images == null || images.isEmpty()) return;
+
         for (MultipartFile image : images) {
             String uuid = UUID.randomUUID().toString();
             String keyName = amazonS3Manager.generateReviewKeyName(uuid);
             String imageUrl = amazonS3Manager.uploadFile(keyName, image);
 
-            SharingReviewImage reviewImage = SharingReviewImage.builder()
-                    .imageUrl(imageUrl)
-                    .sharingReview(review)
-                    .build();
+            if (type == ReviewType.SHARING && review instanceof SharingReview sharingReview) {
+                SharingReviewImage reviewImage = SharingReviewImage.builder()
+                        .imageUrl(imageUrl)
+                        .sharingReview(sharingReview)
+                        .build();
 
-            sharingReviewImageRepository.save(reviewImage);
-            review.addReviewImage(reviewImage);
+                sharingReviewImageRepository.save(reviewImage);
+                sharingReview.addReviewImage(reviewImage);
+            }
+
+            if (type == ReviewType.PURCHASE && review instanceof PurchaseReview purchaseReview) {
+                PurchaseReviewImage reviewImage = PurchaseReviewImage.builder()
+                        .imageUrl(imageUrl)
+                        .purchaseReview(purchaseReview)
+                        .build();
+
+                purchaseReviewImageRepository.save(reviewImage);
+                purchaseReview.addReviewImage(reviewImage);
+            }
         }
+    }
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.USER_NOT_FOUND));
+    }
+
+    private enum ReviewType {
+        SHARING, PURCHASE
     }
 }

@@ -2,7 +2,7 @@ package com.onenth.OneNth.domain.product.controller;
 
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
-import com.onenth.OneNth.domain.product.service.ReviewCommandService;
+import com.onenth.OneNth.domain.product.service.reviewService.ReviewCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.handler.PurchasingItemHandler;
@@ -51,7 +51,7 @@ public class ReviewController {
             throw new SharingItemHandler(ErrorStatus.EXCEED_REVIEW_IMAGE_LIMIT);
         }
         ReviewResponseDTO.successCreateSharingReviewDTO result
-                = reviewCommandService.createsharingItemReview(memberId,request,sharingItemId, images);
+                = reviewCommandService.createSharingItemReview(memberId,request,sharingItemId, images);
         return ApiResponse.onSuccess(result);
     }
 
