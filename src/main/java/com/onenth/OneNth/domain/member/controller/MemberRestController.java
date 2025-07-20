@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.member.controller;
 
 import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
+import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVerificationService;
 import com.onenth.OneNth.domain.member.service.memberService.MemberCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberRestController {
 
     private final MemberCommandService memberCommandService;
+    private final EmailVerificationService emailVerificationService;
 
     /**
      * 일반 회원가입 API 구현
@@ -52,6 +54,26 @@ public class MemberRestController {
     @PostMapping("/login")
     public ApiResponse<MemberResponseDTO.LoginResultDTO> login(@RequestBody @Valid MemberRequestDTO.LoginRequestDTO request) {
         return ApiResponse.onSuccess(memberCommandService.loginMember(request));
+    }
+
+    /**
+     *  비밀번호 찾기 용 이메일 인증 번호 발송 API
+     */
+    @PostMapping("/password/request-code")
+    public ApiResponse<String> sendPasswordFindCode(@RequestBody MemberRequestDTO.PasswordFindRequestDTO request) {
+        emailVerificationService.sendCodeForPasswordReset(request);
+        return ApiResponse.onSuccess("이메일로 인증번호가 전송되었습니다.");
+    }
+
+    @PostMapping("/password/code-verify")
+    public ApiResponse<String> verifyPasswordFindCode(@RequestBody MemberRequestDTO.VerifyCodeRequestDTO request) {
+        emailVerificationService.verifyCode(request.getEmail(), request.getCode());
+        return ApiResponse.onSuccess("이메일 인증이 완료되었습니다. 비밀번호를 재설정 해주세요");
+    }
+
+    @PostMapping("/password/reset")
+    public ApiResponse<MemberResponseDTO.PasswordResetResultDTO> resetPassword(@RequestBody MemberRequestDTO.ResetPasswordRequestDTO request) {
+        return ApiResponse.onSuccess(memberCommandService.resetPassword(request));
     }
 
 }

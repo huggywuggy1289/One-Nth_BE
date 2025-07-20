@@ -79,4 +79,21 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 accessToken
         );
     }
+
+    @Override
+    public MemberResponseDTO.PasswordResetResultDTO resetPassword(MemberRequestDTO.ResetPasswordRequestDTO request) {
+        //이메일 인증 여부 확인
+        if (!emailVerificationService.isVerified(request.getEmail())) {
+            throw new RuntimeException("이메일 인증이 완료되지 않았습니다.");
+        }
+
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+
+        // 새 비밀번호 암호화 저장
+        member.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        memberRepository.save(member);
+
+        return MemberResponseDTO.PasswordResetResultDTO.builder().isSuccess(true).build();
+    }
 }

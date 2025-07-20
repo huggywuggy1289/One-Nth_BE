@@ -32,10 +32,13 @@ public class SecurityConfig {
                                         "/api/members/signup",
                                         "/api/members/login",
                                         "/api/email-auth/request-code",
-                                        "/api/email-auth/verify-code",
+                                        "/api/email-auth/code-verify",
                                         "/api/auth/kakao/login",
                                         "/api/auth/kakao/signup",
                                         "/api/auth/kakao/callback",
+                                        "/api/members/password/request-code",
+                                        "/api/members/password/code-verify",
+                                        "/api/members/password/reset",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
