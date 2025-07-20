@@ -37,6 +37,8 @@ public class QPurchaseReview extends EntityPathBase<PurchaseReview> {
 
     public final NumberPath<java.math.BigDecimal> rate = createNumber("rate", java.math.BigDecimal.class);
 
+    public final ListPath<PurchaseReviewImage, QPurchaseReviewImage> reviewImages = this.<PurchaseReviewImage, QPurchaseReviewImage>createList("reviewImages", PurchaseReviewImage.class, QPurchaseReviewImage.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 

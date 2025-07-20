@@ -27,6 +27,9 @@ public class ReviewCommandService {
     private final SharingItemRepository sharingItemRepository;
     private final SharingReviewRepository sharingReviewRepository;
     private final SharingReviewImageRepository sharingReviewImageRepository;
+    private final PurchaseReviewImageRepository purchaseReviewImageRepository;
+    private final PurchaseItemRepository purchaseItemRepository;
+    private final PurchaseReviewRepository purchaseReviewRepository;
     private final AmazonS3Manager amazonS3Manager;
 
     @Transactional
@@ -47,6 +50,38 @@ public class ReviewCommandService {
             saveReviewImages(images, sharingReview);
         }
         return new ReviewResponseDTO.successCreateSharingReviewDTO(sharingReview.getId());
+    }
+
+    @Transactional
+    public ReviewResponseDTO.successCreatePurchaseReviewDTO createPurchaseItemReview(
+            Long memberId, ReviewRequestDTO.createReview request,
+            Long targetPurchaseItemId, List<MultipartFile> images) {
+
+        Member reviewer = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.USER_NOT_FOUND));
+
+        PurchaseItem purchaseItem = purchaseItemRepository.findById(targetPurchaseItemId)
+                .orElseThrow(() -> new SharingItemHandler(ErrorStatus.PURCHASE_ITEM_NOT_FOUND));
+
+        PurchaseReview review = ReviewConverter.toPurchaseReview(request,reviewer,purchaseItem);
+        purchaseReviewRepository.save(review);
+
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile image : images) {
+                String uuid = UUID.randomUUID().toString();
+                String keyName = amazonS3Manager.generateReviewKeyName(uuid);
+                String imageUrl = amazonS3Manager.uploadFile(keyName, image);
+
+                PurchaseReviewImage reviewImage = PurchaseReviewImage.builder()
+                        .imageUrl(imageUrl)
+                        .purchaseReview(review)
+                        .build();
+
+                purchaseReviewImageRepository.save(reviewImage);
+                review.addReviewImage(reviewImage);
+            }
+        }
+        return new ReviewResponseDTO.successCreatePurchaseReviewDTO(review.getId());
     }
 
     private void saveReviewImages(List<MultipartFile> images, SharingReview review) {

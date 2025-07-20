@@ -5,6 +5,7 @@ import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.service.ReviewCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.PurchasingItemHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.SharingItemHandler;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,27 +61,27 @@ public class ReviewController {
                     "같이 사요 거래가 완료된 후, 해당 거래에 대한 후기를 작성하는 API입니다." +
                             " 리뷰 내용, 별점과 함께 최대 3장의 이미지를 첨부할 수 있습니다."
     )
-    @PostMapping(value = "/sharings/{purchaseItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<ReviewResponseDTO.successCreateSharingReviewDTO> postPurchaseReview (
+    @PostMapping(value = "/purchase/{purchaseItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<ReviewResponseDTO.successCreatePurchaseReviewDTO> postPurchaseReview (
             @AuthUser Long memberId,
             @PathVariable("purchaseItemId") Long purchaseItemId,
             @RequestPart("review") ReviewRequestDTO.createReview request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
 
         if (request.getContent() == null || request.getContent().isBlank()) {
-            throw new SharingItemHandler(ErrorStatus.REVIEW_CONTENT_REQUIRED);
+            throw new PurchasingItemHandler(ErrorStatus.REVIEW_CONTENT_REQUIRED);
         }
         if (request.getRate() == null ||
                 request.getRate().compareTo(BigDecimal.ZERO) < 0 ||
                 request.getRate().compareTo(BigDecimal.valueOf(5.0)) > 0) {
-            throw new SharingItemHandler(ErrorStatus.REVIEW_RATE_OUT_OF_RANGE);
+            throw new PurchasingItemHandler(ErrorStatus.REVIEW_RATE_OUT_OF_RANGE);
         }
         if (images != null && images.size() > 3) {
-            throw new SharingItemHandler(ErrorStatus.EXCEED_REVIEW_IMAGE_LIMIT);
+            throw new PurchasingItemHandler(ErrorStatus.EXCEED_REVIEW_IMAGE_LIMIT);
         }
 
-        ReviewResponseDTO.successCreateSharingReviewDTO result
-                = reviewCommandService.createsharingItemReview(memberId,request,purchaseItemId, images);
+        ReviewResponseDTO.successCreatePurchaseReviewDTO result
+                = reviewCommandService.createPurchaseItemReview(memberId,request,purchaseItemId, images);
         return ApiResponse.onSuccess(result);
     }
 }

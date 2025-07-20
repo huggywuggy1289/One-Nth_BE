@@ -12,4 +12,11 @@ public class ReviewResponseDTO {
     public static class successCreateSharingReviewDTO {
         private Long sharingReviewId;
     }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    public static class successCreatePurchaseReviewDTO {
+        private Long puchaseReviewId;
+    }
 }

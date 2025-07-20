@@ -19,6 +19,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 함께 나눠요 관련
     SHARING_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SHARING_ITEM_4001", "존재하지 않는 품목입니다."),
 
+    // 같이 사요 관련
+    PURCHASE_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "PURCHASE_ITEM_4001", "존재하지 않는 품목입니다."),
+
     // 상품 리뷰 관련
     EXCEED_REVIEW_IMAGE_LIMIT(HttpStatus.BAD_REQUEST, "REVIEW_4001", "리뷰 이미지는 3장까지 업로드 가능합니다."),
     REVIEW_CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, "REVIEW_4002", "리뷰 내용을 입력해주세요."),
