@@ -5,12 +5,8 @@ import com.onenth.OneNth.domain.member.repository.memberRepository.MemberReposit
 import com.onenth.OneNth.domain.product.converter.ReviewConverter;
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
-import com.onenth.OneNth.domain.product.entity.SharingItem;
-import com.onenth.OneNth.domain.product.entity.SharingReview;
-import com.onenth.OneNth.domain.product.entity.SharingReviewImage;
-import com.onenth.OneNth.domain.product.repository.SharingItemRepository;
-import com.onenth.OneNth.domain.product.repository.SharingReviewImageRepository;
-import com.onenth.OneNth.domain.product.repository.SharingReviewRepository;
+import com.onenth.OneNth.domain.product.entity.*;
+import com.onenth.OneNth.domain.product.repository.*;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.SharingItemHandler;
@@ -35,7 +31,7 @@ public class ReviewCommandService {
 
     @Transactional
     public ReviewResponseDTO.successCreateSharingReviewDTO createsharingItemReview(
-            Long memberId, ReviewRequestDTO.createSharingReview request,
+            Long memberId, ReviewRequestDTO.createReview request,
             Long targetSharingItemId, List<MultipartFile> images) {
 
         Member reviewer = memberRepository.findById(memberId)

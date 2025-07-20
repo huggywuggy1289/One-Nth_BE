@@ -9,7 +9,7 @@ public class ReviewRequestDTO {
 
     @Getter
     @NoArgsConstructor
-    public static class createSharingReview{
+    public static class createReview{
         private String content;
         private BigDecimal rate;
     }
