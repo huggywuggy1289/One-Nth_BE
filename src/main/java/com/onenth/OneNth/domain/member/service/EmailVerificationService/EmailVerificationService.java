@@ -41,6 +41,7 @@ public class EmailVerificationService {
                 .code(code)
                 .expiresAt(LocalDateTime.now().plusMinutes(5))
                 .isVerified(false)
+                .purpose("signup")
                 .build();
 
         codeRepository.save(emailVerificationCode);
@@ -70,6 +71,7 @@ public class EmailVerificationService {
                 .code(code)
                 .expiresAt(LocalDateTime.now().plusMinutes(5))
                 .isVerified(false)
+                .purpose("reset_password")
                 .build();
 
         codeRepository.save(emailVerificationCode);
@@ -98,8 +100,8 @@ public class EmailVerificationService {
         return String.valueOf((int)(Math.random() * 900000) + 100000);
     }
 
-    public boolean isVerified(String email) {
-        return codeRepository.findTopByEmailOrderByExpiresAtDesc(email)
+    public boolean isVerified(String email, String purpose) {
+        return codeRepository.findTopByEmailAndPurposeOrderByExpiresAtDesc(email, purpose)
                 .map(EmailVerificationCode::isVerified)
                 .orElse(false);
     }

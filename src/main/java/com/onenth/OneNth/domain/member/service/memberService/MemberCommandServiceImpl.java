@@ -34,7 +34,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public MemberResponseDTO.SignupResultDTO signupMember(MemberRequestDTO.SignupDTO request) {
 
         //이메일 인증 여부 우선 확인
-        if (!emailVerificationService.isVerified(request.getEmail())) {
+        if (!emailVerificationService.isVerified(request.getEmail(), "signup")) {
             throw new RuntimeException("이메일 인증을 먼저 완료해주세요");
         }
 
@@ -83,7 +83,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     public MemberResponseDTO.PasswordResetResultDTO resetPassword(MemberRequestDTO.ResetPasswordRequestDTO request) {
         //이메일 인증 여부 확인
-        if (!emailVerificationService.isVerified(request.getEmail())) {
+        if (!emailVerificationService.isVerified(request.getEmail(), "reset_password")) {
             throw new RuntimeException("이메일 인증이 완료되지 않았습니다.");
         }
 

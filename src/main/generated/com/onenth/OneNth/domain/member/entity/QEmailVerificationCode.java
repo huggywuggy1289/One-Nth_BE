@@ -34,6 +34,8 @@ public class QEmailVerificationCode extends EntityPathBase<EmailVerificationCode
 
     public final BooleanPath isVerified = createBoolean("isVerified");
 
+    public final StringPath purpose = createString("purpose");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
