@@ -129,6 +129,29 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         review.getReviewImages().removeAll(imagesToRemove);
     }
 
+    @Transactional
+    @Override
+    public void uploadNewReviewImage(List<MultipartFile> images, ItemType itemType, Long reviewId, Long memberId) {
+        Member member = findMemberById(memberId);
+
+        Review review = switch (itemType) {
+            case SHARE -> sharingReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new SharingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
+            case PURCHASE -> purchaseReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
+        };
+
+        if (!review.getMember().equals(member)) {
+            throw new MemberHandler(ErrorStatus._FORBIDDEN);
+        }
+
+        if(itemType.equals(ItemType.SHARE)){
+            saveReviewImages(images, review, ReviewType.SHARING);
+        }else{
+            saveReviewImages(images, review, ReviewType.PURCHASE);
+        }
+    }
+
     private void saveReviewImages(List<MultipartFile> images, Object review, ReviewType type) {
         if (images == null || images.isEmpty()) return;
 

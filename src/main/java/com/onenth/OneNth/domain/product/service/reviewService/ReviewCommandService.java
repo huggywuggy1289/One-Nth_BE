@@ -19,4 +19,5 @@ public interface ReviewCommandService {
 
     void updateReview(ReviewRequestDTO.createReview request, ItemType itemType, Long reviewId, Long memberId);
     void deleteReviewImage(ReviewRequestDTO.DeleteReviewImages request, ItemType itemType, Long reviewId, Long memberId);
+    void uploadNewReviewImage(List<MultipartFile> images, ItemType itemType, Long reviewId, Long memberId);
 }

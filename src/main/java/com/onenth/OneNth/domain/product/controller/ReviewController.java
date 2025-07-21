@@ -136,6 +136,28 @@ public class ReviewController {
             @RequestBody ReviewRequestDTO.DeleteReviewImages deleteReviewImages
     ) {
         reviewCommandService.deleteReviewImage(deleteReviewImages, itemType, reviewId, memberId);
-        return ApiResponse.onSuccess("선택한 이미지들이 삭제되었습니다.");
+        return ApiResponse.onSuccess("선택한 거래 후기 이미지들이 삭제되었습니다.");
+    }
+
+    @Operation(
+            summary = "거래 후기 수정 - 이미지 추가 API",
+            description = """
+    작성한 거래 후기에서 후기 이미지를 새롭게 추가하는 API입니다. 거래 후기 수정에서 활용됩니다.
+    - URL 경로에 포함된 `reviewId` 위치에 수정할 후기의 ID를 넣어 요청합니다.
+    - 쿼리 파라미터 'itemType'에 후기에 '거래 유형'을 명시합니다. (('PURCHASE' (같이 사요), 'SHARE' (함께 나눠요))
+    - 'images' 필드에는 후기 이미지를 선택적으로 첨부할 수 있습니다.
+    - 본인만 이미지 추가 권한이 있습니다.
+    """
+    )
+    @PostMapping(value = "/{reviewId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<String> postReviewImages(
+            @AuthUser Long memberId,
+            @PathVariable("reviewId") Long reviewId,
+            @Parameter(description = "거래 유형 (PURCHASE: 같이 사요 후기, SHARE: 함께 나눠요 후기)")
+            @RequestParam("itemType") ItemType itemType,
+            @RequestPart(value = "images") List<MultipartFile> images
+    ) {
+        reviewCommandService.uploadNewReviewImage(images, itemType, reviewId, memberId);
+        return ApiResponse.onSuccess("거래 후기 이미지 추가가 완료되었습니다.");
     }
 }
