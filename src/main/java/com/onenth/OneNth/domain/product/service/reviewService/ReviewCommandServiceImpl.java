@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,6 +98,35 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
 
         review.setContent(request.getContent());
         review.setRate(request.getRate());
+    }
+
+    @Transactional
+    @Override
+    public void deleteReviewImage(ReviewRequestDTO.DeleteReviewImages request, ItemType itemType, Long reviewId, Long memberId) {
+        Member member = findMemberById(memberId);
+
+        Review review = switch (itemType) {
+            case SHARE -> sharingReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new SharingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
+            case PURCHASE -> purchaseReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
+        };
+
+        if (!review.getMember().equals(member)) {
+            throw new MemberHandler(ErrorStatus._FORBIDDEN);
+        }
+
+        List<Long> deleteImageList = request.getImageIds();
+        if (deleteImageList.isEmpty()) {
+            return;
+        }
+
+        List<ReviewImage> imagesToRemove = review.getReviewImages().stream()
+                .filter(img -> deleteImageList.contains(img.getId()))
+                .collect(Collectors.toList());
+
+        imagesToRemove.forEach(img -> amazonS3Manager.deleteFile(img.getImageUrl()));
+        review.getReviewImages().removeAll(imagesToRemove);
     }
 
     private void saveReviewImages(List<MultipartFile> images, Object review, ReviewType type) {

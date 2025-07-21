@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PurchaseReviewImage extends BaseEntity {
+public class PurchaseReviewImage extends BaseEntity implements ReviewImage{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,6 +21,6 @@ public class PurchaseReviewImage extends BaseEntity {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sharing_review_id", nullable = false)
+    @JoinColumn(name = "purchase_review_id", nullable = false)
     private PurchaseReview purchaseReview;
 }

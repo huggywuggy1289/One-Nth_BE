@@ -36,7 +36,7 @@ public class SharingReview extends BaseEntity implements Review {
     private Member member;
 
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "sharingReview", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SharingReviewImage> reviewImages = new ArrayList<>();
 
     public void addReviewImage(SharingReviewImage image) {
@@ -51,5 +51,10 @@ public class SharingReview extends BaseEntity implements Review {
     @Override
     public void setRate(BigDecimal rate) {
         this.rate = rate;
+    }
+
+    @Override
+    public List<ReviewImage> getReviewImages() {
+        return (List<ReviewImage>) (List<?>) this.reviewImages;
     }
 }

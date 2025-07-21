@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.product.controller;
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
+import com.onenth.OneNth.domain.product.repository.reviewRepository.purchase.PurchaseReviewImageRepository;
 import com.onenth.OneNth.domain.product.service.reviewService.ReviewCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -27,6 +28,7 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewCommandService reviewCommandService;
+    private final PurchaseReviewImageRepository purchaseReviewImageRepository;
 
     @Operation(
             summary = "거래 후기 작성 API (함께 나눠요)",
@@ -102,5 +104,28 @@ public class ReviewController {
     ) {
         reviewCommandService.updateReview(request, itemType, reviewId, memberId);
         return ApiResponse.onSuccess("거래후기의 본문, 별점 수정이 완료되었습니다.");
+    }
+
+    @Operation(
+            summary = "거래 후기 이미지 선택 삭제 API",
+            description = """
+        사용자가 작성한 거래 후기에서 특정 이미지들만 삭제합니다. 거래 후기 수정에 사용됩니다.
+        - PathVariable: reviewId는 후기 ID입니다.
+        - RequestParam: itemType은 후기의 거래 유형입니다. (PURCHASE / SHARE)
+        - RequestBody: 삭제할 이미지들의 ID 리스트입니다.
+        """
+    )
+    @DeleteMapping("/{reviewId}/images")
+    public ApiResponse<String> deleteSelectedReviewImages(
+            @AuthUser Long memberId,
+            @PathVariable("reviewId") Long reviewId,
+
+            @Parameter(description = "거래 유형 (PURCHASE: 같이 사요 후기, SHARE: 함께 나눠요 후기)")
+            @RequestParam("itemType") ItemType itemType,
+
+            @RequestBody ReviewRequestDTO.DeleteReviewImages deleteReviewImages
+    ) {
+        reviewCommandService.deleteReviewImage(deleteReviewImages, itemType, reviewId, memberId);
+        return ApiResponse.onSuccess("선택한 이미지들이 삭제되었습니다.");
     }
 }

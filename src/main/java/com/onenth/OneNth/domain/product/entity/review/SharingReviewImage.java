@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SharingReviewImage extends BaseEntity {
+public class SharingReviewImage extends BaseEntity implements ReviewImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
