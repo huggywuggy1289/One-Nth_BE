@@ -49,7 +49,7 @@ public class ReviewController {
             throw new SharingItemHandler(ErrorStatus.REVIEW_CONTENT_REQUIRED);
         }
         if (request.getRate() == null ||
-                request.getRate().compareTo(BigDecimal.ZERO) < 0 ||
+                request.getRate().compareTo(BigDecimal.valueOf(0.5)) < 0 ||
                 request.getRate().compareTo(BigDecimal.valueOf(5.0)) > 0) {
             throw new SharingItemHandler(ErrorStatus.REVIEW_RATE_OUT_OF_RANGE);
         }
@@ -82,9 +82,9 @@ public class ReviewController {
             throw new PurchasingItemHandler(ErrorStatus.REVIEW_CONTENT_REQUIRED);
         }
         if (request.getRate() == null ||
-                request.getRate().compareTo(BigDecimal.ZERO) < 0 ||
+                request.getRate().compareTo(BigDecimal.valueOf(0.5)) < 0 ||
                 request.getRate().compareTo(BigDecimal.valueOf(5.0)) > 0) {
-            throw new PurchasingItemHandler(ErrorStatus.REVIEW_RATE_OUT_OF_RANGE);
+            throw new SharingItemHandler(ErrorStatus.REVIEW_RATE_OUT_OF_RANGE);
         }
         if (images != null && images.size() > 3) {
             throw new PurchasingItemHandler(ErrorStatus.EXCEED_REVIEW_IMAGE_LIMIT);
@@ -113,6 +113,14 @@ public class ReviewController {
             @RequestParam("itemType") ItemType itemType,
             @RequestBody ReviewRequestDTO.createReview request
     ) {
+        if (request.getContent() == null || request.getContent().isBlank()) {
+            throw new SharingItemHandler(ErrorStatus.REVIEW_CONTENT_REQUIRED);
+        }
+        if (request.getRate() == null ||
+                request.getRate().compareTo(BigDecimal.valueOf(0.5)) < 0 ||
+                request.getRate().compareTo(BigDecimal.valueOf(5.0)) > 0) {
+            throw new SharingItemHandler(ErrorStatus.REVIEW_RATE_OUT_OF_RANGE);
+        }
         reviewCommandService.updateReview(request, itemType, reviewId, memberId);
         return ApiResponse.onSuccess("거래후기의 본문, 별점 수정이 완료되었습니다.");
     }
