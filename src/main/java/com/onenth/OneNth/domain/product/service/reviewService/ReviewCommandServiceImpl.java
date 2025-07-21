@@ -184,7 +184,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
 
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
     private enum ReviewType {
