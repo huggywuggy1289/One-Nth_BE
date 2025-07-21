@@ -2,7 +2,6 @@ package com.onenth.OneNth.global.apiPayload.code.status;
 
 import com.onenth.OneNth.global.apiPayload.code.BaseErrorCode;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
-import com.onenth.OneNth.global.apiPayload.exception.handler.SharingItemHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,14 @@ public enum ErrorStatus implements BaseErrorCode {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW_4000", "존재하지 않는 리뷰입니다."),
     EXCEED_REVIEW_IMAGE_LIMIT(HttpStatus.BAD_REQUEST, "REVIEW_4001", "리뷰 이미지는 3장까지 업로드 가능합니다."),
     REVIEW_CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, "REVIEW_4002", "리뷰 내용을 입력해주세요."),
-    REVIEW_RATE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "REVIEW_4003", "평점은 0.5 이상 5 이하이어야 합니다.");
+    REVIEW_RATE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "REVIEW_4003", "평점은 0.5 이상 5 이하이어야 합니다."),
+
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER01", "존재하지 않는 사용자입니다."),
+    REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "REGION001", "존재하지 않는 지역입니다."),
+
+    REGION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "MEMBER_REGION001", "등록 가능한 지역은 최대 3개입니다."),
+    REGION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER_REGION002", "이미 등록한 지역입니다."),
+    MEMBER_REGION_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER_REGION003", "해당 사용자가 등록하지 않은 지역입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
