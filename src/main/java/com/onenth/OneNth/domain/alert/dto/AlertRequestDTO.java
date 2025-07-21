@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AlertRequestDTO {
 
     @Getter
@@ -34,6 +37,18 @@ public class AlertRequestDTO {
         @Schema(description = "알람 활성화 여부", example = "true")
         @NotNull(message = "알림 활성화 여부는 필수입니다.")
         private Boolean isEnabled;
+
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class UpdateKeywordAlertListRequestDTO {
+
+        @Schema(description = "상품 키워드 id 리스트", example = "[1, 2, 3]")
+        private List<Long> productKeywordIdList = new ArrayList<>();
+
+        @Schema(description = "지역 키워드 id 리스트", example = "[1, 3]")
+        private List<Long> regionKeywordIdList = new ArrayList<>();
 
     }
 }

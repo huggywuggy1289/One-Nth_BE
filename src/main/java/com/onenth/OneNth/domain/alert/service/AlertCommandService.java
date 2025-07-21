@@ -20,4 +20,9 @@ public interface AlertCommandService {
             Long keywordAlertId,
             AlertRequestDTO.SetKeywordAlertStatusRequestDTO request
     );
+
+    AlertResponseDTO.AlertListResponseDTO updateKeywordAlertList(
+            Long userId,
+            AlertRequestDTO.UpdateKeywordAlertListRequestDTO request
+    );
 }

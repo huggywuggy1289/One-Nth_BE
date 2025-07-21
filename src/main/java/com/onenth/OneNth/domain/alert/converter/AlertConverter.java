@@ -1,10 +1,14 @@
 package com.onenth.OneNth.domain.alert.converter;
 
 import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
+import com.onenth.OneNth.domain.alert.entity.Alert;
 import com.onenth.OneNth.domain.alert.entity.KeywordAlert;
 import com.onenth.OneNth.domain.alert.entity.RegionKeywordAlert;
+import com.onenth.OneNth.domain.alert.entity.enums.KeywordAlertType;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.region.entity.Region;
+
+import java.util.List;
 
 public class AlertConverter {
 
@@ -53,6 +57,30 @@ public class AlertConverter {
                 .keywordAlertId(keywordAlert.getId())
                 .keyword(keywordAlert.getKeyword())
                 .enabled(keywordAlert.isEnabled())
+                .build();
+    }
+
+    public static AlertResponseDTO.AlertListResponseDTO toAlertListResponseDTO(List<AlertResponseDTO.AlertSummary> alertSummaryList) {
+        return AlertResponseDTO.AlertListResponseDTO.builder()
+                .alertSummaryList(alertSummaryList)
+                .build();
+    }
+
+    public static AlertResponseDTO.AlertSummary toAlertSummaryFromProductKeywordAlert(KeywordAlert keywordAlert) {
+        return AlertResponseDTO.AlertSummary.builder()
+                .keywordAlertType(KeywordAlertType.PRODUCT)
+                .alertId(keywordAlert.getId())
+                .keyword(keywordAlert.getKeyword())
+                .enabled(keywordAlert.isEnabled())
+                .build();
+    }
+
+    public static AlertResponseDTO.AlertSummary toAlertSummaryFromRegionKeywordAlert(RegionKeywordAlert regionKeywordAlert) {
+        return AlertResponseDTO.AlertSummary.builder()
+                .keywordAlertType(KeywordAlertType.REGION)
+                .alertId(regionKeywordAlert.getId())
+                .keyword(regionKeywordAlert.getRegionKeyword().getRegionName())
+                .enabled(regionKeywordAlert.isEnabled())
                 .build();
     }
 }

@@ -102,4 +102,23 @@ public class AlertController {
     ) {
         return ApiResponse.onSuccess(alertCommandService.setKeywordAlertStatus(userId, keywordAlertId, request));
     }
+
+    @Operation(
+            summary = "키워드(지역, 일반 포함) 알림 목록 수정 API",
+            description = "사용자 설정 중 키워드 알림 목록을 수정하는 API입니다. 응답으로 KeywordAlertType(region/product), alertId, keyword, 알림 활성화 여부(enabled)를 하나의 객체로 갖는 리스트를 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 키워드 알림 상태 업데이트 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT003", description = "해당 키워드 알림이 존재하지 않거나 접근 권한이 없습니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION_ALERT003", description = "해당 지역 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PatchMapping("/keyword-alerts")
+    public ApiResponse<AlertResponseDTO.AlertListResponseDTO> updateKeywordAlertList(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @RequestBody AlertRequestDTO.UpdateKeywordAlertListRequestDTO request
+    ) {
+        return ApiResponse.onSuccess(alertCommandService.updateKeywordAlertList(userId, request));
+    }
 }
