@@ -64,4 +64,23 @@ public class AlertController {
     ) {
         return ApiResponse.onSuccess(alertCommandService.setRegionAlertStatus(userId, regionKeywordAlertId, request));
     }
+
+    @Operation(
+            summary = "일반 키워드 알림 등록 API",
+            description = "사용자 설정 중 일반 키워드를 알림으로 등록하는 API입니다. 응답으로 keywordAlertId와 keyword, 알림 활성화 여부(enabled)을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 키워드 알림 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT001", description = "등록 가능 키워드 알림은 최대 5개입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT002", description = "이미 알림으로 등록한 키워드입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PostMapping("/keyword-alerts")
+    public ApiResponse<AlertResponseDTO.AddKeywordAlertResponseDTO> addKeywordAlert(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @Valid @RequestBody AlertRequestDTO.AddKeywordAlertRequestDTO request
+    ) {
+        return ApiResponse.onSuccess(alertCommandService.addKeyword(userId, request));
+    }
 }

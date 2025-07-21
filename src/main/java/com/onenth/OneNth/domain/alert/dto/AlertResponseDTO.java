@@ -20,4 +20,13 @@ public class AlertResponseDTO {
         private String regionKeywordName;
         private boolean enabled;
     }
+
+    @Getter
+    @Builder
+    public static class AddKeywordAlertResponseDTO {
+        private Long keywordAlertId;
+        private String keyword;
+        private boolean enabled;
+    }
+
 }

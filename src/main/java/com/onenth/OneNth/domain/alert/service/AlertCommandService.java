@@ -11,4 +11,7 @@ public interface AlertCommandService {
             Long userId,
             Long regionKeywordAlertId,
             AlertRequestDTO.SetRegionAlertStatusRequestDTO request);
+
+    AlertResponseDTO.AddKeywordAlertResponseDTO addKeyword(Long userId, AlertRequestDTO.AddKeywordAlertRequestDTO request);
+
 }

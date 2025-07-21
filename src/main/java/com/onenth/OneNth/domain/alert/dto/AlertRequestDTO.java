@@ -16,4 +16,14 @@ public class AlertRequestDTO {
         private Boolean isEnabled;
 
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class AddKeywordAlertRequestDTO {
+
+        @Schema(description = "알람으로 등록할 키워드", example = "욕실청소")
+        @NotNull(message = "키워드로 등록할 단어를 입력해주세요.")
+        private String keyword;
+
+    }
 }

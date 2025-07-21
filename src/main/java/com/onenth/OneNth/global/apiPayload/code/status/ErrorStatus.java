@@ -22,7 +22,11 @@ public enum ErrorStatus implements BaseErrorCode {
 
     REGION_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "REGION_ALERT001", "등록 가능한 지역 알림은 최대 3개입니다."),
     REGION_KEYWORD_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "REGION_ALERT002", "이미 알림으로 등록한 지역입니다."),
-    REGION_KEYWORD_NOT_FOUND_OR_NOT_YOURS(HttpStatus.BAD_REQUEST, "REGION_ALERT003", "해당 지역 키워드 알림이 존재하지 않거나 접근 권한이 없습니다")
+    REGION_KEYWORD_NOT_FOUND_OR_NOT_YOURS(HttpStatus.BAD_REQUEST, "REGION_ALERT003", "해당 지역 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
+
+    KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT001", "등록 가능한 키워드 알림은 최대 5개입니다."),
+    KEYWORD_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT002", "이미 알림으로 등록한 키워드입니다."),
+
     ;
     
     private final HttpStatus httpStatus;

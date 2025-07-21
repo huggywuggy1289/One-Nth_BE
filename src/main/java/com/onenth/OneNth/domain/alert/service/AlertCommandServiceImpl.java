@@ -3,7 +3,9 @@ package com.onenth.OneNth.domain.alert.service;
 import com.onenth.OneNth.domain.alert.converter.AlertConverter;
 import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
 import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
+import com.onenth.OneNth.domain.alert.entity.KeywordAlert;
 import com.onenth.OneNth.domain.alert.entity.RegionKeywordAlert;
+import com.onenth.OneNth.domain.alert.repository.KeywordAlertRepository;
 import com.onenth.OneNth.domain.alert.repository.RegionKeywordAlertRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class AlertCommandServiceImpl implements AlertCommandService {
 
     private final RegionKeywordAlertRepository regionKeywordAlertRepository;
+    private final KeywordAlertRepository keywordAlertRepository;
     private final MemberRepository memberRepository;
     private final RegionRepository regionRepository;
 
@@ -43,7 +46,7 @@ public class AlertCommandServiceImpl implements AlertCommandService {
 
         RegionKeywordAlert regionKeywordAlert = AlertConverter.toRegionKeywordAlert(member, region);
 
-        return AlertConverter.toAddAlertResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
+        return AlertConverter.toAddRegionAlertResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
 
     }
 
@@ -68,4 +71,23 @@ public class AlertCommandServiceImpl implements AlertCommandService {
         return AlertConverter.toSetRegionAlertStatusResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
     }
 
+    @Override
+    public AlertResponseDTO.AddKeywordAlertResponseDTO addKeyword(Long userId, AlertRequestDTO.AddKeywordAlertRequestDTO request) {
+
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        if (keywordAlertRepository.countByMember(member) >= 5) {
+            throw new GeneralException(ErrorStatus.KEYWORD_LIMIT_EXCEEDED);
+        }
+
+        if (keywordAlertRepository.existsByMemberAndKeyword(member, request.getKeyword())) {
+            throw new GeneralException(ErrorStatus.KEYWORD_ALREADY_EXISTS);
+        }
+
+        KeywordAlert keywordAlert = AlertConverter.toKeywordAlert(member, request.getKeyword());
+
+        return AlertConverter.toAddKeywordAlertResponse(keywordAlertRepository.save(keywordAlert));
+
+    }
 }
