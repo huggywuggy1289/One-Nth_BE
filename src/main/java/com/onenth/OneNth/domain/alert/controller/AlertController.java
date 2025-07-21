@@ -83,4 +83,23 @@ public class AlertController {
     ) {
         return ApiResponse.onSuccess(alertCommandService.addKeyword(userId, request));
     }
+
+    @Operation(
+            summary = "일반 키워드 알림 on/off API",
+            description = "사용자 설정 중 키워드 알림을 끄거나 켜는 API입니다. 응답으로 keywordAlertId와 keywordName, 알림 활성화 여부(enabled)을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 키워드 알림 상태 업데이트 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT003", description = "해당 키워드 알림이 존재하지 않거나 접근 권한이 없습니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PatchMapping("/keyword-alerts/{keywordAlertId}")
+    public ApiResponse<AlertResponseDTO.SetKeywordAlertStatusResponseDTO> setKeywordAlertStatus(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @PathVariable Long keywordAlertId,
+            @RequestBody AlertRequestDTO.SetKeywordAlertStatusRequestDTO request
+    ) {
+        return ApiResponse.onSuccess(alertCommandService.setKeywordAlertStatus(userId, keywordAlertId, request));
+    }
 }

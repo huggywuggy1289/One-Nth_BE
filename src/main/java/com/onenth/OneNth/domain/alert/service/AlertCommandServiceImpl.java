@@ -90,4 +90,26 @@ public class AlertCommandServiceImpl implements AlertCommandService {
         return AlertConverter.toAddKeywordAlertResponse(keywordAlertRepository.save(keywordAlert));
 
     }
+
+    @Override
+    public AlertResponseDTO.SetKeywordAlertStatusResponseDTO setKeywordAlertStatus(
+            Long userId,
+            Long keywordAlertId,
+            AlertRequestDTO.SetKeywordAlertStatusRequestDTO request) {
+
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        KeywordAlert keywordAlert = keywordAlertRepository.findByIdAndMember(keywordAlertId, member)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.KEYWORD_NOT_FOUND_OR_NOT_YOURS));
+
+        if (request.getIsEnabled()) {
+            keywordAlert.enable();
+        } else {
+            keywordAlert.disable();
+        }
+
+        return AlertConverter.toSetKeywordAlertStatusResponseDTO(keywordAlertRepository.save(keywordAlert));
+    }
+
 }

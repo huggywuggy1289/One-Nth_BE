@@ -47,4 +47,12 @@ public class AlertConverter {
                 .enabled(keywordAlert.isEnabled())
                 .build();
     }
+
+    public static AlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(KeywordAlert keywordAlert) {
+        return AlertResponseDTO.SetKeywordAlertStatusResponseDTO.builder()
+                .keywordAlertId(keywordAlert.getId())
+                .keyword(keywordAlert.getKeyword())
+                .enabled(keywordAlert.isEnabled())
+                .build();
+    }
 }

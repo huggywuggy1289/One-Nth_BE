@@ -29,4 +29,11 @@ public class AlertResponseDTO {
         private boolean enabled;
     }
 
+    @Getter
+    @Builder
+    public static class SetKeywordAlertStatusResponseDTO {
+        private Long keywordAlertId;
+        private String keyword;
+        private boolean enabled;
+    }
 }

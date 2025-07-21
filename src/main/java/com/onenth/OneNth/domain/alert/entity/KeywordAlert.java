@@ -27,4 +27,12 @@ public class KeywordAlert extends BaseEntity {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    public void enable() {
+        enabled = true;
+    }
+
+    public void disable() {
+        enabled = false;
+    }
+
 }
