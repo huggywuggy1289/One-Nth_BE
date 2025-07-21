@@ -3,7 +3,6 @@ package com.onenth.OneNth.domain.product.controller;
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
-import com.onenth.OneNth.domain.product.repository.reviewRepository.purchase.PurchaseReviewImageRepository;
 import com.onenth.OneNth.domain.product.service.reviewService.ReviewCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -24,17 +23,20 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
-@Tag(name = "거래 후기(리뷰) 관련 API", description = "거래 후기 관련 API입니다.")
+@Tag(name = "거래 후기(리뷰) 관련 API", description = "거래 후기 작성, 수정 관련 API 지원")
 public class ReviewController {
 
     private final ReviewCommandService reviewCommandService;
-    private final PurchaseReviewImageRepository purchaseReviewImageRepository;
 
     @Operation(
             summary = "거래 후기 작성 API (함께 나눠요)",
-            description =
-                    "함께 나눠요 거래가 완료된 후, 해당 거래에 대한 후기를 작성하는 API입니다." +
-                    " 리뷰 내용, 별점과 함께 최대 3장의 이미지를 첨부할 수 있습니다."
+            description = """
+    '함께 나눠요' 거래가 완료된 후, 거래에 대한 후기를 작성하는 API입니다.
+    - URL 경로에 포함된 `sharingItemId` 위치에 후기를 남길 물품의 ID를 넣어 요청합니다.
+    - 'review' 필드에 후기 내용과 별점 정보를 JSON 문자열로 포함해야 합니다.
+    - 'images' 필드에는 최대 3장까지 후기 이미지를 선택적으로 첨부할 수 있습니다.
+    - 별점은 0.5 이상 5.0 이하의 숫자여야 합니다.
+    """
     )
     @PostMapping(value = "/sharings/{sharingItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ReviewResponseDTO.successCreateSharingReviewDTO> postSharingReview (
@@ -61,9 +63,13 @@ public class ReviewController {
 
     @Operation(
             summary = "거래 후기 작성 API (같이 사요)",
-            description =
-                    "같이 사요 거래가 완료된 후, 해당 거래에 대한 후기를 작성하는 API입니다." +
-                            " 리뷰 내용, 별점과 함께 최대 3장의 이미지를 첨부할 수 있습니다."
+            description = """
+    '같이 사요' 거래가 완료된 후, 거래에 대한 후기를 작성하는 API입니다.
+    - URL 경로에 포함된 `purchaseItemId` 위치에 후기를 남길 물품의 ID를 넣어 요청합니다.
+    - 'review' 필드에 후기 내용과 별점 정보를 JSON 문자열로 포함해야 합니다.
+    - 'images' 필드에는 최대 3장까지 후기 이미지를 선택적으로 첨부할 수 있습니다.
+    - 별점은 0.5 이상 5.0 이하의 숫자여야 합니다.
+    """
     )
     @PostMapping(value = "/purchase/{purchaseItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ReviewResponseDTO.successCreatePurchaseReviewDTO> postPurchaseReview (
@@ -90,9 +96,14 @@ public class ReviewController {
     }
 
     @Operation(
-            summary = "내가 쓴 거래 후기 수정 API",
-            description ="사용자가 작성한 거래 후기의 '본문 내용'과 '별점(rate)'을 수정합니다. 본인이 작성한 리뷰에 대해서만 수정 권한이 있으며," +
-                    " itemType 파라미터를 통해 어떤 유형의 거래 후기인지(PURCHASE 또는 SHARE)를 구분합니다."
+            summary = "거래 후기 수정 - 본문, 별점 수정 API",
+            description = """
+    작성한 거래 후기의 내용과 별점을 수정하는 API입니다. 거래 후기 수정에서 활용됩니다.
+    - URL 경로에 포함된 `reviewId` 위치에 수정할 후기의 ID를 넣어 요청합니다.
+    - 쿼리 파라미터 'itemType'에 후기의 '거래 유형'을 명시합니다. ('PURCHASE' (같이 사요), 'SHARE' (함께 나눠요))
+    - 요청 본문에 수정할 후기 내용과 별점을 JSON 형식으로 포함합니다.
+    - 본인만 수정 권한이 있습니다.
+    """
     )
     @PatchMapping(value = "/{reviewId}")
     public ApiResponse<String> updateReview(
@@ -107,22 +118,21 @@ public class ReviewController {
     }
 
     @Operation(
-            summary = "거래 후기 이미지 선택 삭제 API",
+            summary = "거래 후기 수정 - 이미지 선택 삭제 API",
             description = """
-        사용자가 작성한 거래 후기에서 특정 이미지들만 삭제합니다. 거래 후기 수정에 사용됩니다.
-        - PathVariable: reviewId는 후기 ID입니다.
-        - RequestParam: itemType은 후기의 거래 유형입니다. (PURCHASE / SHARE)
-        - RequestBody: 삭제할 이미지들의 ID 리스트입니다.
-        """
+    작성한 거래 후기에서 삭제를 원하는 이미지들만 삭제하는 API입니다. 거래 후기 수정에서 활용됩니다.
+    - URL 경로에 포함된 `reviewId` 위치에 수정할 후기의 ID를 넣어 요청합니다.
+    - 쿼리 파라미터 'itemType'에 후기에 '거래 유형'을 명시합니다. (('PURCHASE' (같이 사요), 'SHARE' (함께 나눠요))
+    - 요청 본문에 삭제할 이미지의 ID 리스트를 JSON 배열로 포함합니다.
+    - 본인만 삭제 권한이 있습니다.
+    """
     )
     @DeleteMapping("/{reviewId}/images")
     public ApiResponse<String> deleteSelectedReviewImages(
             @AuthUser Long memberId,
             @PathVariable("reviewId") Long reviewId,
-
             @Parameter(description = "거래 유형 (PURCHASE: 같이 사요 후기, SHARE: 함께 나눠요 후기)")
             @RequestParam("itemType") ItemType itemType,
-
             @RequestBody ReviewRequestDTO.DeleteReviewImages deleteReviewImages
     ) {
         reviewCommandService.deleteReviewImage(deleteReviewImages, itemType, reviewId, memberId);
