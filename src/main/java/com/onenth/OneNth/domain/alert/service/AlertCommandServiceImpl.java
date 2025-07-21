@@ -25,7 +25,7 @@ public class AlertCommandServiceImpl implements AlertCommandService {
     private final RegionRepository regionRepository;
 
     @Override
-    public AlertResponseDTO.AddAlertResponseDTO addRegionKeyword(Long userId, Long regionId) {
+    public AlertResponseDTO.AddRegionAlertResponseDTO addRegionKeyword(Long userId, Long regionId) {
 
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -45,6 +45,27 @@ public class AlertCommandServiceImpl implements AlertCommandService {
 
         return AlertConverter.toAddAlertResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
 
+    }
+
+    @Override
+    public AlertResponseDTO.SetRegionAlertStatusResponseDTO setRegionAlertStatus(
+            Long userId,
+            Long regionKeywordAlertId,
+            AlertRequestDTO.SetRegionAlertStatusRequestDTO request) {
+
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        RegionKeywordAlert regionKeywordAlert = regionKeywordAlertRepository.findByIdAndMember(regionKeywordAlertId, member)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.REGION_KEYWORD_NOT_FOUND_OR_NOT_YOURS));
+
+        if (request.getIsEnabled()) {
+            regionKeywordAlert.enable();
+        } else {
+            regionKeywordAlert.disable();
+        }
+
+        return AlertConverter.toSetRegionAlertStatusResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
     }
 
 }

@@ -30,4 +30,12 @@ public class RegionKeywordAlert extends BaseEntity {
 
     @Column(nullable = false)
     private boolean enabled = true;
+
+    public void enable() {
+        this.enabled = true;
+    }
+
+    public void disable() {
+        this.enabled = false;
+    }
 }

@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.alert.controller;
 
+import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
 import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
 import com.onenth.OneNth.domain.alert.service.AlertCommandService;
 import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
@@ -27,7 +28,7 @@ public class AlertController {
 
     @Operation(
             summary = "지역 키워드 알림 등록 API",
-            description = "사용자 설정 중 지역 키워드를 알림으로 등록하는 API입니다. 응답으로 regionKeywordAlertId와 regionName, 알림 활성화 여부(enabled)을 반환합니다."
+            description = "사용자 설정 중 지역 키워드를 알림으로 등록하는 API입니다. 응답으로 regionKeywordAlertId와 regionKeywordName, 알림 활성화 여부(enabled)을 반환합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 키워드 알림 등록 성공"),
@@ -38,10 +39,29 @@ public class AlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PostMapping("/keyword-alerts/regions/{regionId}")
-    public ApiResponse<AlertResponseDTO.AddAlertResponseDTO> addRegionKeywordAlert(
+    public ApiResponse<AlertResponseDTO.AddRegionAlertResponseDTO> addRegionKeywordAlert(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionId
     ) {
         return ApiResponse.onSuccess(alertCommandService.addRegionKeyword(userId, regionId));
+    }
+
+    @Operation(
+            summary = "지역 키워드 알림 on/off API",
+            description = "사용자 설정 중 지역 키워드 알림을 끄거나 켜는 API입니다. 응답으로 regionKeywordAlertId와 regionKeywordName, 알림 활성화 여부(enabled)을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 키워드 알림 상태 업데이트 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION_ALERT003", description = "해당 지역 키워드 알림이 존재하지 않거나 접근 권한이 없습니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PatchMapping("/keyword-alerts/regions/{regionKeywordAlertId}")
+    public ApiResponse<AlertResponseDTO.SetRegionAlertStatusResponseDTO> setRegionAlertStatus(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @PathVariable Long regionKeywordAlertId,
+            @RequestBody AlertRequestDTO.SetRegionAlertStatusRequestDTO request
+    ) {
+        return ApiResponse.onSuccess(alertCommandService.setRegionAlertStatus(userId, regionKeywordAlertId, request));
     }
 }

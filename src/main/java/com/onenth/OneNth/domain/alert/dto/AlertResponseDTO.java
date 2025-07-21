@@ -7,7 +7,15 @@ public class AlertResponseDTO {
 
     @Getter
     @Builder
-    public static class AddAlertResponseDTO {
+    public static class AddRegionAlertResponseDTO {
+        private Long regionKeywordAlertId;
+        private String regionKeywordName;
+        private boolean enabled;
+    }
+
+    @Getter
+    @Builder
+    public static class SetRegionAlertStatusResponseDTO {
         private Long regionKeywordAlertId;
         private String regionKeywordName;
         private boolean enabled;

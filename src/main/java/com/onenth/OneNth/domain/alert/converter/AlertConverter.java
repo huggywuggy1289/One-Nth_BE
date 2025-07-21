@@ -16,8 +16,16 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.AddAlertResponseDTO toAddAlertResponseDTO(RegionKeywordAlert regionKeywordAlert) {
-        return AlertResponseDTO.AddAlertResponseDTO.builder()
+    public static AlertResponseDTO.AddRegionAlertResponseDTO toAddAlertResponseDTO(RegionKeywordAlert regionKeywordAlert) {
+        return AlertResponseDTO.AddRegionAlertResponseDTO.builder()
+                .regionKeywordAlertId(regionKeywordAlert.getId())
+                .regionKeywordName(regionKeywordAlert.getRegionKeyword().getRegionName())
+                .enabled(regionKeywordAlert.isEnabled())
+                .build();
+    }
+
+    public static AlertResponseDTO.SetRegionAlertStatusResponseDTO toSetRegionAlertStatusResponseDTO(RegionKeywordAlert regionKeywordAlert) {
+        return AlertResponseDTO.SetRegionAlertStatusResponseDTO.builder()
                 .regionKeywordAlertId(regionKeywordAlert.getId())
                 .regionKeywordName(regionKeywordAlert.getRegionKeyword().getRegionName())
                 .enabled(regionKeywordAlert.isEnabled())
