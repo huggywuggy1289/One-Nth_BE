@@ -66,6 +66,14 @@ public class AlertConverter {
                 .build();
     }
 
+    public static AlertResponseDTO.AlertSummary toAlertSummary(Object alert) {
+        if (alert instanceof KeywordAlert) {
+            return AlertConverter.toAlertSummaryFromProductKeywordAlert((KeywordAlert) alert);
+        } else {
+            return AlertConverter.toAlertSummaryFromRegionKeywordAlert((RegionKeywordAlert) alert);
+        }
+    }
+
     public static AlertResponseDTO.AlertSummary toAlertSummaryFromProductKeywordAlert(KeywordAlert keywordAlert) {
         return AlertResponseDTO.AlertSummary.builder()
                 .keywordAlertType(KeywordAlertType.PRODUCT)

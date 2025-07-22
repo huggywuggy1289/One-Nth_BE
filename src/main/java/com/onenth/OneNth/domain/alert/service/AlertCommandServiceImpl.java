@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -128,54 +129,67 @@ public class AlertCommandServiceImpl implements AlertCommandService {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-        List<Long> productKeywordIdList = request.getProductKeywordIdList();
-        List<Long> regionKeywordIdList = request.getRegionKeywordIdList();
+        List<Long> productKeywordIds = request.getProductKeywordIdList();
+        List<Long> regionKeywordIds = request.getRegionKeywordIdList();
 
+        deleteUnselectedKeywordAlerts(member, productKeywordIds, regionKeywordIds);
+
+        List<KeywordAlert> keywordAlertList = findProductAlertsByIds(productKeywordIds, member);
+        List<RegionKeywordAlert> regionKeywordAlertList = findRegionAlertsByIds(regionKeywordIds, member);
+
+        List<Object> mergedAlerts = mergeAndSortAlerts(keywordAlertList, regionKeywordAlertList);
+
+        List<AlertResponseDTO.AlertSummary> alertSummaryList = mergedAlerts.stream()
+                .map(alert -> AlertConverter.toAlertSummary(alert))
+                .collect(Collectors.toList());
+
+        return AlertConverter.toAlertListResponseDTO(alertSummaryList);
+    }
+
+    public void deleteUnselectedKeywordAlerts(Member member, List<Long> productAlertIds, List<Long> regionAlertIds) {
         List<KeywordAlert> existingKeywordAlerts = keywordAlertRepository.findAllByMember(member);
         List<RegionKeywordAlert> existingRegionAlerts = regionKeywordAlertRepository.findAllByMember(member);
 
         List<KeywordAlert> keywordAlertsToDelete = existingKeywordAlerts.stream()
-                .filter(alert -> !productKeywordIdList.contains(alert.getId()))
+                .filter(alert -> !productAlertIds.contains(alert.getId()))
                 .collect(Collectors.toList());
 
         List<RegionKeywordAlert> regionAlertsToDelete = existingRegionAlerts.stream()
-                .filter(alert -> !regionKeywordIdList.contains(alert.getId()))
+                .filter(alert -> !regionAlertIds.contains(alert.getId()))
                 .collect(Collectors.toList());
 
         keywordAlertRepository.deleteAll(keywordAlertsToDelete);
         regionKeywordAlertRepository.deleteAll(regionAlertsToDelete);
+    }
 
-        List<KeywordAlert> keywordAlertList = productKeywordIdList.stream().map(
+    private List<KeywordAlert> findProductAlertsByIds(List<Long> productAlertIds, Member member) {
+        return productAlertIds.stream().map(
                 id -> {
                     return keywordAlertRepository.findByIdAndMember(id, member)
                             .orElseThrow(() -> new GeneralException(ErrorStatus.KEYWORD_NOT_FOUND_OR_NOT_YOURS));
                 }).collect(Collectors.toList());
+    }
 
-        List<RegionKeywordAlert> regionKeywordAlertList = regionKeywordIdList.stream().map(
+    private List<RegionKeywordAlert> findRegionAlertsByIds(List<Long> regionAlertIds, Member member) {
+        return regionAlertIds.stream().map(
                 id -> {
                     return regionKeywordAlertRepository.findByIdAndMember(id, member)
                             .orElseThrow(() -> new GeneralException(ErrorStatus.REGION_KEYWORD_NOT_FOUND_OR_NOT_YOURS));
                 }).collect(Collectors.toList());
+    }
 
+    private List<Object> mergeAndSortAlerts(List<KeywordAlert> keywordAlertList, List<RegionKeywordAlert> regionKeywordAlertList) {
         List<Object> mergedAlerts = new ArrayList<>();
         mergedAlerts.addAll(keywordAlertList);
         mergedAlerts.addAll(regionKeywordAlertList);
 
-        mergedAlerts.sort((a, b) -> {
-            LocalDateTime aTime = (a instanceof KeywordAlert) ? ((KeywordAlert) a).getCreatedAt() : ((RegionKeywordAlert) a).getCreatedAt();
-            LocalDateTime bTime = (b instanceof KeywordAlert) ? ((KeywordAlert) b).getCreatedAt() : ((RegionKeywordAlert) b).getCreatedAt();
-            return bTime.compareTo(aTime);
-        });
+        mergedAlerts.sort(Comparator.comparing(alert ->
+                        (alert instanceof KeywordAlert)
+                                ? ((KeywordAlert) alert).getCreatedAt()
+                                : ((RegionKeywordAlert) alert).getCreatedAt(),
+                Comparator.reverseOrder())
+        );
 
-        List<AlertResponseDTO.AlertSummary> alertSummaryList = mergedAlerts.stream().map(
-                alert -> {
-                    if (alert instanceof KeywordAlert) {
-                        return AlertConverter.toAlertSummaryFromProductKeywordAlert((KeywordAlert) alert);
-                    } else {
-                        return AlertConverter.toAlertSummaryFromRegionKeywordAlert((RegionKeywordAlert) alert);
-                    }
-                }).collect(Collectors.toList());
-
-        return AlertConverter.toAlertListResponseDTO(alertSummaryList);
+        return mergedAlerts;
     }
 }
