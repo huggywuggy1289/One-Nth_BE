@@ -1,8 +1,7 @@
 package com.onenth.OneNth.domain.alert.converter;
 
 import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
-import com.onenth.OneNth.domain.alert.entity.Alert;
-import com.onenth.OneNth.domain.alert.entity.KeywordAlert;
+import com.onenth.OneNth.domain.alert.entity.ProductKeywordAlert;
 import com.onenth.OneNth.domain.alert.entity.RegionKeywordAlert;
 import com.onenth.OneNth.domain.alert.entity.enums.KeywordAlertType;
 import com.onenth.OneNth.domain.member.entity.Member;
@@ -36,27 +35,27 @@ public class AlertConverter {
                 .build();
     }
 
-    public static KeywordAlert toKeywordAlert(Member member, String keyword) {
-        return KeywordAlert.builder()
+    public static ProductKeywordAlert toKeywordAlert(Member member, String keyword) {
+        return ProductKeywordAlert.builder()
                 .member(member)
                 .keyword(keyword)
                 .enabled(true)
                 .build();
     }
 
-    public static AlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponse(KeywordAlert keywordAlert) {
+    public static AlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponse(ProductKeywordAlert productKeywordAlert) {
         return AlertResponseDTO.AddKeywordAlertResponseDTO.builder()
-                .keywordAlertId(keywordAlert.getId())
-                .keyword(keywordAlert.getKeyword())
-                .enabled(keywordAlert.isEnabled())
+                .keywordAlertId(productKeywordAlert.getId())
+                .keyword(productKeywordAlert.getKeyword())
+                .enabled(productKeywordAlert.isEnabled())
                 .build();
     }
 
-    public static AlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(KeywordAlert keywordAlert) {
+    public static AlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(ProductKeywordAlert productKeywordAlert) {
         return AlertResponseDTO.SetKeywordAlertStatusResponseDTO.builder()
-                .keywordAlertId(keywordAlert.getId())
-                .keyword(keywordAlert.getKeyword())
-                .enabled(keywordAlert.isEnabled())
+                .keywordAlertId(productKeywordAlert.getId())
+                .keyword(productKeywordAlert.getKeyword())
+                .enabled(productKeywordAlert.isEnabled())
                 .build();
     }
 
@@ -67,19 +66,19 @@ public class AlertConverter {
     }
 
     public static AlertResponseDTO.AlertSummary toAlertSummary(Object alert) {
-        if (alert instanceof KeywordAlert) {
-            return AlertConverter.toAlertSummaryFromProductKeywordAlert((KeywordAlert) alert);
+        if (alert instanceof ProductKeywordAlert) {
+            return AlertConverter.toAlertSummaryFromProductKeywordAlert((ProductKeywordAlert) alert);
         } else {
             return AlertConverter.toAlertSummaryFromRegionKeywordAlert((RegionKeywordAlert) alert);
         }
     }
 
-    public static AlertResponseDTO.AlertSummary toAlertSummaryFromProductKeywordAlert(KeywordAlert keywordAlert) {
+    public static AlertResponseDTO.AlertSummary toAlertSummaryFromProductKeywordAlert(ProductKeywordAlert productKeywordAlert) {
         return AlertResponseDTO.AlertSummary.builder()
                 .keywordAlertType(KeywordAlertType.PRODUCT)
-                .alertId(keywordAlert.getId())
-                .keyword(keywordAlert.getKeyword())
-                .enabled(keywordAlert.isEnabled())
+                .alertId(productKeywordAlert.getId())
+                .keyword(productKeywordAlert.getKeyword())
+                .enabled(productKeywordAlert.isEnabled())
                 .build();
     }
 

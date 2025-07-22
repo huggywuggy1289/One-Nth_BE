@@ -3,8 +3,7 @@ package com.onenth.OneNth.domain.alert.service;
 import com.onenth.OneNth.domain.alert.converter.AlertConverter;
 import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
 import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
-import com.onenth.OneNth.domain.alert.entity.Alert;
-import com.onenth.OneNth.domain.alert.entity.KeywordAlert;
+import com.onenth.OneNth.domain.alert.entity.ProductKeywordAlert;
 import com.onenth.OneNth.domain.alert.entity.RegionKeywordAlert;
 import com.onenth.OneNth.domain.alert.repository.KeywordAlertRepository;
 import com.onenth.OneNth.domain.alert.repository.RegionKeywordAlertRepository;
@@ -18,11 +17,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,9 +90,9 @@ public class AlertCommandServiceImpl implements AlertCommandService {
             throw new GeneralException(ErrorStatus.KEYWORD_ALREADY_EXISTS);
         }
 
-        KeywordAlert keywordAlert = AlertConverter.toKeywordAlert(member, request.getKeyword());
+        ProductKeywordAlert productKeywordAlert = AlertConverter.toKeywordAlert(member, request.getKeyword());
 
-        return AlertConverter.toAddKeywordAlertResponse(keywordAlertRepository.save(keywordAlert));
+        return AlertConverter.toAddKeywordAlertResponse(keywordAlertRepository.save(productKeywordAlert));
 
     }
 
@@ -109,16 +106,16 @@ public class AlertCommandServiceImpl implements AlertCommandService {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-        KeywordAlert keywordAlert = keywordAlertRepository.findByIdAndMember(keywordAlertId, member)
+        ProductKeywordAlert productKeywordAlert = keywordAlertRepository.findByIdAndMember(keywordAlertId, member)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.KEYWORD_NOT_FOUND_OR_NOT_YOURS));
 
         if (request.getIsEnabled()) {
-            keywordAlert.enable();
+            productKeywordAlert.enable();
         } else {
-            keywordAlert.disable();
+            productKeywordAlert.disable();
         }
 
-        return AlertConverter.toSetKeywordAlertStatusResponseDTO(keywordAlertRepository.save(keywordAlert));
+        return AlertConverter.toSetKeywordAlertStatusResponseDTO(keywordAlertRepository.save(productKeywordAlert));
     }
 
     @Override
@@ -134,10 +131,10 @@ public class AlertCommandServiceImpl implements AlertCommandService {
 
         deleteUnselectedKeywordAlerts(member, productKeywordIds, regionKeywordIds);
 
-        List<KeywordAlert> keywordAlertList = findProductAlertsByIds(productKeywordIds, member);
+        List<ProductKeywordAlert> productKeywordAlertList = findProductAlertsByIds(productKeywordIds, member);
         List<RegionKeywordAlert> regionKeywordAlertList = findRegionAlertsByIds(regionKeywordIds, member);
 
-        List<Object> mergedAlerts = mergeAndSortAlerts(keywordAlertList, regionKeywordAlertList);
+        List<Object> mergedAlerts = mergeAndSortAlerts(productKeywordAlertList, regionKeywordAlertList);
 
         List<AlertResponseDTO.AlertSummary> alertSummaryList = mergedAlerts.stream()
                 .map(alert -> AlertConverter.toAlertSummary(alert))
@@ -147,10 +144,10 @@ public class AlertCommandServiceImpl implements AlertCommandService {
     }
 
     public void deleteUnselectedKeywordAlerts(Member member, List<Long> productAlertIds, List<Long> regionAlertIds) {
-        List<KeywordAlert> existingKeywordAlerts = keywordAlertRepository.findAllByMember(member);
+        List<ProductKeywordAlert> existingProductKeywordAlerts = keywordAlertRepository.findAllByMember(member);
         List<RegionKeywordAlert> existingRegionAlerts = regionKeywordAlertRepository.findAllByMember(member);
 
-        List<KeywordAlert> keywordAlertsToDelete = existingKeywordAlerts.stream()
+        List<ProductKeywordAlert> productKeywordAlertsToDelete = existingProductKeywordAlerts.stream()
                 .filter(alert -> !productAlertIds.contains(alert.getId()))
                 .collect(Collectors.toList());
 
@@ -158,11 +155,11 @@ public class AlertCommandServiceImpl implements AlertCommandService {
                 .filter(alert -> !regionAlertIds.contains(alert.getId()))
                 .collect(Collectors.toList());
 
-        keywordAlertRepository.deleteAll(keywordAlertsToDelete);
+        keywordAlertRepository.deleteAll(productKeywordAlertsToDelete);
         regionKeywordAlertRepository.deleteAll(regionAlertsToDelete);
     }
 
-    private List<KeywordAlert> findProductAlertsByIds(List<Long> productAlertIds, Member member) {
+    private List<ProductKeywordAlert> findProductAlertsByIds(List<Long> productAlertIds, Member member) {
         return productAlertIds.stream().map(
                 id -> {
                     return keywordAlertRepository.findByIdAndMember(id, member)
@@ -178,14 +175,14 @@ public class AlertCommandServiceImpl implements AlertCommandService {
                 }).collect(Collectors.toList());
     }
 
-    private List<Object> mergeAndSortAlerts(List<KeywordAlert> keywordAlertList, List<RegionKeywordAlert> regionKeywordAlertList) {
+    private List<Object> mergeAndSortAlerts(List<ProductKeywordAlert> productKeywordAlertList, List<RegionKeywordAlert> regionKeywordAlertList) {
         List<Object> mergedAlerts = new ArrayList<>();
-        mergedAlerts.addAll(keywordAlertList);
+        mergedAlerts.addAll(productKeywordAlertList);
         mergedAlerts.addAll(regionKeywordAlertList);
 
         mergedAlerts.sort(Comparator.comparing(alert ->
-                        (alert instanceof KeywordAlert)
-                                ? ((KeywordAlert) alert).getCreatedAt()
+                        (alert instanceof ProductKeywordAlert)
+                                ? ((ProductKeywordAlert) alert).getCreatedAt()
                                 : ((RegionKeywordAlert) alert).getCreatedAt(),
                 Comparator.reverseOrder())
         );

@@ -2,7 +2,6 @@ package com.onenth.OneNth.domain.alert.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.member.entity.Member;
-import com.onenth.OneNth.domain.region.entity.Region;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class KeywordAlert extends BaseEntity {
+public class ProductKeywordAlert extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
