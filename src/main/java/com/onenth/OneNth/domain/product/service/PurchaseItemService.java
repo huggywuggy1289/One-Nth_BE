@@ -1,11 +1,13 @@
 package com.onenth.OneNth.domain.product.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
+import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.Tag;
@@ -216,4 +218,38 @@ public class PurchaseItemService {
 
 
     // 단일 상품 리스트 조회
+    @Transactional(readOnly = true)
+    public PurchaseItemResponseDTO.GetPurchaseItemResponseDTO getItemDetail(Long groupPurchaseId, Long userId) {
+
+        PurchaseItem item = purchaseItemRepository.findById(groupPurchaseId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        Member member = item.getMember();  // 이미 포함돼 있음
+
+        boolean isVerified = true;
+        String profileImageUrl = null;
+
+        List<String> imageUrls = itemImageRepository.findByPurchaseItemId(groupPurchaseId)
+                .stream()
+                .map(ItemImage::getUrl)
+                .toList();
+
+        return PurchaseItemResponseDTO.GetPurchaseItemResponseDTO.builder()
+                .title(item.getName())
+                .imageUrls(imageUrls)
+                .purchaseUrl(item.getPurchaseLocation())
+                .expirationDate(
+                        item.getItemCategory() == ItemCategory.FOOD
+                                ? item.getExpirationDate()
+                                : null
+                )
+                .writerNickname(member.getNickname())
+                .writerProfileImageUrl(profileImageUrl)
+                .writerVerified(isVerified)
+                .itemCategory(item.getItemCategory())
+                .purchaseMethod(item.getPurchaseMethod())
+                .originPrice(item.getPrice())
+                .build();
     }
+
+}
