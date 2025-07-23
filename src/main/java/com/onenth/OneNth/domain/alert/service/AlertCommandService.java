@@ -5,19 +5,19 @@ import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
 
 public interface AlertCommandService {
 
-    AlertResponseDTO.AddRegionAlertResponseDTO addRegionKeyword(Long userId, Long regionId);
+    AlertResponseDTO.AddKeywordAlertResponseDTO addRegionKeyword(Long userId, Long regionId);
 
-    AlertResponseDTO.SetRegionAlertStatusResponseDTO setRegionAlertStatus(
+    AlertResponseDTO.SetKeywordAlertStatusResponseDTO setRegionAlertStatus(
             Long userId,
             Long regionKeywordAlertId,
             AlertRequestDTO.SetRegionAlertStatusRequestDTO request
     );
 
-    AlertResponseDTO.AddKeywordAlertResponseDTO addKeyword(Long userId, AlertRequestDTO.AddKeywordAlertRequestDTO request);
+    AlertResponseDTO.AddKeywordAlertResponseDTO addProductKeyword(Long userId, AlertRequestDTO.AddKeywordAlertRequestDTO request);
 
-    AlertResponseDTO.SetKeywordAlertStatusResponseDTO setKeywordAlertStatus(
+    AlertResponseDTO.SetKeywordAlertStatusResponseDTO setProductKeywordAlertStatus(
             Long userId,
-            Long keywordAlertId,
+            Long productKeywordAlertId,
             AlertRequestDTO.SetKeywordAlertStatusRequestDTO request
     );
 

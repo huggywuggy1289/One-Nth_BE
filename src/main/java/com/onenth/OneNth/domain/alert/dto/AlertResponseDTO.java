@@ -10,23 +10,8 @@ public class AlertResponseDTO {
 
     @Getter
     @Builder
-    public static class AddRegionAlertResponseDTO {
-        private Long regionKeywordAlertId;
-        private String regionKeywordName;
-        private boolean enabled;
-    }
-
-    @Getter
-    @Builder
-    public static class SetRegionAlertStatusResponseDTO {
-        private Long regionKeywordAlertId;
-        private String regionKeywordName;
-        private boolean enabled;
-    }
-
-    @Getter
-    @Builder
     public static class AddKeywordAlertResponseDTO {
+        private KeywordAlertType keywordAlertType;
         private Long keywordAlertId;
         private String keyword;
         private boolean enabled;
@@ -35,6 +20,7 @@ public class AlertResponseDTO {
     @Getter
     @Builder
     public static class SetKeywordAlertStatusResponseDTO {
+        private KeywordAlertType keywordAlertType;
         private Long keywordAlertId;
         private String keyword;
         private boolean enabled;

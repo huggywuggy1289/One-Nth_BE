@@ -19,23 +19,25 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.AddRegionAlertResponseDTO toAddRegionAlertResponseDTO(RegionKeywordAlert regionKeywordAlert) {
-        return AlertResponseDTO.AddRegionAlertResponseDTO.builder()
-                .regionKeywordAlertId(regionKeywordAlert.getId())
-                .regionKeywordName(regionKeywordAlert.getRegionKeyword().getRegionName())
+    public static AlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponseDTO(RegionKeywordAlert regionKeywordAlert) {
+        return AlertResponseDTO.AddKeywordAlertResponseDTO.builder()
+                .keywordAlertType(KeywordAlertType.REGION)
+                .keywordAlertId(regionKeywordAlert.getId())
+                .keyword(regionKeywordAlert.getRegionKeyword().getRegionName())
                 .enabled(regionKeywordAlert.isEnabled())
                 .build();
     }
 
-    public static AlertResponseDTO.SetRegionAlertStatusResponseDTO toSetRegionAlertStatusResponseDTO(RegionKeywordAlert regionKeywordAlert) {
-        return AlertResponseDTO.SetRegionAlertStatusResponseDTO.builder()
-                .regionKeywordAlertId(regionKeywordAlert.getId())
-                .regionKeywordName(regionKeywordAlert.getRegionKeyword().getRegionName())
+    public static AlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(RegionKeywordAlert regionKeywordAlert) {
+        return AlertResponseDTO.SetKeywordAlertStatusResponseDTO.builder()
+                .keywordAlertType(KeywordAlertType.REGION)
+                .keywordAlertId(regionKeywordAlert.getId())
+                .keyword(regionKeywordAlert.getRegionKeyword().getRegionName())
                 .enabled(regionKeywordAlert.isEnabled())
                 .build();
     }
 
-    public static ProductKeywordAlert toKeywordAlert(Member member, String keyword) {
+    public static ProductKeywordAlert toProductKeywordAlert(Member member, String keyword) {
         return ProductKeywordAlert.builder()
                 .member(member)
                 .keyword(keyword)
@@ -43,8 +45,9 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponse(ProductKeywordAlert productKeywordAlert) {
+    public static AlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponseDTO(ProductKeywordAlert productKeywordAlert) {
         return AlertResponseDTO.AddKeywordAlertResponseDTO.builder()
+                .keywordAlertType(KeywordAlertType.PRODUCT)
                 .keywordAlertId(productKeywordAlert.getId())
                 .keyword(productKeywordAlert.getKeyword())
                 .enabled(productKeywordAlert.isEnabled())
@@ -53,6 +56,7 @@ public class AlertConverter {
 
     public static AlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(ProductKeywordAlert productKeywordAlert) {
         return AlertResponseDTO.SetKeywordAlertStatusResponseDTO.builder()
+                .keywordAlertType(KeywordAlertType.PRODUCT)
                 .keywordAlertId(productKeywordAlert.getId())
                 .keyword(productKeywordAlert.getKeyword())
                 .enabled(productKeywordAlert.isEnabled())

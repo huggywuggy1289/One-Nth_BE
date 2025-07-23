@@ -20,13 +20,13 @@ public enum ErrorStatus implements BaseErrorCode {
     REGION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER_REGION002", "이미 등록한 지역입니다."),
     MEMBER_REGION_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER_REGION003", "해당 사용자가 등록하지 않은 지역입니다."),
 
-    REGION_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "REGION_ALERT001", "등록 가능한 지역 알림은 최대 3개입니다."),
-    REGION_KEYWORD_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "REGION_ALERT002", "이미 알림으로 등록한 지역입니다."),
-    REGION_KEYWORD_NOT_FOUND_OR_NOT_YOURS(HttpStatus.BAD_REQUEST, "REGION_ALERT003", "해당 지역 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
+    REGION_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT001", "등록 가능한 지역 알림은 최대 3개입니다."),
+    REGION_KEYWORD_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT002", "이미 알림으로 등록한 지역입니다."),
+    REGION_KEYWORD_NOT_FOUND_OR_NOT_YOURS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT003", "해당 지역 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
 
-    KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT001", "등록 가능한 키워드 알림은 최대 5개입니다."),
-    KEYWORD_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT002", "이미 알림으로 등록한 키워드입니다."),
-    KEYWORD_NOT_FOUND_OR_NOT_YOURS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT003", "해당 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
+    PRODUCT_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT004", "등록 가능한 키워드 알림은 최대 5개입니다."),
+    PRODUCT_KEYWORD_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT005", "이미 알림으로 등록한 키워드입니다."),
+    PRODUCT_KEYWORD_NOT_FOUND_OR_NOT_YOURS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT006", "해당 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
 
     ;
     

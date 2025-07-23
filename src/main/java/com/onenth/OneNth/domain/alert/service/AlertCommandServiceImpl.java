@@ -5,7 +5,7 @@ import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
 import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
 import com.onenth.OneNth.domain.alert.entity.ProductKeywordAlert;
 import com.onenth.OneNth.domain.alert.entity.RegionKeywordAlert;
-import com.onenth.OneNth.domain.alert.repository.KeywordAlertRepository;
+import com.onenth.OneNth.domain.alert.repository.ProductKeywordAlertRepository;
 import com.onenth.OneNth.domain.alert.repository.RegionKeywordAlertRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
 public class AlertCommandServiceImpl implements AlertCommandService {
 
     private final RegionKeywordAlertRepository regionKeywordAlertRepository;
-    private final KeywordAlertRepository keywordAlertRepository;
+    private final ProductKeywordAlertRepository productKeywordAlertRepository;
     private final MemberRepository memberRepository;
     private final RegionRepository regionRepository;
 
     @Override
-    public AlertResponseDTO.AddRegionAlertResponseDTO addRegionKeyword(Long userId, Long regionId) {
+    public AlertResponseDTO.AddKeywordAlertResponseDTO addRegionKeyword(Long userId, Long regionId) {
 
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -51,12 +51,12 @@ public class AlertCommandServiceImpl implements AlertCommandService {
 
         RegionKeywordAlert regionKeywordAlert = AlertConverter.toRegionKeywordAlert(member, region);
 
-        return AlertConverter.toAddRegionAlertResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
+        return AlertConverter.toAddKeywordAlertResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
 
     }
 
     @Override
-    public AlertResponseDTO.SetRegionAlertStatusResponseDTO setRegionAlertStatus(
+    public AlertResponseDTO.SetKeywordAlertStatusResponseDTO setRegionAlertStatus(
             Long userId,
             Long regionKeywordAlertId,
             AlertRequestDTO.SetRegionAlertStatusRequestDTO request) {
@@ -73,41 +73,41 @@ public class AlertCommandServiceImpl implements AlertCommandService {
             regionKeywordAlert.disable();
         }
 
-        return AlertConverter.toSetRegionAlertStatusResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
+        return AlertConverter.toSetKeywordAlertStatusResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
     }
 
     @Override
-    public AlertResponseDTO.AddKeywordAlertResponseDTO addKeyword(Long userId, AlertRequestDTO.AddKeywordAlertRequestDTO request) {
+    public AlertResponseDTO.AddKeywordAlertResponseDTO addProductKeyword(Long userId, AlertRequestDTO.AddKeywordAlertRequestDTO request) {
 
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-        if (keywordAlertRepository.countByMember(member) >= 5) {
-            throw new GeneralException(ErrorStatus.KEYWORD_LIMIT_EXCEEDED);
+        if (productKeywordAlertRepository.countByMember(member) >= 5) {
+            throw new GeneralException(ErrorStatus.PRODUCT_KEYWORD_LIMIT_EXCEEDED);
         }
 
-        if (keywordAlertRepository.existsByMemberAndKeyword(member, request.getKeyword())) {
-            throw new GeneralException(ErrorStatus.KEYWORD_ALREADY_EXISTS);
+        if (productKeywordAlertRepository.existsByMemberAndKeyword(member, request.getKeyword())) {
+            throw new GeneralException(ErrorStatus.PRODUCT_KEYWORD_ALREADY_EXISTS);
         }
 
-        ProductKeywordAlert productKeywordAlert = AlertConverter.toKeywordAlert(member, request.getKeyword());
+        ProductKeywordAlert productKeywordAlert = AlertConverter.toProductKeywordAlert(member, request.getKeyword());
 
-        return AlertConverter.toAddKeywordAlertResponse(keywordAlertRepository.save(productKeywordAlert));
+        return AlertConverter.toAddKeywordAlertResponseDTO(productKeywordAlertRepository.save(productKeywordAlert));
 
     }
 
     @Override
-    public AlertResponseDTO.SetKeywordAlertStatusResponseDTO setKeywordAlertStatus(
+    public AlertResponseDTO.SetKeywordAlertStatusResponseDTO setProductKeywordAlertStatus(
             Long userId,
-            Long keywordAlertId,
+            Long productKeywordAlertId,
             AlertRequestDTO.SetKeywordAlertStatusRequestDTO request
     ) {
 
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-        ProductKeywordAlert productKeywordAlert = keywordAlertRepository.findByIdAndMember(keywordAlertId, member)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.KEYWORD_NOT_FOUND_OR_NOT_YOURS));
+        ProductKeywordAlert productKeywordAlert = productKeywordAlertRepository.findByIdAndMember(productKeywordAlertId, member)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.PRODUCT_KEYWORD_NOT_FOUND_OR_NOT_YOURS));
 
         if (request.getIsEnabled()) {
             productKeywordAlert.enable();
@@ -115,7 +115,7 @@ public class AlertCommandServiceImpl implements AlertCommandService {
             productKeywordAlert.disable();
         }
 
-        return AlertConverter.toSetKeywordAlertStatusResponseDTO(keywordAlertRepository.save(productKeywordAlert));
+        return AlertConverter.toSetKeywordAlertStatusResponseDTO(productKeywordAlertRepository.save(productKeywordAlert));
     }
 
     @Override
@@ -144,7 +144,7 @@ public class AlertCommandServiceImpl implements AlertCommandService {
     }
 
     public void deleteUnselectedKeywordAlerts(Member member, List<Long> productAlertIds, List<Long> regionAlertIds) {
-        List<ProductKeywordAlert> existingProductKeywordAlerts = keywordAlertRepository.findAllByMember(member);
+        List<ProductKeywordAlert> existingProductKeywordAlerts = productKeywordAlertRepository.findAllByMember(member);
         List<RegionKeywordAlert> existingRegionAlerts = regionKeywordAlertRepository.findAllByMember(member);
 
         List<ProductKeywordAlert> productKeywordAlertsToDelete = existingProductKeywordAlerts.stream()
@@ -155,15 +155,15 @@ public class AlertCommandServiceImpl implements AlertCommandService {
                 .filter(alert -> !regionAlertIds.contains(alert.getId()))
                 .collect(Collectors.toList());
 
-        keywordAlertRepository.deleteAll(productKeywordAlertsToDelete);
+        productKeywordAlertRepository.deleteAll(productKeywordAlertsToDelete);
         regionKeywordAlertRepository.deleteAll(regionAlertsToDelete);
     }
 
     private List<ProductKeywordAlert> findProductAlertsByIds(List<Long> productAlertIds, Member member) {
         return productAlertIds.stream().map(
                 id -> {
-                    return keywordAlertRepository.findByIdAndMember(id, member)
-                            .orElseThrow(() -> new GeneralException(ErrorStatus.KEYWORD_NOT_FOUND_OR_NOT_YOURS));
+                    return productKeywordAlertRepository.findByIdAndMember(id, member)
+                            .orElseThrow(() -> new GeneralException(ErrorStatus.PRODUCT_KEYWORD_NOT_FOUND_OR_NOT_YOURS));
                 }).collect(Collectors.toList());
     }
 
