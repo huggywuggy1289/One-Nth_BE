@@ -1,6 +1,6 @@
-package com.onenth.OneNth.domain.alert.repository;
+package com.onenth.OneNth.domain.alert.keywordAlert.repository;
 
-import com.onenth.OneNth.domain.alert.entity.ProductKeywordAlert;
+import com.onenth.OneNth.domain.alert.keywordAlert.entity.ProductKeywordAlert;
 import com.onenth.OneNth.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,15 +1,15 @@
-package com.onenth.OneNth.domain.alert.converter;
+package com.onenth.OneNth.domain.alert.keywordAlert.converter;
 
-import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
-import com.onenth.OneNth.domain.alert.entity.ProductKeywordAlert;
-import com.onenth.OneNth.domain.alert.entity.RegionKeywordAlert;
-import com.onenth.OneNth.domain.alert.entity.enums.KeywordAlertType;
+import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertResponseDTO;
+import com.onenth.OneNth.domain.alert.keywordAlert.entity.ProductKeywordAlert;
+import com.onenth.OneNth.domain.alert.keywordAlert.entity.RegionKeywordAlert;
+import com.onenth.OneNth.domain.alert.keywordAlert.entity.enums.KeywordAlertType;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.region.entity.Region;
 
 import java.util.List;
 
-public class AlertConverter {
+public class KeywordAlertConverter {
 
     public static RegionKeywordAlert toRegionKeywordAlert(Member member, Region region) {
         return RegionKeywordAlert.builder()
@@ -19,8 +19,8 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponseDTO(RegionKeywordAlert regionKeywordAlert) {
-        return AlertResponseDTO.AddKeywordAlertResponseDTO.builder()
+    public static KeywordAlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponseDTO(RegionKeywordAlert regionKeywordAlert) {
+        return KeywordAlertResponseDTO.AddKeywordAlertResponseDTO.builder()
                 .keywordAlertType(KeywordAlertType.REGION)
                 .keywordAlertId(regionKeywordAlert.getId())
                 .keyword(regionKeywordAlert.getRegionKeyword().getRegionName())
@@ -28,8 +28,8 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(RegionKeywordAlert regionKeywordAlert) {
-        return AlertResponseDTO.SetKeywordAlertStatusResponseDTO.builder()
+    public static KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(RegionKeywordAlert regionKeywordAlert) {
+        return KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO.builder()
                 .keywordAlertType(KeywordAlertType.REGION)
                 .keywordAlertId(regionKeywordAlert.getId())
                 .keyword(regionKeywordAlert.getRegionKeyword().getRegionName())
@@ -45,8 +45,8 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponseDTO(ProductKeywordAlert productKeywordAlert) {
-        return AlertResponseDTO.AddKeywordAlertResponseDTO.builder()
+    public static KeywordAlertResponseDTO.AddKeywordAlertResponseDTO toAddKeywordAlertResponseDTO(ProductKeywordAlert productKeywordAlert) {
+        return KeywordAlertResponseDTO.AddKeywordAlertResponseDTO.builder()
                 .keywordAlertType(KeywordAlertType.PRODUCT)
                 .keywordAlertId(productKeywordAlert.getId())
                 .keyword(productKeywordAlert.getKeyword())
@@ -54,8 +54,8 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(ProductKeywordAlert productKeywordAlert) {
-        return AlertResponseDTO.SetKeywordAlertStatusResponseDTO.builder()
+    public static KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO toSetKeywordAlertStatusResponseDTO(ProductKeywordAlert productKeywordAlert) {
+        return KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO.builder()
                 .keywordAlertType(KeywordAlertType.PRODUCT)
                 .keywordAlertId(productKeywordAlert.getId())
                 .keyword(productKeywordAlert.getKeyword())
@@ -63,22 +63,22 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.AlertListResponseDTO toAlertListResponseDTO(List<AlertResponseDTO.AlertSummary> alertSummaryList) {
-        return AlertResponseDTO.AlertListResponseDTO.builder()
+    public static KeywordAlertResponseDTO.AlertListResponseDTO toAlertListResponseDTO(List<KeywordAlertResponseDTO.AlertSummary> alertSummaryList) {
+        return KeywordAlertResponseDTO.AlertListResponseDTO.builder()
                 .alertSummaryList(alertSummaryList)
                 .build();
     }
 
-    public static AlertResponseDTO.AlertSummary toAlertSummary(Object alert) {
+    public static KeywordAlertResponseDTO.AlertSummary toAlertSummary(Object alert) {
         if (alert instanceof ProductKeywordAlert) {
-            return AlertConverter.toAlertSummaryFromProductKeywordAlert((ProductKeywordAlert) alert);
+            return KeywordAlertConverter.toAlertSummaryFromProductKeywordAlert((ProductKeywordAlert) alert);
         } else {
-            return AlertConverter.toAlertSummaryFromRegionKeywordAlert((RegionKeywordAlert) alert);
+            return KeywordAlertConverter.toAlertSummaryFromRegionKeywordAlert((RegionKeywordAlert) alert);
         }
     }
 
-    public static AlertResponseDTO.AlertSummary toAlertSummaryFromProductKeywordAlert(ProductKeywordAlert productKeywordAlert) {
-        return AlertResponseDTO.AlertSummary.builder()
+    public static KeywordAlertResponseDTO.AlertSummary toAlertSummaryFromProductKeywordAlert(ProductKeywordAlert productKeywordAlert) {
+        return KeywordAlertResponseDTO.AlertSummary.builder()
                 .keywordAlertType(KeywordAlertType.PRODUCT)
                 .alertId(productKeywordAlert.getId())
                 .keyword(productKeywordAlert.getKeyword())
@@ -86,8 +86,8 @@ public class AlertConverter {
                 .build();
     }
 
-    public static AlertResponseDTO.AlertSummary toAlertSummaryFromRegionKeywordAlert(RegionKeywordAlert regionKeywordAlert) {
-        return AlertResponseDTO.AlertSummary.builder()
+    public static KeywordAlertResponseDTO.AlertSummary toAlertSummaryFromRegionKeywordAlert(RegionKeywordAlert regionKeywordAlert) {
+        return KeywordAlertResponseDTO.AlertSummary.builder()
                 .keywordAlertType(KeywordAlertType.REGION)
                 .alertId(regionKeywordAlert.getId())
                 .keyword(regionKeywordAlert.getRegionKeyword().getRegionName())

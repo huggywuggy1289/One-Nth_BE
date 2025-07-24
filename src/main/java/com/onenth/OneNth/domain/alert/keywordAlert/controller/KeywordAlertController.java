@@ -1,10 +1,8 @@
-package com.onenth.OneNth.domain.alert.controller;
+package com.onenth.OneNth.domain.alert.keywordAlert.controller;
 
-import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
-import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
-import com.onenth.OneNth.domain.alert.service.AlertCommandService;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
+import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertRequestDTO;
+import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertResponseDTO;
+import com.onenth.OneNth.domain.alert.keywordAlert.service.KeywordAlertCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
@@ -14,17 +12,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user-settings")
-public class AlertController {
+public class KeywordAlertController {
 
-    private final AlertCommandService alertCommandService;
+    private final KeywordAlertCommandService keywordAlertCommandService;
 
     @Operation(
             summary = "지역 키워드 알림 등록 API",
@@ -39,11 +35,11 @@ public class AlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PostMapping("/keyword-alerts/regions/{regionId}")
-    public ApiResponse<AlertResponseDTO.AddKeywordAlertResponseDTO> addRegionKeywordAlert(
+    public ApiResponse<KeywordAlertResponseDTO.AddKeywordAlertResponseDTO> addRegionKeywordAlert(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionId
     ) {
-        return ApiResponse.onSuccess(alertCommandService.addRegionKeyword(userId, regionId));
+        return ApiResponse.onSuccess(keywordAlertCommandService.addRegionKeyword(userId, regionId));
     }
 
     @Operation(
@@ -57,12 +53,12 @@ public class AlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PatchMapping("/keyword-alerts/regions/{regionKeywordAlertId}")
-    public ApiResponse<AlertResponseDTO.SetKeywordAlertStatusResponseDTO> setRegionAlertStatus(
+    public ApiResponse<KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO> setRegionAlertStatus(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionKeywordAlertId,
-            @RequestBody AlertRequestDTO.SetRegionAlertStatusRequestDTO request
+            @RequestBody KeywordAlertRequestDTO.SetRegionAlertStatusRequestDTO request
     ) {
-        return ApiResponse.onSuccess(alertCommandService.setRegionAlertStatus(userId, regionKeywordAlertId, request));
+        return ApiResponse.onSuccess(keywordAlertCommandService.setRegionAlertStatus(userId, regionKeywordAlertId, request));
     }
 
     @Operation(
@@ -77,11 +73,11 @@ public class AlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PostMapping("/keyword-alerts")
-    public ApiResponse<AlertResponseDTO.AddKeywordAlertResponseDTO> addKeywordAlert(
+    public ApiResponse<KeywordAlertResponseDTO.AddKeywordAlertResponseDTO> addKeywordAlert(
             @Parameter(hidden=true) @AuthUser Long userId,
-            @Valid @RequestBody AlertRequestDTO.AddKeywordAlertRequestDTO request
+            @Valid @RequestBody KeywordAlertRequestDTO.AddKeywordAlertRequestDTO request
     ) {
-        return ApiResponse.onSuccess(alertCommandService.addProductKeyword(userId, request));
+        return ApiResponse.onSuccess(keywordAlertCommandService.addProductKeyword(userId, request));
     }
 
     @Operation(
@@ -95,12 +91,12 @@ public class AlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PatchMapping("/keyword-alerts/{keywordAlertId}")
-    public ApiResponse<AlertResponseDTO.SetKeywordAlertStatusResponseDTO> setKeywordAlertStatus(
+    public ApiResponse<KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO> setKeywordAlertStatus(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long keywordAlertId,
-            @RequestBody AlertRequestDTO.SetKeywordAlertStatusRequestDTO request
+            @RequestBody KeywordAlertRequestDTO.SetKeywordAlertStatusRequestDTO request
     ) {
-        return ApiResponse.onSuccess(alertCommandService.setProductKeywordAlertStatus(userId, keywordAlertId, request));
+        return ApiResponse.onSuccess(keywordAlertCommandService.setProductKeywordAlertStatus(userId, keywordAlertId, request));
     }
 
     @Operation(
@@ -115,10 +111,10 @@ public class AlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PatchMapping("/keyword-alerts")
-    public ApiResponse<AlertResponseDTO.AlertListResponseDTO> updateKeywordAlertList(
+    public ApiResponse<KeywordAlertResponseDTO.AlertListResponseDTO> updateKeywordAlertList(
             @Parameter(hidden=true) @AuthUser Long userId,
-            @RequestBody AlertRequestDTO.UpdateKeywordAlertListRequestDTO request
+            @RequestBody KeywordAlertRequestDTO.UpdateKeywordAlertListRequestDTO request
     ) {
-        return ApiResponse.onSuccess(alertCommandService.updateKeywordAlertList(userId, request));
+        return ApiResponse.onSuccess(keywordAlertCommandService.updateKeywordAlertList(userId, request));
     }
 }

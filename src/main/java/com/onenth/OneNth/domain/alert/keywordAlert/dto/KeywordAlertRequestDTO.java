@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.alert.dto;
+package com.onenth.OneNth.domain.alert.keywordAlert.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlertRequestDTO {
+public class KeywordAlertRequestDTO {
 
     @Getter
     @NoArgsConstructor

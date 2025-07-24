@@ -1,12 +1,12 @@
-package com.onenth.OneNth.domain.alert.dto;
+package com.onenth.OneNth.domain.alert.keywordAlert.dto;
 
-import com.onenth.OneNth.domain.alert.entity.enums.KeywordAlertType;
+import com.onenth.OneNth.domain.alert.keywordAlert.entity.enums.KeywordAlertType;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
-public class AlertResponseDTO {
+public class KeywordAlertResponseDTO {
 
     @Getter
     @Builder

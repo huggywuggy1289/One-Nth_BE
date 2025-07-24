@@ -1,12 +1,12 @@
-package com.onenth.OneNth.domain.alert.service;
+package com.onenth.OneNth.domain.alert.keywordAlert.service;
 
-import com.onenth.OneNth.domain.alert.converter.AlertConverter;
-import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
-import com.onenth.OneNth.domain.alert.dto.AlertResponseDTO;
-import com.onenth.OneNth.domain.alert.entity.ProductKeywordAlert;
-import com.onenth.OneNth.domain.alert.entity.RegionKeywordAlert;
-import com.onenth.OneNth.domain.alert.repository.ProductKeywordAlertRepository;
-import com.onenth.OneNth.domain.alert.repository.RegionKeywordAlertRepository;
+import com.onenth.OneNth.domain.alert.keywordAlert.converter.KeywordAlertConverter;
+import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertRequestDTO;
+import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertResponseDTO;
+import com.onenth.OneNth.domain.alert.keywordAlert.entity.ProductKeywordAlert;
+import com.onenth.OneNth.domain.alert.keywordAlert.entity.RegionKeywordAlert;
+import com.onenth.OneNth.domain.alert.keywordAlert.repository.ProductKeywordAlertRepository;
+import com.onenth.OneNth.domain.alert.keywordAlert.repository.RegionKeywordAlertRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AlertCommandServiceImpl implements AlertCommandService {
+public class KeywordAlertCommandServiceImpl implements KeywordAlertCommandService {
 
     private final RegionKeywordAlertRepository regionKeywordAlertRepository;
     private final ProductKeywordAlertRepository productKeywordAlertRepository;
@@ -33,7 +33,7 @@ public class AlertCommandServiceImpl implements AlertCommandService {
     private final RegionRepository regionRepository;
 
     @Override
-    public AlertResponseDTO.AddKeywordAlertResponseDTO addRegionKeyword(Long userId, Long regionId) {
+    public KeywordAlertResponseDTO.AddKeywordAlertResponseDTO addRegionKeyword(Long userId, Long regionId) {
 
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -49,17 +49,17 @@ public class AlertCommandServiceImpl implements AlertCommandService {
             throw new GeneralException(ErrorStatus.REGION_KEYWORD_ALREADY_EXISTS);
         }
 
-        RegionKeywordAlert regionKeywordAlert = AlertConverter.toRegionKeywordAlert(member, region);
+        RegionKeywordAlert regionKeywordAlert = KeywordAlertConverter.toRegionKeywordAlert(member, region);
 
-        return AlertConverter.toAddKeywordAlertResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
+        return KeywordAlertConverter.toAddKeywordAlertResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
 
     }
 
     @Override
-    public AlertResponseDTO.SetKeywordAlertStatusResponseDTO setRegionAlertStatus(
+    public KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO setRegionAlertStatus(
             Long userId,
             Long regionKeywordAlertId,
-            AlertRequestDTO.SetRegionAlertStatusRequestDTO request) {
+            KeywordAlertRequestDTO.SetRegionAlertStatusRequestDTO request) {
 
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -73,11 +73,11 @@ public class AlertCommandServiceImpl implements AlertCommandService {
             regionKeywordAlert.disable();
         }
 
-        return AlertConverter.toSetKeywordAlertStatusResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
+        return KeywordAlertConverter.toSetKeywordAlertStatusResponseDTO(regionKeywordAlertRepository.save(regionKeywordAlert));
     }
 
     @Override
-    public AlertResponseDTO.AddKeywordAlertResponseDTO addProductKeyword(Long userId, AlertRequestDTO.AddKeywordAlertRequestDTO request) {
+    public KeywordAlertResponseDTO.AddKeywordAlertResponseDTO addProductKeyword(Long userId, KeywordAlertRequestDTO.AddKeywordAlertRequestDTO request) {
 
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -90,17 +90,17 @@ public class AlertCommandServiceImpl implements AlertCommandService {
             throw new GeneralException(ErrorStatus.PRODUCT_KEYWORD_ALREADY_EXISTS);
         }
 
-        ProductKeywordAlert productKeywordAlert = AlertConverter.toProductKeywordAlert(member, request.getKeyword());
+        ProductKeywordAlert productKeywordAlert = KeywordAlertConverter.toProductKeywordAlert(member, request.getKeyword());
 
-        return AlertConverter.toAddKeywordAlertResponseDTO(productKeywordAlertRepository.save(productKeywordAlert));
+        return KeywordAlertConverter.toAddKeywordAlertResponseDTO(productKeywordAlertRepository.save(productKeywordAlert));
 
     }
 
     @Override
-    public AlertResponseDTO.SetKeywordAlertStatusResponseDTO setProductKeywordAlertStatus(
+    public KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO setProductKeywordAlertStatus(
             Long userId,
             Long productKeywordAlertId,
-            AlertRequestDTO.SetKeywordAlertStatusRequestDTO request
+            KeywordAlertRequestDTO.SetKeywordAlertStatusRequestDTO request
     ) {
 
         Member member = memberRepository.findById(userId)
@@ -115,13 +115,13 @@ public class AlertCommandServiceImpl implements AlertCommandService {
             productKeywordAlert.disable();
         }
 
-        return AlertConverter.toSetKeywordAlertStatusResponseDTO(productKeywordAlertRepository.save(productKeywordAlert));
+        return KeywordAlertConverter.toSetKeywordAlertStatusResponseDTO(productKeywordAlertRepository.save(productKeywordAlert));
     }
 
     @Override
-    public AlertResponseDTO.AlertListResponseDTO updateKeywordAlertList(
+    public KeywordAlertResponseDTO.AlertListResponseDTO updateKeywordAlertList(
             Long userId,
-            AlertRequestDTO.UpdateKeywordAlertListRequestDTO request
+            KeywordAlertRequestDTO.UpdateKeywordAlertListRequestDTO request
     ) {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -136,11 +136,11 @@ public class AlertCommandServiceImpl implements AlertCommandService {
 
         List<Object> mergedAlerts = mergeAndSortAlerts(productKeywordAlertList, regionKeywordAlertList);
 
-        List<AlertResponseDTO.AlertSummary> alertSummaryList = mergedAlerts.stream()
-                .map(alert -> AlertConverter.toAlertSummary(alert))
+        List<KeywordAlertResponseDTO.AlertSummary> alertSummaryList = mergedAlerts.stream()
+                .map(alert -> KeywordAlertConverter.toAlertSummary(alert))
                 .collect(Collectors.toList());
 
-        return AlertConverter.toAlertListResponseDTO(alertSummaryList);
+        return KeywordAlertConverter.toAlertListResponseDTO(alertSummaryList);
     }
 
     public void deleteUnselectedKeywordAlerts(Member member, List<Long> productAlertIds, List<Long> regionAlertIds) {
