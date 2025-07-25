@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.alert.entity.enums;
+package com.onenth.OneNth.domain.alert.entity;
 
 public enum AlertType {
     KEYWORD,

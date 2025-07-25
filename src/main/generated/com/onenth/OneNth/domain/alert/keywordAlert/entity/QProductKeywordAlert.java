@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.alert.entity;
+package com.onenth.OneNth.domain.alert.keywordAlert.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -11,16 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QRegionKeywordAlert is a Querydsl query type for RegionKeywordAlert
+ * QProductKeywordAlert is a Querydsl query type for ProductKeywordAlert
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QRegionKeywordAlert extends EntityPathBase<RegionKeywordAlert> {
+public class QProductKeywordAlert extends EntityPathBase<ProductKeywordAlert> {
 
-    private static final long serialVersionUID = 417994979L;
+    private static final long serialVersionUID = -1782621245L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QRegionKeywordAlert regionKeywordAlert = new QRegionKeywordAlert("regionKeywordAlert");
+    public static final QProductKeywordAlert productKeywordAlert = new QProductKeywordAlert("productKeywordAlert");
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
@@ -38,23 +38,23 @@ public class QRegionKeywordAlert extends EntityPathBase<RegionKeywordAlert> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
-    public QRegionKeywordAlert(String variable) {
-        this(RegionKeywordAlert.class, forVariable(variable), INITS);
+    public QProductKeywordAlert(String variable) {
+        this(ProductKeywordAlert.class, forVariable(variable), INITS);
     }
 
-    public QRegionKeywordAlert(Path<? extends RegionKeywordAlert> path) {
+    public QProductKeywordAlert(Path<? extends ProductKeywordAlert> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QRegionKeywordAlert(PathMetadata metadata) {
+    public QProductKeywordAlert(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QRegionKeywordAlert(PathMetadata metadata, PathInits inits) {
-        this(RegionKeywordAlert.class, metadata, inits);
+    public QProductKeywordAlert(PathMetadata metadata, PathInits inits) {
+        this(ProductKeywordAlert.class, metadata, inits);
     }
 
-    public QRegionKeywordAlert(Class<? extends RegionKeywordAlert> type, PathMetadata metadata, PathInits inits) {
+    public QProductKeywordAlert(Class<? extends ProductKeywordAlert> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.member = inits.isInitialized("member") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("member")) : null;
     }
