@@ -67,6 +67,14 @@ public class MemberResponseDTO {
 
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CancelScrapOrLikeResponseDTO {
+        Boolean isSuccess;
+    }
+
 //    @Builder
 //    @Getter
 //    @NoArgsConstructor

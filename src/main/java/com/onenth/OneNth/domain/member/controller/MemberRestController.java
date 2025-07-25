@@ -10,6 +10,7 @@ import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -118,13 +119,56 @@ public class MemberRestController {
             @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true),
             @Parameter(name = "size", description = "페이지 당 미리보기 개수", example = "10", required = true)
     })
-    @GetMapping("/mypage/likes")
+    @GetMapping("/mypage/likes/")
     public ApiResponse<MemberResponseDTO.PostListDTO> getLikedPosts(
             @Parameter(hidden = true) @AuthUser Long memberId,
             @RequestParam(name="page", defaultValue = "1") Integer page,
             @RequestParam(name="size", defaultValue = "10") Integer size
     ) {
         return ApiResponse.onSuccess(memberQueryService.getLikedPosts(memberId, page, size));
+    }
+
+    /**
+     * 마이페이지 - 내가 스크랩한 글 취소 API 구현
+     */
+    @Operation(
+            summary = "마이페이지- 내가 스크랩한 글 취소 API",
+            description = "사용자가 스크랩한 글 취소 API 입니다. postId를 PathVariable 로 보내주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "postId", in = ParameterIn.PATH, description = "해당 게시글의 ID", example = "1", required = true)
+    })
+    @DeleteMapping("/mypage/scraps/{postId}")
+    public ApiResponse<MemberResponseDTO.CancelScrapOrLikeResponseDTO> cancelScrap(
+            @Parameter(hidden = true) @AuthUser Long memberId,
+            @PathVariable(name = "postId") Long postId
+    ) {
+        return ApiResponse.onSuccess(memberCommandService.cancelScrap(memberId, postId));
+    }
+    /**
+     * 마이페이지 - 내가 공감한 글 취소 API 구현
+     */
+    @Operation(
+            summary = "마이페이지- 내가 공감한 글 취소 API",
+            description = "사용자가 공감한 글 취소 API 입니다. postId를 PathVariable 로 보내주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "postId", in = ParameterIn.PATH, description = "해당 게시글의 ID", example = "1", required = true)
+    })
+    @DeleteMapping("/mypage/likes/{postId}")
+    public ApiResponse<MemberResponseDTO.CancelScrapOrLikeResponseDTO> cancelLike(
+            @Parameter(hidden = true) @AuthUser Long memberId,
+            @PathVariable(name = "postId") Long postId
+    ) {
+        return ApiResponse.onSuccess(memberCommandService.cancelLike(memberId, postId));
     }
 
 }

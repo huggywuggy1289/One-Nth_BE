@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
     @Query("SELECT s FROM Scrap s " +
@@ -16,4 +18,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
             "WHERE s.member.id = :memberId " +
             "ORDER BY s.createdAt DESC ")
     Page<Scrap> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
+
+    Optional<Scrap> findByMemberIdAndPostId(Long memberId, Long postId);
 }
