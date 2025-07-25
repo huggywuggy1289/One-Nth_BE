@@ -36,27 +36,11 @@ public class SharingItemController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<SharingItemResponseDTO.RegisterResponse> registerSharingItem(
-            @RequestParam("title") String title,
-            @RequestParam("quantity") Integer quantity,
-            @RequestParam("price") Integer price,
-            @RequestParam("itemCategory") ItemCategory itemCategory,
-            @RequestParam(value = "expirationDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expirationDate,
-            @RequestParam("isAvailable") Boolean isAvailable,
-            @RequestParam("purchaseMethod") PurchaseMethod purchaseMethod,
-            @RequestParam("regionId") Long regionId,
-            @RequestParam("tags") List<String> tags,
-            @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+            @RequestPart("data") @Valid SharingItemRequestDTO dto,
+            @RequestPart(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
             @AuthUser Long userId
     ) {
-        SharingItemRequestDTO dto = SharingItemConverter.toRequestDTO(
-                title, quantity, price, itemCategory, expirationDate,
-                isAvailable, purchaseMethod, regionId, tags
-        );
-
         Long savedId = sharingItemService.registerItem(dto, imageFiles, userId);
         return ApiResponse.onSuccess(SharingItemConverter.toRegisterResponse(savedId));
     }
-
-
-
 }
