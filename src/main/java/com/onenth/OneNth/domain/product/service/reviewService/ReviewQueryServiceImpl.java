@@ -1,11 +1,17 @@
 package com.onenth.OneNth.domain.product.service.reviewService;
 
+import com.amazonaws.services.ec2.model.Purchase;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
+import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.converter.ReviewConverter;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
+import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.review.*;
+import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
+import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
 import com.onenth.OneNth.domain.product.repository.reviewRepository.purchase.PurchaseReviewRepository;
 import com.onenth.OneNth.domain.product.repository.reviewRepository.sharing.SharingReviewRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -30,6 +36,9 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
 
     private final SharingReviewRepository sharingReviewRepository;
     private final PurchaseReviewRepository purchaseReviewRepository;
+
+    private final SharingItemRepository sharingItemRepository;
+    private final PurchaseItemRepository purchaseItemRepository;
 
     @Override
     public ReviewResponseDTO.getReviewListDTO getMemberReviews(Long memberId) {
@@ -70,6 +79,36 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
                 .collect(Collectors.toList());
 
         return ReviewConverter.toGetReviewDTO(review, imageList, itemType, userId);
+    }
+
+    @Override
+    public ReviewResponseDTO.getReviewListDTO getUserReceivedReviews(Long userId) {
+
+        Member targetMember = memberRepository.findById(userId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        List<ReviewResponseDTO.getReviewDTO> getReviewDTOList = new ArrayList<>();
+
+        List<SharingItem> sharingItems = sharingItemRepository.findByMember(targetMember);
+        for (SharingItem item : sharingItems) {
+            if (item.getSharingReviews().isEmpty()) continue;
+
+            Long revieweeId = item.getMember().getId();
+            for (SharingReview review : item.getSharingReviews()) {
+                getReviewDTOList.add(toReviewDTO(review, ItemType.SHARE, revieweeId));
+            }
+        }
+
+        List<PurchaseItem> purchaseItems = purchaseItemRepository.findByMember(targetMember);
+        for (PurchaseItem item : purchaseItems) {
+            if (item.getPurchaseReviews().isEmpty()) continue;
+
+            Long revieweeId = item.getMember().getId();
+            for (PurchaseReview review : item.getPurchaseReviews()) {
+                getReviewDTOList.add(toReviewDTO(review, ItemType.PURCHASE, revieweeId));
+            }
+        }
+        getReviewDTOList.sort(Comparator.comparing(ReviewResponseDTO.getReviewDTO::getCreatedAt).reversed());
+        return ReviewConverter.toGetReviewListDTO(getReviewDTOList, targetMember.getId());
     }
 
     private ReviewResponseDTO.getReviewDTO toReviewDTO(Review review, ItemType itemType, Long targetUserId) {

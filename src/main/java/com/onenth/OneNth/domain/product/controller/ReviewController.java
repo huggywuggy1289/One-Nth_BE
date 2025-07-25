@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
-@Tag(name = "거래 후기(리뷰) 관련 API", description = "거래 후기 작성, 수정 관련 API 지원")
+@Tag(name = "거래 후기(리뷰) 관련 API", description = "거래 후기 작성, 수정, 삭제, 조회 관련 API 지원")
 public class ReviewController {
 
     private final ReviewCommandService reviewCommandService;
@@ -174,7 +174,7 @@ public class ReviewController {
     @Operation(
             summary = "내가 작성한 거래 후기 목록 조회 API",
             description = """
-    본인이 작성한 모든 거래 후기를 조회합니다. 최신순으로 조회됩니다.
+    본인이 작성한 모든 거래 후기를 조회합니다. 기본적으로 최신순 조회됩니다.
     """
     )
     @GetMapping(value = "/mine")
@@ -199,6 +199,20 @@ public class ReviewController {
             @Parameter(description = "거래 유형 (PURCHASE: 같이 사요 후기, SHARE: 함께 나눠요 후기)")
             @RequestParam("itemType") ItemType itemType) {
         ReviewResponseDTO.getReviewDTO result = reviewQueryService.getReviewDetails(reviewId,memberId,itemType);
+        return ApiResponse.onSuccess(result);
+    }
+
+    @Operation(
+            summary = "특정 사용자가 받은 거래 후기 목록 조회 API",
+            description = """
+    특정 사용자가 받은 거래 후기 목록을 조회합니다. 기본적으로 최신순 조회됩니다.
+    - URL 경로에 포함된 `userId` 위치에 조회하고자 하는 사용자의 Id를 넣습니다.
+    """
+    )
+    @GetMapping(value = "user/{userId}")
+    public ApiResponse<ReviewResponseDTO.getReviewListDTO> getUserReviews(
+            @PathVariable("userId") Long userId) {
+        ReviewResponseDTO.getReviewListDTO result = reviewQueryService.getUserReceivedReviews(userId);
         return ApiResponse.onSuccess(result);
     }
 }

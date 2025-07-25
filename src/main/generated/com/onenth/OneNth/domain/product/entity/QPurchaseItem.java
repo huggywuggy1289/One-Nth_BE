@@ -45,6 +45,8 @@ public class QPurchaseItem extends EntityPathBase<PurchaseItem> {
 
     public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod> purchaseMethod = createEnum("purchaseMethod", com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod.class);
 
+    public final ListPath<com.onenth.OneNth.domain.product.entity.review.PurchaseReview, com.onenth.OneNth.domain.product.entity.review.QPurchaseReview> purchaseReviews = this.<com.onenth.OneNth.domain.product.entity.review.PurchaseReview, com.onenth.OneNth.domain.product.entity.review.QPurchaseReview>createList("purchaseReviews", com.onenth.OneNth.domain.product.entity.review.PurchaseReview.class, com.onenth.OneNth.domain.product.entity.review.QPurchaseReview.class, PathInits.DIRECT2);
+
     public final com.onenth.OneNth.domain.region.entity.QRegion region;
 
     public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.Status> status = createEnum("status", com.onenth.OneNth.domain.product.entity.enums.Status.class);
