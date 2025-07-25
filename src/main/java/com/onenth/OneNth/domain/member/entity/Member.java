@@ -6,9 +6,9 @@ import com.onenth.OneNth.domain.member.entity.enums.LoginType;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.PostComment;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
-import com.onenth.OneNth.domain.product.entity.PurchaseReview;
+import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
-import com.onenth.OneNth.domain.product.entity.SharingReview;
+import com.onenth.OneNth.domain.product.entity.review.SharingReview;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -20,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 public class Member extends BaseEntity {
 
     @Id
@@ -32,7 +33,7 @@ public class Member extends BaseEntity {
     @Column(length=254, nullable=false, unique = true)
     private String email;
 
-    @Column(length=300, nullable=false)
+    //@Column(length=300, nullable=false) 소셜로그인은 NULL 가능
     private String password;
 
     @Column(length=10, nullable=false)
@@ -44,6 +45,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LoginType loginType;
+
+    private String socialId;
 
     private LocalDate inactiveDate;
 
@@ -57,6 +60,11 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberRegion> memberRegions = new ArrayList<>();
+
+    public void addMemberRegion(MemberRegion memberRegion) {
+        this.memberRegions.add(memberRegion);
+        memberRegion.setMember(this);
+    }
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alert> alerts = new ArrayList<>();

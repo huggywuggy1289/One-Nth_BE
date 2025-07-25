@@ -26,4 +26,12 @@ public class MemberResponseDTO {
         Long memberId;
         String accessToken;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PasswordResetResultDTO {
+        Boolean isSuccess;
+    }
 }

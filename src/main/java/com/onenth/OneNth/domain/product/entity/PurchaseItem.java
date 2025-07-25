@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.member.entity.Member;
 import jakarta.persistence.*;
@@ -57,6 +58,9 @@ public class PurchaseItem extends BaseEntity {
 
     @OneToMany(mappedBy = "purchaseItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemImage> itemImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "purchaseItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseReview> purchaseReviews = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(

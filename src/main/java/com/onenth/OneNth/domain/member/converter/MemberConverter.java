@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.member.converter;
 
+import com.onenth.OneNth.domain.auth.dto.KakaoRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
 import com.onenth.OneNth.domain.member.entity.Member;
@@ -30,6 +31,25 @@ public class MemberConverter {
                 .region(region)
                 .build();
 
+        member.getMemberRegions().add(memberRegion);
+
+        return member;
+    }
+
+    //카카오 회원가입 요청 dto 를 Member 엔티티로 변환
+    public static Member toMember(KakaoRequestDTO.KakaoSignupRequestDTO request, Region region) {
+        Member member = Member.builder()
+                .email(request.getEmail())
+                .name(request.getName())
+                .socialId(request.getSocialId())
+                .nickname(request.getNickname())
+                .loginType(LoginType.KAKAO)
+                .memberRegions(new ArrayList<>())
+                .marketingAgree(request.getMarketingAgree())
+                .build();
+
+        //회원가입시에는 지역 한개만 매핑
+        MemberRegion memberRegion = MemberRegion.of(member, region);
         member.getMemberRegions().add(memberRegion);
 
         return member;
