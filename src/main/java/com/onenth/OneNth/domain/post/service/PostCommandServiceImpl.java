@@ -37,9 +37,14 @@ public class PostCommandServiceImpl implements PostCommandService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        Region region = regionRepository.findById(requestDto.getRegionId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지역입니다."));
-
+        Region region = null;
+        if (postType != PostType.LIFE_TIP) {
+            if (requestDto.getRegionId() == null) {
+                throw new IllegalArgumentException("지역 정보(regionId)가 없습니다.");
+            }
+            region = regionRepository.findById(Long.valueOf(requestDto.getRegionId()))
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지역입니다."));
+        }
 
         Post post = PostConverter.toEntity(requestDto, postType, member, region);
         Post savedPost = postRepository.save(post);
