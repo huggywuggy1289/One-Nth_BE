@@ -1,7 +1,6 @@
 package com.onenth.OneNth.domain.alert.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
-import com.onenth.OneNth.domain.alert.entity.enums.AlertType;
 import com.onenth.OneNth.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;

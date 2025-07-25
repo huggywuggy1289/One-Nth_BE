@@ -24,7 +24,7 @@ public class QAlert extends EntityPathBase<Alert> {
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
-    public final EnumPath<com.onenth.OneNth.domain.alert.entity.enums.AlertType> alertType = createEnum("alertType", com.onenth.OneNth.domain.alert.entity.enums.AlertType.class);
+    public final EnumPath<AlertType> alertType = createEnum("alertType", AlertType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
