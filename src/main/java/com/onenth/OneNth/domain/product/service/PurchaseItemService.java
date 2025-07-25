@@ -1,10 +1,13 @@
 package com.onenth.OneNth.domain.product.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
+import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
+import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.Tag;
@@ -16,6 +19,7 @@ import com.onenth.OneNth.domain.product.repository.itemRepository.ItemImageRepos
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
+import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +40,7 @@ public class PurchaseItemService {
     private final ItemImageRepository itemImageRepository;
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
     private  final TagRepository tagRepository; // +
+    private final RegionRepository regionRepository;
 
     //s3 연동
     private final AmazonS3 amazonS3;
@@ -173,34 +178,29 @@ public class PurchaseItemService {
         return purchaseItem.getId();
     }
 
-    // 전체 상품 리스트 조회 - 지역명, 카테고리명 , 태그명(보류)
+    // 전체 상품 리스트 조회
     @Transactional(readOnly = true)
     public List<PurchaseItemListDTO> searchItems(String keyword, Long userId) {
-        // 대표 지역 1개 가져오기
-        Region region = memberRegionRepository.findByMemberId(userId)
+        List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
                 .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("회원의 지역이 설정되지 않았습니다."))
-                .getRegion();
-
-        // QueryDSL 조회 조건
-        List<PurchaseItem> items;
-
-        if (keyword.startsWith("#")) {
-            // 태그 검색은 미구현
-            throw new UnsupportedOperationException("태그 검색은 현재 지원되지 않습니다.");
-        } else if (isCategory(keyword)) {
-            // 카테고리 검색 (대표 지역 내)
-            items = purchaseItemRepository.findByRegionAndCategory(region.getId(), keyword);
-        } else {
-            // 지역명 검색 (모든 지역 대상)
-            items = purchaseItemRepository.findByRegionName(keyword);
-        }
-
-        // DTO 변환
-        return items.stream()
-                .map(PurchaseItemListDTO::fromEntity)
+                .map(r -> r.getRegion().getId())
                 .toList();
+
+        List<PurchaseItem> items = new ArrayList<>();
+            // 태그 검색 (설정 지역 내)
+        if (keyword.startsWith("#")) {
+            String tag = keyword;
+            items = purchaseItemRepository.findByRegionsAndTag(regionIds, tag);
+        } else if (isCategory(keyword)) {
+            // 카테고리 검색 (설정 지역 내)
+            items = purchaseItemRepository.findByRegionsAndCategory(regionIds, keyword);
+        } else if (isRegion(keyword)){
+            // 지역명 검색 (모든 지역)
+            items = purchaseItemRepository.findByRegionsName(keyword);
+        }
+        System.out.println("keyword: [" + keyword + "]");
+
+        return PurchaseItemConverter.toPurchaseItemListDTOs(items);
     }
 
     private boolean isCategory(String keyword) {
@@ -212,5 +212,44 @@ public class PurchaseItemService {
             }
         }
 
-    // 단일 상품 리스트 조회
+    private boolean isRegion(String keyword){
+        return regionRepository.findByRegionNameContaining(keyword).isPresent();
     }
+
+
+    // 단일 상품 리스트 조회
+    @Transactional(readOnly = true)
+    public PurchaseItemResponseDTO.GetPurchaseItemResponseDTO getItemDetail(Long groupPurchaseId, Long userId) {
+
+        PurchaseItem item = purchaseItemRepository.findById(groupPurchaseId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        Member member = item.getMember();  // 이미 포함돼 있음
+
+        boolean isVerified = true;
+        String profileImageUrl = null;
+
+        List<String> imageUrls = itemImageRepository.findByPurchaseItemId(groupPurchaseId)
+                .stream()
+                .map(ItemImage::getUrl)
+                .toList();
+
+        return PurchaseItemResponseDTO.GetPurchaseItemResponseDTO.builder()
+                .title(item.getName())
+                .imageUrls(imageUrls)
+                .purchaseUrl(item.getPurchaseLocation())
+                .expirationDate(
+                        item.getItemCategory() == ItemCategory.FOOD
+                                ? item.getExpirationDate()
+                                : null
+                )
+                .writerNickname(member.getNickname())
+                .writerProfileImageUrl(profileImageUrl)
+                .writerVerified(isVerified)
+                .itemCategory(item.getItemCategory())
+                .purchaseMethod(item.getPurchaseMethod())
+                .originPrice(item.getPrice())
+                .build();
+    }
+
+}
