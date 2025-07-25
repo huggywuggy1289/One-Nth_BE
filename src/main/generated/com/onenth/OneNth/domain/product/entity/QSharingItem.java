@@ -79,4 +79,3 @@ public class QSharingItem extends EntityPathBase<SharingItem> {
     }
 
 }
-
