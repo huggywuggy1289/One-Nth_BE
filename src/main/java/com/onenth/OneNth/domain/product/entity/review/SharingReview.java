@@ -57,4 +57,9 @@ public class SharingReview extends BaseEntity implements Review {
     public List<ReviewImage> getReviewImages() {
         return (List<ReviewImage>) (List<?>) this.reviewImages;
     }
+
+    @Override
+    public Long getItemId() {
+        return this.sharingItem.getId();
+    }
 }

@@ -33,10 +33,11 @@ public class ReviewConverter {
     }
 
     public static ReviewResponseDTO.getReviewDTO toGetReviewDTO(
-            Review review, List<String> imageUrl, ItemType itemType, Long targetUserId) {
+            Review review, List<String> imageUrl, ItemType itemType, Long targetUserId, Long itemId) {
         return ReviewResponseDTO.getReviewDTO.builder()
                 .reviewId(review.getId())
                 .itemType(itemType)
+                .itemId(itemId)
                 .reviewerId(review.getMember().getId())
                 .reviewTargetId(targetUserId)
                 .content(review.getContent())

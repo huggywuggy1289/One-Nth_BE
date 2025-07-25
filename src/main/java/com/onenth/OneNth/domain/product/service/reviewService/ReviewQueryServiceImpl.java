@@ -1,9 +1,7 @@
 package com.onenth.OneNth.domain.product.service.reviewService;
 
-import com.amazonaws.services.ec2.model.Purchase;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
-import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.converter.ReviewConverter;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
@@ -74,11 +72,13 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
                     .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
         };
 
+        Long itemId = review.getItemId();
+
         List<String> imageList = review.getReviewImages().stream()
                 .map(ReviewImage::getImageUrl)
                 .collect(Collectors.toList());
 
-        return ReviewConverter.toGetReviewDTO(review, imageList, itemType, userId);
+        return ReviewConverter.toGetReviewDTO(review, imageList, itemType, userId, itemId);
     }
 
     @Override
@@ -116,6 +116,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
                 .stream()
                 .map(ReviewImage::getImageUrl)
                 .collect(Collectors.toList());
-        return ReviewConverter.toGetReviewDTO(review, imageList, itemType, targetUserId);
+        Long itemId = review.getItemId();
+        return ReviewConverter.toGetReviewDTO(review, imageList, itemType, targetUserId, itemId);
     }
 }

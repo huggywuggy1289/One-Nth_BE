@@ -13,6 +13,7 @@ public interface Review {
     BigDecimal getRate();
     List<ReviewImage> getReviewImages();
     LocalDateTime getCreatedAt();
+    Long getItemId();
 
     void setContent(String content);
     void setRate(BigDecimal rate);

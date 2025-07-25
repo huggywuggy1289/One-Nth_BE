@@ -33,6 +33,7 @@ public class ReviewResponseDTO {
     public static class getReviewDTO{
         private Long reviewId;
         private ItemType itemType;
+        private Long itemId;
         private LocalDateTime createdAt;
         private Long reviewerId;
         private Long reviewTargetId;
