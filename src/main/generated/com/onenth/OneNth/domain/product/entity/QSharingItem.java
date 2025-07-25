@@ -47,6 +47,8 @@ public class QSharingItem extends EntityPathBase<SharingItem> {
 
     public final NumberPath<Integer> salesPrice = createNumber("salesPrice", Integer.class);
 
+    public final ListPath<com.onenth.OneNth.domain.product.entity.review.SharingReview, com.onenth.OneNth.domain.product.entity.review.QSharingReview> sharingReviews = this.<com.onenth.OneNth.domain.product.entity.review.SharingReview, com.onenth.OneNth.domain.product.entity.review.QSharingReview>createList("sharingReviews", com.onenth.OneNth.domain.product.entity.review.SharingReview.class, com.onenth.OneNth.domain.product.entity.review.QSharingReview.class, PathInits.DIRECT2);
+
     public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.Status> status = createEnum("status", com.onenth.OneNth.domain.product.entity.enums.Status.class);
 
     public final StringPath storageWay = createString("storageWay");

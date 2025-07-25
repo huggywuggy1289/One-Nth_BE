@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.product.entity;
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.entity.enums.TradeMethod;
+import com.onenth.OneNth.domain.product.entity.review.SharingReview;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.member.entity.Member;
 import jakarta.persistence.*;
@@ -59,6 +60,9 @@ public class SharingItem extends BaseEntity {
 
     @OneToMany(mappedBy = "sharingItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemImage> itemImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sharingItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SharingReview> sharingReviews = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
