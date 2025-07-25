@@ -183,4 +183,22 @@ public class ReviewController {
         ReviewResponseDTO.getReviewListDTO result = reviewQueryService.getMemberReviews(memberId);
         return ApiResponse.onSuccess(result);
     }
+
+    @Operation(
+            summary = "거래 후기 개별 조회 API",
+            description = """
+    개별 거래 후기를 상세 조회합니다
+    - URL 경로에 포함된 `reviewId` 위치에 조회할 후기의 ID를 넣어 요청합니다.
+    - 쿼리 파라미터 'itemType'에 후기에 '거래 유형'을 명시합니다. (('PURCHASE' (같이 사요), 'SHARE' (함께 나눠요))
+    """
+    )
+    @GetMapping(value = "/{reviewId}")
+    public ApiResponse<ReviewResponseDTO.getReviewDTO> getReviewDetails(
+            @AuthUser Long memberId,
+            @PathVariable("reviewId") Long reviewId,
+            @Parameter(description = "거래 유형 (PURCHASE: 같이 사요 후기, SHARE: 함께 나눠요 후기)")
+            @RequestParam("itemType") ItemType itemType) {
+        ReviewResponseDTO.getReviewDTO result = reviewQueryService.getReviewDetails(reviewId,memberId,itemType);
+        return ApiResponse.onSuccess(result);
+    }
 }

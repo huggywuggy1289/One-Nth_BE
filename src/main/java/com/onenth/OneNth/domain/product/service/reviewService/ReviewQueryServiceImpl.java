@@ -10,6 +10,8 @@ import com.onenth.OneNth.domain.product.repository.reviewRepository.purchase.Pur
 import com.onenth.OneNth.domain.product.repository.reviewRepository.sharing.SharingReviewRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
+import com.onenth.OneNth.global.apiPayload.exception.handler.PurchasingItemHandler;
+import com.onenth.OneNth.global.apiPayload.exception.handler.SharingItemHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,23 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
 
         getReviewDTOList.sort(Comparator.comparing(ReviewResponseDTO.getReviewDTO::getCreatedAt).reversed());
         return ReviewConverter.toGetReviewListDTO(getReviewDTOList, targetMember.getId());
+    }
+
+    @Override
+    public ReviewResponseDTO.getReviewDTO getReviewDetails(Long reviewId, Long userId, ItemType itemType) {
+
+        Review review = switch (itemType) {
+            case SHARE -> sharingReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new SharingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
+            case PURCHASE -> purchaseReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.REVIEW_NOT_FOUND));
+        };
+
+        List<String> imageList = review.getReviewImages().stream()
+                .map(ReviewImage::getImageUrl)
+                .collect(Collectors.toList());
+
+        return ReviewConverter.toGetReviewDTO(review, imageList, itemType, userId);
     }
 
     private ReviewResponseDTO.getReviewDTO toReviewDTO(Review review, ItemType itemType, Long targetUserId) {
