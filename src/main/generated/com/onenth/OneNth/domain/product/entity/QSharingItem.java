@@ -24,8 +24,6 @@ public class QSharingItem extends EntityPathBase<SharingItem> {
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
-    public final StringPath category = createString("category");
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -33,27 +31,27 @@ public class QSharingItem extends EntityPathBase<SharingItem> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final BooleanPath isVerified = createBoolean("isVerified");
+    public final BooleanPath isAvailable = createBoolean("isAvailable");
+
+    public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.ItemCategory> itemCategory = createEnum("itemCategory", com.onenth.OneNth.domain.product.entity.enums.ItemCategory.class);
 
     public final ListPath<ItemImage, QItemImage> itemImages = this.<ItemImage, QItemImage>createList("itemImages", ItemImage.class, QItemImage.class, PathInits.DIRECT2);
 
     public final com.onenth.OneNth.domain.member.entity.QMember member;
 
-    public final StringPath name = createString("name");
+    public final NumberPath<Integer> price = createNumber("price", Integer.class);
+
+    public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod> purchaseMethod = createEnum("purchaseMethod", com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod.class);
 
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
 
     public final com.onenth.OneNth.domain.region.entity.QRegion region;
 
-    public final NumberPath<Integer> salesPrice = createNumber("salesPrice", Integer.class);
-
     public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.Status> status = createEnum("status", com.onenth.OneNth.domain.product.entity.enums.Status.class);
 
-    public final StringPath storageWay = createString("storageWay");
+    public final ListPath<Tag, QTag> tags = this.<Tag, QTag>createList("tags", Tag.class, QTag.class, PathInits.DIRECT2);
 
-    public final StringPath tradeLocation = createString("tradeLocation");
-
-    public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.TradeMethod> tradeMethod = createEnum("tradeMethod", com.onenth.OneNth.domain.product.entity.enums.TradeMethod.class);
+    public final StringPath title = createString("title");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
