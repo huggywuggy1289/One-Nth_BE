@@ -2,10 +2,15 @@ package com.onenth.OneNth.domain.product.converter;
 
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
+import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
+import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
+import com.onenth.OneNth.domain.product.entity.review.Review;
 import com.onenth.OneNth.domain.product.entity.review.SharingReview;
+
+import java.util.List;
 
 public class ReviewConverter {
 
@@ -24,6 +29,29 @@ public class ReviewConverter {
                 .content(request.getContent())
                 .member(member)
                 .purchaseItem(purchaseItem)
+                .build();
+    }
+
+    public static ReviewResponseDTO.getReviewDTO toGetReviewDTO(
+            Review review, List<String> imageUrl, ItemType itemType, Long targetUserId) {
+        return ReviewResponseDTO.getReviewDTO.builder()
+                .reviewId(review.getId())
+                .itemType(itemType)
+                .reviewerId(review.getMember().getId())
+                .reviewTargetId(targetUserId)
+                .content(review.getContent())
+                .createdAt(review.getCreatedAt())
+                .rate(review.getRate())
+                .reviewImageList(imageUrl)
+                .build();
+    }
+
+    public static ReviewResponseDTO.getReviewListDTO toGetReviewListDTO(
+            List<ReviewResponseDTO.getReviewDTO> getReviewDTOList
+            ,Long memberId) {
+        return ReviewResponseDTO.getReviewListDTO.builder()
+                .memberId(memberId)
+                .reviewList(getReviewDTOList)
                 .build();
     }
 }

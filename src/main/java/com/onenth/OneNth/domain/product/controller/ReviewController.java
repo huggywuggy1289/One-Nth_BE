@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.service.reviewService.ReviewCommandService;
+import com.onenth.OneNth.domain.product.service.reviewService.ReviewQueryServiceImpl;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.handler.PurchasingItemHandler;
@@ -27,6 +28,7 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewCommandService reviewCommandService;
+    private final ReviewQueryServiceImpl reviewQueryService;
 
     @Operation(
             summary = "거래 후기 작성 API (함께 나눠요)",
@@ -167,5 +169,18 @@ public class ReviewController {
     ) {
         reviewCommandService.uploadNewReviewImage(images, itemType, reviewId, memberId);
         return ApiResponse.onSuccess("거래 후기 이미지 추가가 완료되었습니다.");
+    }
+
+    @Operation(
+            summary = "내가 작성한 거래 후기 목록 조회 API",
+            description = """
+    본인이 작성한 모든 거래 후기를 조회합니다. 최신순으로 조회됩니다.
+    """
+    )
+    @GetMapping(value = "/mine")
+    public ApiResponse<ReviewResponseDTO.getReviewListDTO> getMyReviews(
+            @AuthUser Long memberId) {
+        ReviewResponseDTO.getReviewListDTO result = reviewQueryService.getMemberReviews(memberId);
+        return ApiResponse.onSuccess(result);
     }
 }
