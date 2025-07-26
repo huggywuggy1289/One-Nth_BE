@@ -19,7 +19,7 @@ public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -30,6 +30,14 @@ public class Post extends BaseEntity {
 
     @Column(length = 2048, nullable = false)
     private String content;
+
+    private String address;
+
+    @Column(length = 100)
+    private String placeName;
+
+    @Column(length = 100)
+    private String regionName;
 
     private Double latitude;
 
@@ -43,7 +51,7 @@ public class Post extends BaseEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "region_id", nullable = false)
+    @JoinColumn(name = "region_id")
     private Region region;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
