@@ -15,9 +15,6 @@ public class UserSettingsConverter {
                 .region(region)
                 .build();
 
-        System.out.println("memberRegions is null? " + (member.getMemberRegions() == null));
-        System.out.println("memberRegions instanceof HibernateProxy? " + (member.getMemberRegions() instanceof org.hibernate.collection.spi.PersistentCollection));
-
         member.getMemberRegions().add(memberRegion);
 
         return memberRegion;
