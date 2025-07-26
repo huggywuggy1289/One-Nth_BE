@@ -2,52 +2,118 @@ package com.onenth.OneNth.domain.post.controller;
 
 import com.onenth.OneNth.domain.post.dto.PostSaveRequestDTO;
 import com.onenth.OneNth.domain.post.dto.PostSaveResponseDTO;
+import com.onenth.OneNth.domain.post.entity.enums.PostType;
 import com.onenth.OneNth.domain.post.service.PostCommandService;
+import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.status.SuccessStatus;
+import com.onenth.OneNth.global.auth.annotation.AuthUser;
+import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
+import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@Tag(name = "게시글 관련 API",
+        description = "게시글 등록 API")
 @RestController
 @RequiredArgsConstructor
 public class PostRestController {
 
     private final PostCommandService postCommandService;
+    private final GeoCodingService geoCodingService;
+    private final RegionRepository regionRepository;
 
     @Operation(
-            summary = "게시글 등록을 위한 API",
-            description = "새 게시글을 등록합니다."
+            summary = "생활꿀팁/할인정보/우리동네맛집 게시글 등록 API",
+            description = """
+    생활꿀팁/할인정보/우리동네맛집 게시판의 게시글을 등록하는 API입니다.
+    - 쿼리 파라미터 'postType'에 '게시글 종류'를 명시합니다.('DISCOUNT'(할인정보),'RESTAURANT'(우리동네맛집),'LIFE_TIP'(생활꿀팁))
+    - 생활꿀팁의 경우, 'post' 필드에 제목, 내용, 링크 정보를 JSON 문자열로 포함해야 합니다.
+    - 할인정보/우리동네맛집의 경우, 'post' 필드에 제목, 내용, 주소, 장소명을 JSON 문자열로 포함해야 합니다.
+    - 해당 게시글에 필요한 정보가 아닌 경우, 모두 자동 NULL 값 처리됩니다.
+    - 'images' 필드에는 최대 5장까지 게시글 이미지를 선택적으로 첨부할 수 있습니다.
+    """
     )
+    // multipart/form-data 요청 처리 (이미지 첨부 가능)
+    @PostMapping(value = "/api/post/{postType}", consumes = "multipart/form-data")
+    public ApiResponse<PostSaveResponseDTO> saveMultipart(
+            @PathVariable PostType postType,
+            @AuthUser Long memberId,
+            @RequestPart("post") PostSaveRequestDTO requestDto,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) {
+        return saveCommon(postType, memberId, requestDto, images);
+    }
 
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "COMMON200",
-                    description = "OK, 성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "COMMON400",
-                    description = "잘못된 요청입니다.",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-            )
-    })
+    // application/json 요청 처리 (이미지 없이 JSON 데이터만)
+    @PostMapping(value = "/api/post/{postType}", consumes = "application/json")
+    public ApiResponse<PostSaveResponseDTO> saveJson(
+            @PathVariable PostType postType,
+            @AuthUser Long memberId,
+            @RequestBody PostSaveRequestDTO requestDto
+    ) {
+        return saveCommon(postType, memberId, requestDto, null);
+    }
 
-    @PostMapping("/api/post")
-    public ApiResponse<PostSaveResponseDTO> save(@RequestBody PostSaveRequestDTO requestDto){
-        Long postId = postCommandService.save(requestDto);
+    // 공통 로직 분리
+    private ApiResponse<PostSaveResponseDTO> saveCommon(
+            PostType postType,
+            Long memberId,
+            PostSaveRequestDTO requestDto,
+            List<MultipartFile> images
+    ) {
+        // 사진 최대 5장 제한
+        if (images != null && images.size() > 5) {
+            throw new IllegalArgumentException("이미지는 최대 5장까지 업로드할 수 있습니다.");
+        }
+
+        // postType이 LIFE_TIP일 경우 좌표값, 주소, 장소명 제거
+        if (postType == PostType.LIFE_TIP) {
+            requestDto.setLatitude(null);
+            requestDto.setLongitude(null);
+            requestDto.setAddress(null);
+            requestDto.setPlaceName(null);
+        }
+
+        // 주소가 있고, postType이 LIFE_TIP이 아닌 경우만 좌표, 장소명, 지역 ID 조회
+        if (requestDto.getAddress() != null &&
+                postType != PostType.LIFE_TIP) {
+
+            try {
+                GeoCodingResult result = geoCodingService.getCoordinatesFromAddress(requestDto.getAddress());
+                requestDto.setLatitude(result.getLatitude());
+                requestDto.setLongitude(result.getLongitude());
+                requestDto.setRegionName(result.getRegionName());
+
+                regionRepository.findByRegionNameContaining(result.getRegionName())
+                        .ifPresent(region -> requestDto.setRegionId(region.getId()));
+
+            } catch (Exception e) {
+                throw new RuntimeException("좌표 조회 실패: " + e.getMessage(), e);
+            }
+        } else {
+            requestDto.setLatitude(null);
+            requestDto.setLongitude(null);
+        }
+
+        // postType이 RESTAURANT이거나 DISCOUNT일 경우 링크값 제거
+        if (postType == PostType.RESTAURANT || postType == PostType.DISCOUNT) {
+            requestDto.setLink(null);
+        }
+
+        Long postId = postCommandService.save(requestDto, postType, memberId, images);
 
         PostSaveResponseDTO response = PostSaveResponseDTO.builder()
                 .postId(postId)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return ApiResponse.of(SuccessStatus._OK, response);}
+        return ApiResponse.of(SuccessStatus._OK, response);
+    }
 }
