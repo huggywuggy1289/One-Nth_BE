@@ -40,6 +40,26 @@ public class GeneralAlertCommandServiceImpl implements GeneralAlertCommandServic
             memberAlertSetting.disableAlerts(AlertType.SCRAP);
         }
 
-        return GeneralAlertConverter.toSetScrapAlertStatusResponseDTO(AlertType.SCRAP, memberAlertSetting);
+        return GeneralAlertConverter.toSetScrapAlertStatusResponseDTO(memberAlertSetting);
+    }
+
+    @Override
+    public GeneralAlertResponseDTO.SetReviewAlertStatusResponseDTO setReviewAlertStatus(
+            Long userId,
+            GeneralAlertRequestDTO.SetReviewAlertStatusRequestDTO request
+    ) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        MemberAlertSetting memberAlertSetting = memberAlertSettingRepository.findByMember(member)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ALERT_SETTING_NOT_FOUND));
+
+        if (request.getIsEnabled()) {
+            memberAlertSetting.enableAlerts(AlertType.REVIEW);
+        } else {
+            memberAlertSetting.disableAlerts(AlertType.REVIEW);
+        }
+
+        return GeneralAlertConverter.toSetReviewAlertStatusResponseDTO(memberAlertSetting);
     }
 }

@@ -6,10 +6,17 @@ import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAl
 
 public class GeneralAlertConverter {
 
-    public static GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO toSetScrapAlertStatusResponseDTO(AlertType alertType, MemberAlertSetting memberAlertSetting) {
+    public static GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO toSetScrapAlertStatusResponseDTO(MemberAlertSetting memberAlertSetting) {
         return GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO.builder()
-                .alertType(alertType)
+                .alertType(AlertType.SCRAP)
                 .enabled(memberAlertSetting.isScrapAlerts())
+                .build();
+    }
+
+    public static GeneralAlertResponseDTO.SetReviewAlertStatusResponseDTO toSetReviewAlertStatusResponseDTO(MemberAlertSetting memberAlertSetting) {
+        return GeneralAlertResponseDTO.SetReviewAlertStatusResponseDTO.builder()
+                .alertType(AlertType.REVIEW)
+                .enabled(memberAlertSetting.isReviewAlerts())
                 .build();
     }
 }

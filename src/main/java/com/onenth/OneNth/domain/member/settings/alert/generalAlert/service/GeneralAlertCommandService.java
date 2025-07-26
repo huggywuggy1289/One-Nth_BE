@@ -10,4 +10,9 @@ public interface GeneralAlertCommandService {
             GeneralAlertRequestDTO.SetScrapAlertStatusRequestDTO request
     );
 
+    GeneralAlertResponseDTO.SetReviewAlertStatusResponseDTO setReviewAlertStatus(
+            Long userId,
+            GeneralAlertRequestDTO.SetReviewAlertStatusRequestDTO request
+    );
+
 }

@@ -16,4 +16,13 @@ public class GeneralAlertResponseDTO {
         AlertType alertType;
         boolean enabled;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SetReviewAlertStatusResponseDTO {
+        AlertType alertType;
+        boolean enabled;
+    }
 }

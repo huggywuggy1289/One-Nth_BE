@@ -16,4 +16,14 @@ public class GeneralAlertRequestDTO {
         private Boolean isEnabled;
 
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class SetReviewAlertStatusRequestDTO {
+
+        @Schema(description = "리뷰 알림 활성화 여부", example = "true")
+        @NotNull(message = "알림 활성화 여부는 필수입니다.")
+        private Boolean isEnabled;
+
+    }
 }
