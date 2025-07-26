@@ -19,9 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Tag(name = "게시글 관련 API",
-        description = "게시글 등록 API")
+@Tag(name = "게시글 관련 API", description = "게시글 등록 API")
 @RestController
+@RequestMapping("/api/post")
 @RequiredArgsConstructor
 public class PostRestController {
 
@@ -41,7 +41,7 @@ public class PostRestController {
     """
     )
     // multipart/form-data 요청 처리 (이미지 첨부 가능)
-    @PostMapping(value = "/api/post/{postType}", consumes = "multipart/form-data")
+    @PostMapping(value = "/{postType}", consumes = "multipart/form-data")
     public ApiResponse<PostSaveResponseDTO> saveMultipart(
             @PathVariable PostType postType,
             @AuthUser Long memberId,
@@ -52,7 +52,7 @@ public class PostRestController {
     }
 
     // application/json 요청 처리 (이미지 없이 JSON 데이터만)
-    @PostMapping(value = "/api/post/{postType}", consumes = "application/json")
+    @PostMapping(value = "/{postType}", consumes = "application/json")
     public ApiResponse<PostSaveResponseDTO> saveJson(
             @PathVariable PostType postType,
             @AuthUser Long memberId,
