@@ -1,0 +1,45 @@
+package com.onenth.OneNth.domain.member.settings.alert.generalAlert.service;
+
+import com.onenth.OneNth.domain.alert.entity.AlertType;
+import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
+import com.onenth.OneNth.domain.member.entity.MemberRegion;
+import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.converter.GeneralAlertConverter;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAlertRequestDTO;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAlertResponseDTO;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.repository.MemberAlertSettingRepository;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class GeneralAlertCommandServiceImpl implements GeneralAlertCommandService {
+
+    private final MemberRepository memberRepository;
+    private final MemberAlertSettingRepository memberAlertSettingRepository;
+
+    @Override
+    public GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO setScrapAlertStatus(
+            Long userId,
+            GeneralAlertRequestDTO.SetScrapAlertStatusRequestDTO request
+    ) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        MemberAlertSetting memberAlertSetting = memberAlertSettingRepository.findByMember(member)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ALERT_SETTING_NOT_FOUND));
+
+        if (request.getIsEnabled()) {
+            memberAlertSetting.enableAlerts(AlertType.SCRAP);
+        } else {
+            memberAlertSetting.disableAlerts(AlertType.SCRAP);
+        }
+
+        return GeneralAlertConverter.toSetScrapAlertStatusResponseDTO(AlertType.SCRAP, memberAlertSetting);
+    }
+}

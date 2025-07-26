@@ -1,0 +1,47 @@
+package com.onenth.OneNth.domain.member.settings.alert.generalAlert.controller;
+
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAlertRequestDTO;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAlertResponseDTO;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.service.GeneralAlertCommandService;
+import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
+import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
+import com.onenth.OneNth.global.apiPayload.ApiResponse;
+import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
+import com.onenth.OneNth.global.auth.annotation.AuthUser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/user-settings")
+public class GeneralAlertController {
+
+    private final GeneralAlertCommandService generalAlertCommandService;
+
+    @Operation(
+            summary =  "스크랩 알림 on/off API",
+            description = "사용자 설정 중 스크랩 알림 설정 on/off API입니다. 응답으로 alertType(스크랩)과 enabled(활성 여부)을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 스크랩 알람 설정 변경 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ALERT_SETTING001", description = "해당 사용자의 알림 설정 정보가 존재하지 않습니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PostMapping("/scrap-alerts")
+    public ApiResponse<GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO> setScrapAlertStatus(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @Valid @RequestBody GeneralAlertRequestDTO.SetScrapAlertStatusRequestDTO request
+    ) {
+        return ApiResponse.onSuccess(generalAlertCommandService.setScrapAlertStatus(userId, request));
+    }
+}

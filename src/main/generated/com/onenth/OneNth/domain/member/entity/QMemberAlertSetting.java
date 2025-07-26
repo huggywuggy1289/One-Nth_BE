@@ -11,20 +11,20 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QMemberNotificationSetting is a Querydsl query type for MemberNotificationSetting
+ * QMemberAlertSetting is a Querydsl query type for MemberAlertSetting
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QMemberNotificationSetting extends EntityPathBase<MemberNotificationSetting> {
+public class QMemberAlertSetting extends EntityPathBase<MemberAlertSetting> {
 
-    private static final long serialVersionUID = 979123767L;
+    private static final long serialVersionUID = 1242621506L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QMemberNotificationSetting memberNotificationSetting = new QMemberNotificationSetting("memberNotificationSetting");
+    public static final QMemberAlertSetting memberAlertSetting = new QMemberAlertSetting("memberAlertSetting");
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
-    public final BooleanPath chatNotifications = createBoolean("chatNotifications");
+    public final BooleanPath chatAlerts = createBoolean("chatAlerts");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
@@ -33,30 +33,30 @@ public class QMemberNotificationSetting extends EntityPathBase<MemberNotificatio
 
     public final QMember member;
 
-    public final BooleanPath reviewNotifications = createBoolean("reviewNotifications");
+    public final BooleanPath reviewAlerts = createBoolean("reviewAlerts");
 
-    public final BooleanPath scrapNotifications = createBoolean("scrapNotifications");
+    public final BooleanPath scrapAlerts = createBoolean("scrapAlerts");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
-    public QMemberNotificationSetting(String variable) {
-        this(MemberNotificationSetting.class, forVariable(variable), INITS);
+    public QMemberAlertSetting(String variable) {
+        this(MemberAlertSetting.class, forVariable(variable), INITS);
     }
 
-    public QMemberNotificationSetting(Path<? extends MemberNotificationSetting> path) {
+    public QMemberAlertSetting(Path<? extends MemberAlertSetting> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QMemberNotificationSetting(PathMetadata metadata) {
+    public QMemberAlertSetting(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QMemberNotificationSetting(PathMetadata metadata, PathInits inits) {
-        this(MemberNotificationSetting.class, metadata, inits);
+    public QMemberAlertSetting(PathMetadata metadata, PathInits inits) {
+        this(MemberAlertSetting.class, metadata, inits);
     }
 
-    public QMemberNotificationSetting(Class<? extends MemberNotificationSetting> type, PathMetadata metadata, PathInits inits) {
+    public QMemberAlertSetting(Class<? extends MemberAlertSetting> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }
