@@ -82,3 +82,5 @@ cloud:
 kakao:
   client_id: ${KAKAO_CLIENT_ID}
   redirect_uri: http://localhost:8080/api/auth/kakao/callback
+  api:
+    key: ${KAKAO_REST_API_KEY}
