@@ -62,4 +62,24 @@ public class GeneralAlertCommandServiceImpl implements GeneralAlertCommandServic
 
         return GeneralAlertConverter.toSetReviewAlertStatusResponseDTO(memberAlertSetting);
     }
+
+    @Override
+    public GeneralAlertResponseDTO.SetChatAlertStatusResponseDTO setChatAlertStatus(
+            Long userId,
+            GeneralAlertRequestDTO.SetChatAlertStatusRequestDTO request
+    ) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        MemberAlertSetting memberAlertSetting = memberAlertSettingRepository.findByMember(member)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ALERT_SETTING_NOT_FOUND));
+
+        if (request.getIsEnabled()) {
+            memberAlertSetting.enableAlerts(AlertType.CHAT);
+        } else {
+            memberAlertSetting.disableAlerts(AlertType.CHAT);
+        }
+
+        return GeneralAlertConverter.toSetChatAlertStatusResponseDTO(memberAlertSetting);
+    }
 }

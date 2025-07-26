@@ -19,4 +19,11 @@ public class GeneralAlertConverter {
                 .enabled(memberAlertSetting.isReviewAlerts())
                 .build();
     }
+
+    public static GeneralAlertResponseDTO.SetChatAlertStatusResponseDTO toSetChatAlertStatusResponseDTO(MemberAlertSetting memberAlertSetting) {
+        return GeneralAlertResponseDTO.SetChatAlertStatusResponseDTO.builder()
+                .alertType(AlertType.CHAT)
+                .enabled(memberAlertSetting.isChatAlerts())
+                .build();
+    }
 }

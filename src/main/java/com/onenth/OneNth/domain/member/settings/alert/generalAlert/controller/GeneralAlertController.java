@@ -63,4 +63,22 @@ public class GeneralAlertController {
         return ApiResponse.onSuccess(generalAlertCommandService.setReviewAlertStatus(userId, request));
     }
 
+    @Operation(
+            summary =  "채팅 전체 알림 on/off API",
+            description = "사용자 설정 중 채팅 전체 알림 설정 on/off API입니다. 응답으로 alertType(채팅)과 enabled(활성 여부)을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 리뷰 알람 설정 변경 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ALERT_SETTING001", description = "해당 사용자의 알림 설정 정보가 존재하지 않습니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PostMapping("/chat-alerts")
+    public ApiResponse<GeneralAlertResponseDTO.SetChatAlertStatusResponseDTO> setChatAlertStatus(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @Valid @RequestBody GeneralAlertRequestDTO.SetChatAlertStatusRequestDTO request
+    ) {
+        return ApiResponse.onSuccess(generalAlertCommandService.setChatAlertStatus(userId, request));
+    }
+
 }

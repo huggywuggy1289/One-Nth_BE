@@ -15,4 +15,9 @@ public interface GeneralAlertCommandService {
             GeneralAlertRequestDTO.SetReviewAlertStatusRequestDTO request
     );
 
+    GeneralAlertResponseDTO.SetChatAlertStatusResponseDTO setChatAlertStatus(
+            Long userId,
+            GeneralAlertRequestDTO.SetChatAlertStatusRequestDTO request
+    );
+
 }
