@@ -1,8 +1,8 @@
-package com.onenth.OneNth.domain.alert.keywordAlert.controller;
+package com.onenth.OneNth.domain.member.settings.alert.keywordAlert.controller;
 
-import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertRequestDTO;
-import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertResponseDTO;
-import com.onenth.OneNth.domain.alert.keywordAlert.service.KeywordAlertCommandService;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto.KeywordAlertRequestDTO;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto.KeywordAlertResponseDTO;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.service.KeywordAlertCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
