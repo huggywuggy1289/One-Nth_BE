@@ -1,6 +1,8 @@
 package com.onenth.OneNth.domain.product.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
+import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
+import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.entity.enums.TradeMethod;
 import com.onenth.OneNth.domain.product.entity.review.SharingReview;
@@ -25,30 +27,26 @@ public class SharingItem extends BaseEntity {
     private Long id;
 
     @Column(length = 50, nullable = false)
-    private String name;
+    private String title;
 
     @Column(nullable = false)
     private Integer quantity;
 
     @Column(nullable = false)
-    private Integer salesPrice;
-
-    @Column(nullable = false)
-    private String category;
-
-    private LocalDate expirationDate;
-
-    private Boolean isVerified;
+    private Integer price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TradeMethod tradeMethod;
+    private ItemCategory itemCategory;
 
-    @Column(length = 300)
-    private String tradeLocation;
+    private LocalDate expirationDate;
 
-    @Column(length = 100)
-    private String storageWay;
+    @Column(nullable = false)
+    private Boolean isAvailable;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PurchaseMethod purchaseMethod;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -67,4 +65,12 @@ public class SharingItem extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
+
+    @ManyToMany
+    @JoinTable(
+            name = "sharing_item_tag",
+            joinColumns = @JoinColumn(name = "sharing_item_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags = new ArrayList<>();
 }
