@@ -8,13 +8,14 @@ import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/group-purchases")
 @RequiredArgsConstructor
@@ -46,14 +47,42 @@ public class PurchaseItemController {
         return ApiResponse.onSuccess(PurchaseItemConverter.toRegisterPurchaseItemResponseDTO(savedItemId));
     }
 
-    // 상품 검색(지역명 or 카테고리명 or 태그명) 역시 우리동네 지역추가로직 완성후 개발예정
+    // 상품 검색
+    @Operation(
+            summary = "같이사요 상품 검색",
+            description = """
+            키워드로 상품을 검색합니다.
+            """
+    )
     @GetMapping
-    public ResponseEntity<List<PurchaseItemListDTO>> searchItems(
+    public ResponseEntity<ApiResponse<List<PurchaseItemListDTO>>> searchItems(
             @RequestParam String keyword,
             @AuthUser Long userId
     ) {
         List<PurchaseItemListDTO> result = purchaseItemService.searchItems(keyword, userId);
-        return ResponseEntity.ok(result);
+        log.info("keyword: [{}]", keyword);
+        return ResponseEntity.ok(ApiResponse.onSuccess(result));
+    }
+
+    // 단일 상품 검색
+    @Operation(
+            summary = "같이사요 단일 상품조회",
+            description = """
+            상품의 상세조회를 합니다.
+            
+            - `#태그명` : 설정한 3개 지역 내 태그로 검색
+            - `카테고리명` : 설정한 3개 지역 내 카테고리로 검색
+            - `지역명` : 설정과 무관하게 특정 지역명으로 검색
+            """
+    )
+    @GetMapping("/group-purchases/{groupPurchaseId}")
+    public ApiResponse<PurchaseItemResponseDTO.GetPurchaseItemResponseDTO> getGroupPurchaseDetail(
+            @PathVariable Long groupPurchaseId,
+            @AuthUser Long userId
+    ) {
+        PurchaseItemResponseDTO.GetPurchaseItemResponseDTO detail =
+                purchaseItemService.getItemDetail(groupPurchaseId, userId);
+        return ApiResponse.onSuccess(detail);
     }
 }
 

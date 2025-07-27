@@ -14,7 +14,7 @@ import com.querydsl.core.types.dsl.PathInits;
  * QMemberNotificationSetting is a Querydsl query type for MemberNotificationSetting
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QMemberNotificationSetting extends EntityPathBase<MemberNotificationSetting> {
+public class QMemberNotificationSetting extends EntityPathBase<MemberAlertSetting> {
 
     private static final long serialVersionUID = 979123767L;
 
@@ -41,10 +41,10 @@ public class QMemberNotificationSetting extends EntityPathBase<MemberNotificatio
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QMemberNotificationSetting(String variable) {
-        this(MemberNotificationSetting.class, forVariable(variable), INITS);
+        this(MemberAlertSetting.class, forVariable(variable), INITS);
     }
 
-    public QMemberNotificationSetting(Path<? extends MemberNotificationSetting> path) {
+    public QMemberNotificationSetting(Path<? extends MemberAlertSetting> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
@@ -53,10 +53,10 @@ public class QMemberNotificationSetting extends EntityPathBase<MemberNotificatio
     }
 
     public QMemberNotificationSetting(PathMetadata metadata, PathInits inits) {
-        this(MemberNotificationSetting.class, metadata, inits);
+        this(MemberAlertSetting.class, metadata, inits);
     }
 
-    public QMemberNotificationSetting(Class<? extends MemberNotificationSetting> type, PathMetadata metadata, PathInits inits) {
+    public QMemberNotificationSetting(Class<? extends MemberAlertSetting> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }
