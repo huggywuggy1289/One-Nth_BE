@@ -161,4 +161,35 @@ public class MemberConverter {
             return createdAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         }
     }
+
+    // 내가 쓴 게시글을 한번에 보기
+    public static MemberResponseDTO.PostListDTO toMyPostPreviewListDTO(Page<Post> postList, int page ) {
+        List<MemberResponseDTO.PostPreviewDTO> postPreviewList = postList.stream()
+                .map(MemberConverter::toPostPreviewDTO).toList();
+
+        return MemberResponseDTO.PostListDTO.builder()
+                .totalPage(postList.getTotalPages())
+                .totalElements(postList.getTotalElements())
+                .currentPage(page)
+                .listSize(postPreviewList.size())
+                .isFirst(postList.isFirst())
+                .isLast(postList.isLast())
+                .postList(postPreviewList)
+                .build();
+    }
+
+    // 내가 쓴 게시글 조회에서 필요한 미리보기dto로 전환
+    public static MemberResponseDTO.PostPreviewDTO toPostPreviewDTO(Post myPost) {
+
+        return MemberResponseDTO.PostPreviewDTO.builder()
+                .postId(myPost.getId())
+                .postType(myPost.getPostType().toString())
+                .postTitle(myPost.getTitle())
+                .regionName(myPost.getRegion().getRegionName())
+                .commentCount(myPost.getPostComment().size())
+                .likeCount(myPost.getLike().size())
+                .viewCount(0)
+                .createdTime(formatRelativeTime(myPost.getCreatedAt()))
+                .build();
+    }
 }

@@ -119,7 +119,7 @@ public class MemberRestController {
             @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true),
             @Parameter(name = "size", description = "페이지 당 미리보기 개수", example = "10", required = true)
     })
-    @GetMapping("/mypage/likes/")
+    @GetMapping("/mypage/likes")
     public ApiResponse<MemberResponseDTO.PostListDTO> getLikedPosts(
             @Parameter(hidden = true) @AuthUser Long memberId,
             @RequestParam(name="page", defaultValue = "1") Integer page,
@@ -169,6 +169,30 @@ public class MemberRestController {
             @PathVariable(name = "postId") Long postId
     ) {
         return ApiResponse.onSuccess(memberCommandService.cancelLike(memberId, postId));
+    }
+
+    /**
+     * 마이페이지 - 내가 작성한 게시글 조회 API 구현 (최신순 10개씩 페이징)
+     */
+    @Operation(
+            summary = "마이페이지- 내가 작성한 글 조회 API",
+            description = "사용자가 작성한 글 조회 API 입니다. 현재 페이지 번호와 사이즈를 쿼리스트링으로 보내주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true),
+            @Parameter(name = "size", description = "페이지 당 미리보기 개수", example = "10", required = true)
+    })
+    @GetMapping("/mypage/posts")
+    public ApiResponse<MemberResponseDTO.PostListDTO> getMyPosts(
+            @Parameter(hidden = true) @AuthUser Long memberId,
+            @RequestParam(name="page", defaultValue = "1") Integer page,
+            @RequestParam(name="size", defaultValue = "10") Integer size
+    ) {
+        return ApiResponse.onSuccess(memberQueryService.getMyPosts(memberId, page, size));
     }
 
 }
