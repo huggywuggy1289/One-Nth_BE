@@ -1,5 +1,7 @@
 package com.onenth.OneNth.domain.post.controller;
 
+import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.post.dto.PostDetailResponseDTO;
 import com.onenth.OneNth.domain.post.dto.PostListResponseDTO;
 import com.onenth.OneNth.domain.post.dto.PostSaveRequestDTO;
 import com.onenth.OneNth.domain.post.dto.PostSaveResponseDTO;
@@ -158,6 +160,25 @@ public class PostRestController {
         List<PostListResponseDTO> contentList = pageResult.getContent();
 
         return ApiResponse.onSuccess(contentList);
+    }
+
+
+    @Operation(
+            summary = "게시글 상세 조회 API",
+            description = """
+    postId를 이용한 게시글의 상세 정보 조회 API입니다. 
+    응답으로 'postId', '작성자 닉네임', '지역명'(LIFE_TIP의 경우, null), '제목', '내용', '이미지 url', '스크랩 상태', '공감,댓글,조회수', '생성시간'을 제공합니다.
+    
+    - 쿼리파라미터 postId에 게시글 ID를 전달합니다.
+    """
+    )
+    @GetMapping("/{postId}")
+    public ApiResponse<PostDetailResponseDTO> getPostDetail(
+            @PathVariable Long postId,
+            @AuthUser Member member
+            ) {
+        PostDetailResponseDTO response = postQueryService.getPostDetail(postId, member);
+        return ApiResponse.onSuccess(response);
     }
 
 }

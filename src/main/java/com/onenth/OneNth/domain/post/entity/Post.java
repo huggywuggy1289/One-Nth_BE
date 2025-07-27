@@ -49,6 +49,10 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private int viewCount = 0;
 
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;

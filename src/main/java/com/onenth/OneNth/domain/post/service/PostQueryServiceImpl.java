@@ -1,16 +1,21 @@
 package com.onenth.OneNth.domain.post.service;
 
+import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.post.dto.PostDetailResponseDTO;
 import com.onenth.OneNth.domain.post.dto.PostListResponseDTO;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
-import com.onenth.OneNth.domain.post.repository.PostRepository;
-import com.onenth.OneNth.domain.post.service.PostQueryService;
+import com.onenth.OneNth.domain.post.repository.*;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostQueryServiceImpl implements PostQueryService {
 
     private final PostRepository postRepository;
-    private final RegionRepository regionRepository;
+    private final PostImageRepository postImageRepository;
+    private final PostCommentRepository postCommentRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final PostScrapRepository postScrapRepository;
 
     @Override
     public Page<PostListResponseDTO> getPostList(
@@ -59,5 +67,31 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     private String createPreview(String content) {
         return content.length() > 50 ? content.substring(0, 50) + "..." : content;
+    }
+
+    public PostDetailResponseDTO getPostDetail(Long postId, Member member) {
+        Post post = postRepository.findByIdWithMemberAndRegion(postId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_POST));
+
+        int commentCount = (int) postCommentRepository.countByPost(post);
+        int likeCount = (int) postLikeRepository.countByPost(post);
+        boolean scrapStatus = postScrapRepository.existsByPostIdAndMemberId(postId, member.getId());
+        List<String> imageUrls = postImageRepository.findUrlsByPost(post);
+
+        post.increaseViewCount(); // 조회수 증가 (Entity 메서드)
+
+        return PostDetailResponseDTO.builder()
+                .postId(post.getId().toString())
+                .nickname(post.getMember().getNickname())
+                .regionName(post.getRegion() != null ? post.getRegion().getRegionName() : null)
+                .title(post.getTitle())
+                .content(post.getContent())
+                .imageUrls(imageUrls)
+                .commentCount(commentCount)
+                .likeCount(likeCount)
+                .scrapStatus(scrapStatus)
+                .viewCount(post.getViewCount())
+                .createdAt(post.getCreatedAt())
+                .build();
     }
 }
