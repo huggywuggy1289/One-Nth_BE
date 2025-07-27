@@ -25,7 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SharingItemService {
@@ -172,7 +174,10 @@ public class SharingItemService {
             items = sharingItemRepository.findByRegionName(keyword);
         }
 
-        System.out.println("keyword: [" + keyword + "]");
+        items.forEach(i ->
+                log.info("📦 [item: {}] ↔ [region: {}]", i.getTitle(),
+                        i.getRegion() != null ? i.getRegion().getRegionName() : "null")
+        );
 
         return items.stream()
                 .map(SharingItemListDTO::fromEntity)

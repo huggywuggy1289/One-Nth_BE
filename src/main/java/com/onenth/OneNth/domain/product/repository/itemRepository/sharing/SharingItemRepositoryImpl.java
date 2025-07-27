@@ -50,7 +50,7 @@ public class SharingItemRepositoryImpl implements SharingItemRepositoryCustom {
 
         return queryFactory
                 .selectFrom(item)
-                .join(item.region, region)
+                .join(item.region, region).fetchJoin()
                 .where(region.regionName.like("%" + cleanKeyword + "%"))
                 .fetch();
     }
