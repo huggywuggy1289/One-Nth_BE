@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.product.controller;
 
 import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
+import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
@@ -27,6 +29,7 @@ public class SharingItemController {
 
     private final SharingItemService sharingItemService;
 
+    // 상품 등록
     @Operation(
             summary = "함께 나눠요 상품 등록 API",
             description = "함께 나눠요 상품을 등록합니다. \n\n" +
@@ -42,5 +45,26 @@ public class SharingItemController {
     ) {
         Long savedId = sharingItemService.registerItem(dto, imageFiles, userId);
         return ApiResponse.onSuccess(SharingItemConverter.toRegisterResponse(savedId));
+    }
+
+    // 상품 검색
+    @Operation(
+            summary = "함께나눠요 상품 검색",
+            description = """
+            키워드로 상품을 검색합니다.
+            
+            - `#태그명` : 설정한 3개 지역 내 태그로 검색
+            - `카테고리명` : 설정한 3개 지역 내 카테고리로 검색
+            - `지역명` : 설정과 무관하게 특정 지역명으로 검색
+            """
+    )
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<SharingItemListDTO>>> searchSharingItems(
+            @RequestParam String keyword,
+            @AuthUser Long userId
+    ) {
+        List<SharingItemListDTO> result = sharingItemService.searchItems(keyword, userId);
+        log.info("keyword: [{}]", keyword);
+        return ResponseEntity.ok(ApiResponse.onSuccess(result));
     }
 }
