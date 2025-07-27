@@ -83,8 +83,8 @@ public class MemberRestController {
      * 마이페이지 - 내가 스크랩한 글 조회 API 구현 (1최신순 0개씩 페이징)
      */
     @Operation(
-            summary = "마이페이지- 내가 스크랩한 글 조회 API",
-            description = "사용자가 스크랩한 글 조회 API 입니다. 현재 페이지 번호를 쿼리스트링으로 보내주세요."
+            summary = "마이페이지- 내가 스크랩한 게시글 조회 API",
+            description = "사용자가 스크랩한 게시글 조회 API 입니다. 현재 페이지 번호를 쿼리스트링으로 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -108,8 +108,8 @@ public class MemberRestController {
      * 마이페이지 - 내가 공감한 글 조회 API 구현 (최신순 10개씩 페이징)
      */
     @Operation(
-            summary = "마이페이지- 내가 공감한 글 조회 API",
-            description = "사용자가 스크랩한 글 조회 API 입니다. 현재 페이지 번호를 쿼리스트링으로 보내주세요."
+            summary = "마이페이지- 내가 공감한 게시글 조회 API",
+            description = "사용자가 스크랩한 게시글 조회 API 입니다. 현재 페이지 번호를 쿼리스트링으로 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -132,8 +132,8 @@ public class MemberRestController {
      * 마이페이지 - 내가 스크랩한 글 취소 API 구현
      */
     @Operation(
-            summary = "마이페이지- 내가 스크랩한 글 취소 API",
-            description = "사용자가 스크랩한 글 취소 API 입니다. postId를 PathVariable 로 보내주세요."
+            summary = "마이페이지- 내가 스크랩한 게시글 취소 API",
+            description = "사용자가 스크랩한 게시글 취소 API 입니다. postId를 PathVariable 로 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -153,8 +153,8 @@ public class MemberRestController {
      * 마이페이지 - 내가 공감한 글 취소 API 구현
      */
     @Operation(
-            summary = "마이페이지- 내가 공감한 글 취소 API",
-            description = "사용자가 공감한 글 취소 API 입니다. postId를 PathVariable 로 보내주세요."
+            summary = "마이페이지- 내가 공감한 게시글 취소 API",
+            description = "사용자가 공감한 게시글 취소 API 입니다. postId를 PathVariable 로 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -175,8 +175,8 @@ public class MemberRestController {
      * 마이페이지 - 내가 작성한 게시글 조회 API 구현 (최신순 10개씩 페이징)
      */
     @Operation(
-            summary = "마이페이지- 내가 작성한 글 조회 API",
-            description = "사용자가 작성한 글 조회 API 입니다. 현재 페이지 번호와 사이즈를 쿼리스트링으로 보내주세요."
+            summary = "마이페이지- 내가 작성한 게시글 조회 API",
+            description = "사용자가 작성한 게시글 조회 API 입니다. 현재 페이지 번호와 사이즈를 쿼리스트링으로 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),

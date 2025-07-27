@@ -7,7 +7,7 @@ import com.onenth.OneNth.domain.post.entity.Like;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
 import com.onenth.OneNth.domain.post.repository.likeRepository.LikeRepository;
-import com.onenth.OneNth.domain.post.repository.postRepository.PostRepository;
+import com.onenth.OneNth.domain.post.repository.PostRepository;
 import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

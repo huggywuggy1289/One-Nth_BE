@@ -59,6 +59,9 @@ public class MemberResponseDTO {
         Long postId;
         String postType;
         String postTitle;
+        String placeName;
+        Double latitude;
+        Double longitude;
         String regionName;
         Integer commentCount;
         Integer likeCount;
