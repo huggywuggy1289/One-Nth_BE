@@ -47,6 +47,12 @@ public enum ErrorStatus implements BaseErrorCode {
     // 채팅 관련
     CHAT_ROOM_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "CHAT_ROOM001", "자기 자신과의 채팅방 생성은 불가능합니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHAT_ROOM002", "채팅방이 존재하지 않습니다."),
+
+    //게시글 관련
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, "POST_001", "게시글을 찾을 수 없습니다."),
+
+    ALERT_SETTING_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALERT_SETTING001", "해당 사용자의 알림 설정 정보가 존재하지 않습니다."),
+    UNEXPECTED_ALERT_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "ALERT_002", "지원하지 않는 AlertType입니다."),
     ;
 
     private final HttpStatus httpStatus;
