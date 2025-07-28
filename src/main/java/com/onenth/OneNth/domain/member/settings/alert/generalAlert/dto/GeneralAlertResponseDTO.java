@@ -1,7 +1,7 @@
 package com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto;
 
 import com.onenth.OneNth.domain.alert.entity.AlertType;
-import com.onenth.OneNth.domain.alert.keywordAlert.entity.enums.KeywordAlertType;
+import com.onenth.OneNth.domain.member.entity.enums.KeywordAlertType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
