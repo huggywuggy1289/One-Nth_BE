@@ -33,8 +33,6 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final BooleanPath isConfirmed = createBoolean("isConfirmed");
-
     public final StringPath name = createString("name");
 
     //inherited
