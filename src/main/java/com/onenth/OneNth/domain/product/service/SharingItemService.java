@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
 
 import java.io.IOException;
 import java.util.*;
@@ -187,6 +188,23 @@ public class SharingItemService {
                 .map(SharingItemListDTO::fromEntity)
                 .toList();
     }
+
+    // 상품명 검색++++
+    public List<SharingItemListDTO> searchByTitleAndSelectedRegions(String keyword, List<Integer> regionIds) {
+        if (regionIds == null || regionIds.isEmpty()) {
+            // 전국 검색: 지역 조건 없이 상품명만 검색
+            return sharingItemRepository.findByTitleContainingIgnoreCase(keyword)
+                    .stream()
+                    .map(SharingItemListDTO::fromEntity)
+                    .toList();
+        }
+
+        return sharingItemRepository.searchByTitleAndRegion(keyword, regionIds)
+                .stream()
+                .map(SharingItemListDTO::fromEntity)
+                .toList();
+    }
+
 
     private boolean isCategory(String keyword) {
         try {

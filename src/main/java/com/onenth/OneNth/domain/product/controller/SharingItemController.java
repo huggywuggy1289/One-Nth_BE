@@ -67,4 +67,25 @@ public class SharingItemController {
         log.info("keyword: [{}]", keyword);
         return ResponseEntity.ok(ApiResponse.onSuccess(result));
     }
+
+    // 상품검색(상품명)
+    @Operation(
+            summary = "상품명 기반 지역 선택 검색",
+            description = """
+    - keyword에 해당하는 상품명을 LIKE 검색합니다.
+    - regionIds 파라미터에 선택한 지역 ID 리스트를 넘기면 해당 지역만 필터링합니다.
+    - 지역 선택을 안 하면 전국 검색입니다.
+    """
+    )
+
+    @GetMapping("/title")
+    public ApiResponse<List<SharingItemListDTO>> searchByTitleWithRegionFilter(
+            @RequestParam String keyword,
+            @RequestParam(required = false) List<Integer> regionIds,
+            @AuthUser Long userId
+    ) {
+        List<SharingItemListDTO> results = sharingItemService.searchByTitleAndSelectedRegions(keyword, regionIds);
+        return ApiResponse.onSuccess(results);
+    }
+
 }
