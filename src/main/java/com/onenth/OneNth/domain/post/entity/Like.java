@@ -5,23 +5,23 @@ import com.onenth.OneNth.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Table(name = "`like`")
-public class Like extends BaseEntity {
+        @Entity
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        @Table(name = "`like`")
+        public class Like extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Member member;
+            @ManyToOne(fetch = FetchType.LAZY)
+            @JoinColumn(name = "user_id", nullable = false)
+            private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
-}
+            @ManyToOne(fetch = FetchType.LAZY)
+            @JoinColumn(name = "post_id", nullable = false)
+            private Post post;
+        }
