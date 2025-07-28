@@ -1,7 +1,7 @@
-package com.onenth.OneNth.domain.alert.keywordAlert.service;
+package com.onenth.OneNth.domain.member.settings.alert.keywordAlert.service;
 
-import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertRequestDTO;
-import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertResponseDTO;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto.KeywordAlertRequestDTO;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto.KeywordAlertResponseDTO;
 
 public interface KeywordAlertCommandService {
 

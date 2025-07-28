@@ -1,12 +1,12 @@
-package com.onenth.OneNth.domain.alert.keywordAlert.service;
+package com.onenth.OneNth.domain.member.settings.alert.keywordAlert.service;
 
-import com.onenth.OneNth.domain.alert.keywordAlert.converter.KeywordAlertConverter;
-import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertRequestDTO;
-import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertResponseDTO;
-import com.onenth.OneNth.domain.alert.keywordAlert.entity.ProductKeywordAlert;
-import com.onenth.OneNth.domain.alert.keywordAlert.entity.RegionKeywordAlert;
-import com.onenth.OneNth.domain.alert.keywordAlert.repository.ProductKeywordAlertRepository;
-import com.onenth.OneNth.domain.alert.keywordAlert.repository.RegionKeywordAlertRepository;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.converter.KeywordAlertConverter;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto.KeywordAlertRequestDTO;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto.KeywordAlertResponseDTO;
+import com.onenth.OneNth.domain.member.entity.ProductKeywordAlert;
+import com.onenth.OneNth.domain.member.entity.RegionKeywordAlert;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.repository.ProductKeywordAlertRepository;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.repository.RegionKeywordAlertRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.region.entity.Region;

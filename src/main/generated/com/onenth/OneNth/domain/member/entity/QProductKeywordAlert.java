@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.alert.keywordAlert.entity;
+package com.onenth.OneNth.domain.member.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QProductKeywordAlert extends EntityPathBase<ProductKeywordAlert> {
 
-    private static final long serialVersionUID = -1782621245L;
+    private static final long serialVersionUID = 31268046L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -33,7 +33,7 @@ public class QProductKeywordAlert extends EntityPathBase<ProductKeywordAlert> {
 
     public final StringPath keyword = createString("keyword");
 
-    public final com.onenth.OneNth.domain.member.entity.QMember member;
+    public final QMember member;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
@@ -56,7 +56,7 @@ public class QProductKeywordAlert extends EntityPathBase<ProductKeywordAlert> {
 
     public QProductKeywordAlert(Class<? extends ProductKeywordAlert> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.member = inits.isInitialized("member") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("member")) : null;
+        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }
 
 }
