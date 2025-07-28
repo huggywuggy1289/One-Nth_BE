@@ -11,6 +11,8 @@ import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAl
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.repository.MemberAlertSettingRepository;
 import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.repository.ProductKeywordAlertRepository;
 import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.repository.RegionKeywordAlertRepository;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.service.KeywordAlertCommandServiceImpl;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.util.KeywordAlertSortUtil;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -46,27 +48,12 @@ public class GeneralAlertQueryServiceImpl implements GeneralAlertQueryService {
         GeneralAlertResponseDTO.GeneralAlertSummary scrapAlertSummary = GeneralAlertConverter.toGeneralAlertSummary(AlertType.SCRAP, memberAlertSetting);
         GeneralAlertResponseDTO.GeneralAlertSummary reviewAlertSummary = GeneralAlertConverter.toGeneralAlertSummary(AlertType.REVIEW, memberAlertSetting);
 
-        List<Object> mergedAlerts = mergeAndSortAlerts(productKeywordAlerts, regionKeywordAlerts);
+        List<Object> mergedAlerts = KeywordAlertSortUtil.mergeAndSortAlerts(productKeywordAlerts, regionKeywordAlerts);
 
         List<GeneralAlertResponseDTO.KeywordAlertSummary> keywordAlertSummaryList = mergedAlerts.stream()
                 .map(keywordAlert -> GeneralAlertConverter.toKeywordAlertSummary(keywordAlert))
                 .collect(Collectors.toList());
 
         return GeneralAlertConverter.toGetAllAlertSettingsResponseDTO(scrapAlertSummary, reviewAlertSummary, keywordAlertSummaryList);
-    }
-
-    private List<Object> mergeAndSortAlerts(List<ProductKeywordAlert> productKeywordAlertList, List<RegionKeywordAlert> regionKeywordAlertList) {
-        List<Object> mergedAlerts = new ArrayList<>();
-        mergedAlerts.addAll(productKeywordAlertList);
-        mergedAlerts.addAll(regionKeywordAlertList);
-
-        mergedAlerts.sort(Comparator.comparing(alert ->
-                        (alert instanceof ProductKeywordAlert)
-                                ? ((ProductKeywordAlert) alert).getCreatedAt()
-                                : ((RegionKeywordAlert) alert).getCreatedAt(),
-                Comparator.reverseOrder())
-        );
-
-        return mergedAlerts;
     }
 }
