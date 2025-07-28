@@ -6,7 +6,6 @@ import com.onenth.OneNth.domain.post.dto.PostListResponseDTO;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
 import com.onenth.OneNth.domain.post.repository.*;
-import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
