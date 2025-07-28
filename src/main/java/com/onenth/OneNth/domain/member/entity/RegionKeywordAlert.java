@@ -1,7 +1,6 @@
-package com.onenth.OneNth.domain.alert.keywordAlert.entity;
+package com.onenth.OneNth.domain.member.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
-import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.region.entity.Region;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

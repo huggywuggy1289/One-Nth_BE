@@ -11,54 +11,53 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QMemberNotificationSetting is a Querydsl query type for MemberNotificationSetting
+ * QRegionKeywordAlert is a Querydsl query type for RegionKeywordAlert
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QMemberNotificationSetting extends EntityPathBase<MemberNotificationSetting> {
+public class QRegionKeywordAlert extends EntityPathBase<RegionKeywordAlert> {
 
-    private static final long serialVersionUID = 979123767L;
+    private static final long serialVersionUID = -153914565L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QMemberNotificationSetting memberNotificationSetting = new QMemberNotificationSetting("memberNotificationSetting");
+    public static final QRegionKeywordAlert regionKeywordAlert = new QRegionKeywordAlert("regionKeywordAlert");
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
-    public final BooleanPath chatNotifications = createBoolean("chatNotifications");
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
+    public final BooleanPath enabled = createBoolean("enabled");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final QMember member;
 
-    public final BooleanPath reviewNotifications = createBoolean("reviewNotifications");
-
-    public final BooleanPath scrapNotifications = createBoolean("scrapNotifications");
+    public final com.onenth.OneNth.domain.region.entity.QRegion regionKeyword;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
-    public QMemberNotificationSetting(String variable) {
-        this(MemberNotificationSetting.class, forVariable(variable), INITS);
+    public QRegionKeywordAlert(String variable) {
+        this(RegionKeywordAlert.class, forVariable(variable), INITS);
     }
 
-    public QMemberNotificationSetting(Path<? extends MemberNotificationSetting> path) {
+    public QRegionKeywordAlert(Path<? extends RegionKeywordAlert> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QMemberNotificationSetting(PathMetadata metadata) {
+    public QRegionKeywordAlert(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QMemberNotificationSetting(PathMetadata metadata, PathInits inits) {
-        this(MemberNotificationSetting.class, metadata, inits);
+    public QRegionKeywordAlert(PathMetadata metadata, PathInits inits) {
+        this(RegionKeywordAlert.class, metadata, inits);
     }
 
-    public QMemberNotificationSetting(Class<? extends MemberNotificationSetting> type, PathMetadata metadata, PathInits inits) {
+    public QRegionKeywordAlert(Class<? extends RegionKeywordAlert> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
+        this.regionKeyword = inits.isInitialized("regionKeyword") ? new com.onenth.OneNth.domain.region.entity.QRegion(forProperty("regionKeyword")) : null;
     }
 
 }

@@ -1,6 +1,6 @@
-package com.onenth.OneNth.domain.alert.keywordAlert.dto;
+package com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto;
 
-import com.onenth.OneNth.domain.alert.keywordAlert.entity.enums.KeywordAlertType;
+import com.onenth.OneNth.domain.member.entity.enums.KeywordAlertType;
 import lombok.Builder;
 import lombok.Getter;
 

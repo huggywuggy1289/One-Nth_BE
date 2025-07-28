@@ -1,8 +1,8 @@
-package com.onenth.OneNth.domain.alert.keywordAlert.controller;
+package com.onenth.OneNth.domain.member.settings.alert.keywordAlert.controller;
 
-import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertRequestDTO;
-import com.onenth.OneNth.domain.alert.keywordAlert.dto.KeywordAlertResponseDTO;
-import com.onenth.OneNth.domain.alert.keywordAlert.service.KeywordAlertCommandService;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto.KeywordAlertRequestDTO;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.dto.KeywordAlertResponseDTO;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.service.KeywordAlertCommandService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user-settings")
+@RequestMapping("/api/user-settings/keyword-alerts")
 public class KeywordAlertController {
 
     private final KeywordAlertCommandService keywordAlertCommandService;
@@ -34,7 +34,7 @@ public class KeywordAlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT002", description = "이미 알림으로 등록한 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @PostMapping("/keyword-alerts/regions/{regionId}")
+    @PostMapping("/regions/{regionId}")
     public ApiResponse<KeywordAlertResponseDTO.AddKeywordAlertResponseDTO> addRegionKeywordAlert(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionId
@@ -52,7 +52,7 @@ public class KeywordAlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT003", description = "해당 지역 키워드 알림이 존재하지 않거나 접근 권한이 없습니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @PatchMapping("/keyword-alerts/regions/{regionKeywordAlertId}")
+    @PatchMapping("/regions/{regionKeywordAlertId}")
     public ApiResponse<KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO> setRegionAlertStatus(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionKeywordAlertId,
@@ -72,7 +72,7 @@ public class KeywordAlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT005", description = "이미 알림으로 등록한 키워드입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @PostMapping("/keyword-alerts")
+    @PostMapping("")
     public ApiResponse<KeywordAlertResponseDTO.AddKeywordAlertResponseDTO> addKeywordAlert(
             @Parameter(hidden=true) @AuthUser Long userId,
             @Valid @RequestBody KeywordAlertRequestDTO.AddKeywordAlertRequestDTO request
@@ -90,7 +90,7 @@ public class KeywordAlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT006", description = "해당 키워드 알림이 존재하지 않거나 접근 권한이 없습니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @PatchMapping("/keyword-alerts/{keywordAlertId}")
+    @PatchMapping("/{keywordAlertId}")
     public ApiResponse<KeywordAlertResponseDTO.SetKeywordAlertStatusResponseDTO> setKeywordAlertStatus(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long keywordAlertId,
@@ -110,7 +110,7 @@ public class KeywordAlertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "KEYWORD_ALERT003", description = "해당 지역 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @PatchMapping("/keyword-alerts")
+    @PatchMapping("")
     public ApiResponse<KeywordAlertResponseDTO.AlertListResponseDTO> updateKeywordAlertList(
             @Parameter(hidden=true) @AuthUser Long userId,
             @RequestBody KeywordAlertRequestDTO.UpdateKeywordAlertListRequestDTO request

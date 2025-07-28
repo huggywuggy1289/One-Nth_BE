@@ -37,4 +37,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN FETCH p.region " +
             "WHERE p.id = :postId")
     Optional<Post> findByIdWithMemberAndRegion(@Param("postId") Long postId);
+  
+    //마이페이지 - 내가 쓴 글 조회
+    Page<Post> findByMemberId(Long memberId, Pageable pageable);
+
 }
