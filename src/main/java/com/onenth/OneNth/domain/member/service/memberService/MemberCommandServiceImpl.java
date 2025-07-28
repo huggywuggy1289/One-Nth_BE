@@ -8,6 +8,10 @@ import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailService;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVerificationService;
+import com.onenth.OneNth.domain.post.entity.Like;
+import com.onenth.OneNth.domain.post.entity.Scrap;
+import com.onenth.OneNth.domain.post.repository.likeRepository.LikeRepository;
+import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.configuration.security.jwt.JwtTokenProvider;
@@ -19,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+import static com.onenth.OneNth.domain.post.entity.QScrap.scrap;
+
 @Service
 @RequiredArgsConstructor
 public class MemberCommandServiceImpl implements MemberCommandService {
@@ -29,6 +35,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final EmailVerificationService emailVerificationService;
     private final EmailService emailService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ScrapRepository scrapRepository;
+    private final LikeRepository likeRepository;
 
     @Override
     public MemberResponseDTO.SignupResultDTO signupMember(MemberRequestDTO.SignupDTO request) {
@@ -95,5 +103,29 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         memberRepository.save(member);
 
         return MemberResponseDTO.PasswordResetResultDTO.builder().isSuccess(true).build();
+    }
+
+    @Override
+    public MemberResponseDTO.CancelScrapOrLikeResponseDTO cancelScrap(Long memberId, Long postId) {
+        Scrap scrap = scrapRepository.findByMemberIdAndPostId(memberId, postId)
+                .orElseThrow(() -> new RuntimeException("해당 멤버가 스크랩한 글이 없습니다."));
+
+        scrapRepository.delete(scrap);
+
+        return MemberResponseDTO.CancelScrapOrLikeResponseDTO.builder()
+                .isSuccess(true)
+                .build();
+    }
+
+    @Override
+    public MemberResponseDTO.CancelScrapOrLikeResponseDTO cancelLike(Long memberId, Long postId) {
+        Like like = likeRepository.findByMemberIdAndPostId(memberId, postId)
+                .orElseThrow(() -> new RuntimeException("해당 멤버가 공감한 글이 없습니다."));
+
+        likeRepository.delete(like);
+
+        return MemberResponseDTO.CancelScrapOrLikeResponseDTO.builder()
+                .isSuccess(true)
+                .build();
     }
 }
