@@ -89,41 +89,4 @@ public class GeneralAlertCommandServiceImpl implements GeneralAlertCommandServic
 
         return GeneralAlertConverter.toSetChatAlertStatusResponseDTO(memberAlertSetting);
     }
-
-    public GeneralAlertResponseDTO.GetAllAlertSettingsResponseDTO getAllAlertSettings(Long userId) {
-        Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-
-        MemberAlertSetting memberAlertSetting = memberAlertSettingRepository.findByMember(member)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.ALERT_SETTING_NOT_FOUND));
-
-        List<ProductKeywordAlert> productKeywordAlerts = productKeywordAlertRepository.findAllByMember(member);
-        List<RegionKeywordAlert> regionKeywordAlerts = regionKeywordAlertRepository.findAllByMember(member);
-
-        GeneralAlertResponseDTO.GeneralAlertSummary scrapAlertSummary = GeneralAlertConverter.toGeneralAlertSummary(AlertType.SCRAP, memberAlertSetting);
-        GeneralAlertResponseDTO.GeneralAlertSummary reviewAlertSummary = GeneralAlertConverter.toGeneralAlertSummary(AlertType.REVIEW, memberAlertSetting);
-
-        List<Object> mergedAlerts = mergeAndSortAlerts(productKeywordAlerts, regionKeywordAlerts);
-
-        List<GeneralAlertResponseDTO.KeywordAlertSummary> keywordAlertSummaryList = mergedAlerts.stream()
-                .map(keywordAlert -> GeneralAlertConverter.toKeywordAlertSummary(keywordAlert))
-                .collect(Collectors.toList());
-
-        return GeneralAlertConverter.toGetAllAlertSettingsResponseDTO(scrapAlertSummary, reviewAlertSummary, keywordAlertSummaryList);
-    }
-
-    private List<Object> mergeAndSortAlerts(List<ProductKeywordAlert> productKeywordAlertList, List<RegionKeywordAlert> regionKeywordAlertList) {
-        List<Object> mergedAlerts = new ArrayList<>();
-        mergedAlerts.addAll(productKeywordAlertList);
-        mergedAlerts.addAll(regionKeywordAlertList);
-
-        mergedAlerts.sort(Comparator.comparing(alert ->
-                        (alert instanceof ProductKeywordAlert)
-                                ? ((ProductKeywordAlert) alert).getCreatedAt()
-                                : ((RegionKeywordAlert) alert).getCreatedAt(),
-                Comparator.reverseOrder())
-        );
-
-        return mergedAlerts;
-    }
 }

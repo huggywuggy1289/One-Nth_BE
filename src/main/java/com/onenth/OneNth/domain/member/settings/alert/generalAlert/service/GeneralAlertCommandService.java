@@ -20,8 +20,4 @@ public interface GeneralAlertCommandService {
             GeneralAlertRequestDTO.SetChatAlertStatusRequestDTO request
     );
 
-    GeneralAlertResponseDTO.GetAllAlertSettingsResponseDTO getAllAlertSettings(
-            Long userId
-    );
-
 }

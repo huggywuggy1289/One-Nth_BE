@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.member.settings.alert.generalAlert.controller;
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAlertRequestDTO;
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAlertResponseDTO;
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.service.GeneralAlertCommandService;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.service.GeneralAlertQueryService;
 import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
 import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class GeneralAlertController {
 
     private final GeneralAlertCommandService generalAlertCommandService;
+    private final GeneralAlertQueryService generalAlertQueryService;
 
     @Operation(
             summary =  "스크랩 알림 on/off API",
@@ -94,6 +96,6 @@ public class GeneralAlertController {
     public ApiResponse<GeneralAlertResponseDTO.GetAllAlertSettingsResponseDTO> getAllAlertSettings(
             @Parameter(hidden=true) @AuthUser Long userId
     ) {
-        return ApiResponse.onSuccess(generalAlertCommandService.getAllAlertSettings(userId));
+        return ApiResponse.onSuccess(generalAlertQueryService.getAllAlertSettings(userId));
     }
 }
