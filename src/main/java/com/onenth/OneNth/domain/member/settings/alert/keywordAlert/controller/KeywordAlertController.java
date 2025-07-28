@@ -103,7 +103,8 @@ public class KeywordAlertController {
 
     @Operation(
             summary = "키워드(지역, 상품 포함) 알림 목록 수정 API",
-            description = "사용자 설정 중 키워드 알림 목록을 수정하는 API입니다. 응답으로 keywordAlertType(region/product), alertId, keyword, 알림 활성화 여부(enabled)를 하나의 객체로 갖는 리스트를 반환합니다."
+            description = "사용자 설정 중 키워드 알림 목록을 수정하는 API입니다. 응답으로 keywordAlertType(region/product), alertId, keyword, 알림 활성화 여부(enabled)를 하나의 객체로 갖는 리스트를 반환합니다." +
+                    "이때 키워드 알림 목록은 키워드 타입(region/product)에 관계없이 가장 최근에 등록한 알림이 먼저 표시됩니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 키워드 알림 상태 업데이트 성공"),
