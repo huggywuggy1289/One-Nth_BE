@@ -61,4 +61,19 @@ public class ChatController {
         List<ChatResponseDTO.ChatRoomPreviewDTO> result = chatQueryService.getMyChatRoomList(memberId, chatRoomType);
         return ApiResponse.onSuccess(result);
     }
+
+    @Operation(
+            summary = "채팅방 메시지 조회 API",
+            description = """
+        특정 채팅방의 메시지 내역을 조회합니다. 본인이 참여 중인 채팅방이 아니라면 조회가 불가능합니다.
+        - chatRoomId: 조회하고자 하는 체팅방의 ID
+        """
+    )
+    @GetMapping("/messages")
+    public ApiResponse<List<ChatResponseDTO.ChatMessageDTO>> getMyChatMessage(
+            @AuthUser Long memberId,
+            @RequestParam("chatRoomId") Long chatRoomId){
+        List<ChatResponseDTO.ChatMessageDTO> result = chatQueryService.getMyChatMessageList(memberId, chatRoomId);
+        return ApiResponse.onSuccess(result);
+    }
 }

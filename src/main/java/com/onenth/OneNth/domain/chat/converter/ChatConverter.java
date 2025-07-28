@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.chat.converter;
 
 import com.onenth.OneNth.domain.chat.dto.ChatResponseDTO;
+import com.onenth.OneNth.domain.chat.entity.ChatMessage;
 import com.onenth.OneNth.domain.chat.entity.ChatRoom;
 
 public class ChatConverter {
@@ -19,6 +20,14 @@ public class ChatConverter {
                 .chatRoomType(chatRoom.getChatRoomType())
                 .chatRoomName(chatRoom.getName())
                 .opponentId(targetMemberId)
+                .build();
+    }
+
+    public static ChatResponseDTO.ChatMessageDTO toChatMessageDTO (ChatMessage chatMessage) {
+        return ChatResponseDTO.ChatMessageDTO.builder()
+                .senderMemberId(chatMessage.getMember().getId())
+                .content(chatMessage.getContent())
+                .messageTime(chatMessage.getCreatedAt())
                 .build();
     }
 }

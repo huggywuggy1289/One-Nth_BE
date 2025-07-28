@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ChatQueryService {
     List<ChatResponseDTO.ChatRoomPreviewDTO> getMyChatRoomList (Long userId, ChatRoomType chatRoomType);
+    List<ChatResponseDTO.ChatMessageDTO> getMyChatMessageList (Long memberId, Long ChatRoomId);
 }

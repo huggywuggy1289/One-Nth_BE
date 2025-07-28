@@ -1,12 +1,16 @@
 package com.onenth.OneNth.domain.chat.service;
 
+import com.onenth.OneNth.domain.chat.converter.ChatConverter;
 import com.onenth.OneNth.domain.chat.dto.ChatResponseDTO;
 import com.onenth.OneNth.domain.chat.entity.ChatMessage;
+import com.onenth.OneNth.domain.chat.entity.ChatRoom;
 import com.onenth.OneNth.domain.chat.entity.ChatRoomMember;
 import com.onenth.OneNth.domain.chat.entity.enums.ChatRoomType;
+import com.onenth.OneNth.domain.chat.repository.ChatRoomRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.ChatHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.onenth.OneNth.domain.chat.converter.ChatConverter.toChatRoomPreviewDTO;
 
@@ -23,6 +28,8 @@ import static com.onenth.OneNth.domain.chat.converter.ChatConverter.toChatRoomPr
 public class ChatQueryServiceImpl implements ChatQueryService {
 
     private final MemberRepository memberRepository;
+
+    private final ChatRoomRepository chatRoomRepository;
 
     @Override
     public List<ChatResponseDTO.ChatRoomPreviewDTO> getMyChatRoomList(Long memberId, ChatRoomType chatRoomType) {
@@ -53,5 +60,22 @@ public class ChatQueryServiceImpl implements ChatQueryService {
                     return dto;
                 })
                 .toList();
+    }
+
+    @Override
+    public List<ChatResponseDTO.ChatMessageDTO> getMyChatMessageList(Long memberId, Long chatRoomID) {
+        ChatRoom chatRoom = chatRoomRepository.findWithChatMessagesById(chatRoomID)
+                .orElseThrow(()-> new ChatHandler(ErrorStatus.CHAT_SELF_ROOM_NOT_FOUND));
+
+        boolean isParticipant = chatRoom.getChatRoomMembers().stream()
+                .anyMatch(crm -> crm.getMember().getId().equals(memberId));
+        if (!isParticipant) {
+            throw new ChatHandler(ErrorStatus._FORBIDDEN);
+        }
+
+        return chatRoom.getChatMessages()
+                .stream()
+                .map(ChatConverter::toChatMessageDTO)
+                .collect(Collectors.toList());
     }
 }

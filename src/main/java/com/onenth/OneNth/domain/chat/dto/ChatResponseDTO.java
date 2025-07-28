@@ -29,4 +29,14 @@ public class ChatResponseDTO {
         private String lastMessageContent;
         private LocalDateTime lastMessageTime;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChatMessageDTO {
+        private Long senderMemberId;
+        private String content;
+        private LocalDateTime messageTime;
+    }
 }
