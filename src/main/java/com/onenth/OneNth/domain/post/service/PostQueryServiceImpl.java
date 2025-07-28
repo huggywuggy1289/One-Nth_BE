@@ -6,6 +6,10 @@ import com.onenth.OneNth.domain.post.dto.PostListResponseDTO;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
 import com.onenth.OneNth.domain.post.repository.*;
+import com.onenth.OneNth.domain.post.repository.commentRepository.CommentRepository;
+import com.onenth.OneNth.domain.post.repository.imageRepository.ImageRepository;
+import com.onenth.OneNth.domain.post.repository.likeRepository.LikeRepository;
+import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +26,10 @@ import java.util.List;
 public class PostQueryServiceImpl implements PostQueryService {
 
     private final PostRepository postRepository;
-    private final PostImageRepository postImageRepository;
-    private final PostCommentRepository postCommentRepository;
-    private final PostLikeRepository postLikeRepository;
-    private final PostScrapRepository postScrapRepository;
+    private final ImageRepository imageRepository;
+    private final CommentRepository CommentRepository;
+    private final LikeRepository LikeRepository;
+    private final ScrapRepository ScrapRepository;
 
     @Override
     public Page<PostListResponseDTO> getPostList(
@@ -72,10 +76,10 @@ public class PostQueryServiceImpl implements PostQueryService {
         Post post = postRepository.findByIdWithMemberAndRegion(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_POST));
 
-        int commentCount = (int) postCommentRepository.countByPost(post);
-        int likeCount = (int) postLikeRepository.countByPost(post);
-        boolean scrapStatus = postScrapRepository.existsByPostIdAndMemberId(postId, member.getId());
-        List<String> imageUrls = postImageRepository.findUrlsByPost(post);
+        int commentCount = (int) CommentRepository.countByPost(post);
+        int likeCount = (int) LikeRepository.countByPost(post);
+        boolean scrapStatus = ScrapRepository.existsByPostIdAndMemberId(postId, member.getId());
+        List<String> imageUrls = imageRepository.findUrlsByPost(post);
 
         return PostDetailResponseDTO.builder()
                 .postId(post.getId().toString())

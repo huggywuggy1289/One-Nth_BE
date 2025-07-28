@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.post.repository;
+package com.onenth.OneNth.domain.post.repository.imageRepository;
 
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.PostImage;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostImageRepository extends JpaRepository<PostImage, Long> {
+public interface ImageRepository extends JpaRepository<PostImage, Long> {
 
     @Query("SELECT pi.imageUrl FROM PostImage pi WHERE pi.post = :post")
     List<String> findUrlsByPost(@Param("post") Post post);

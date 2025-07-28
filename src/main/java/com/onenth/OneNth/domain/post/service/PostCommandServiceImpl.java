@@ -7,7 +7,7 @@ import com.onenth.OneNth.domain.post.dto.PostSaveRequestDTO;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.PostImage;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
-import com.onenth.OneNth.domain.post.repository.PostImageRepository;
+import com.onenth.OneNth.domain.post.repository.imageRepository.ImageRepository;
 import com.onenth.OneNth.domain.post.repository.PostRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
@@ -29,7 +29,7 @@ public class PostCommandServiceImpl implements PostCommandService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final RegionRepository regionRepository;
-    private final PostImageRepository postImageRepository;
+    private final ImageRepository imageRepository;
     private final AmazonS3Manager amazonS3Manager;
 
     @Override
@@ -58,7 +58,7 @@ public class PostCommandServiceImpl implements PostCommandService {
                         .post(savedPost)
                         .imageUrl(imageUrl)
                         .build();
-                postImageRepository.save(postImage);
+                imageRepository.save(postImage);
             }
         }
 

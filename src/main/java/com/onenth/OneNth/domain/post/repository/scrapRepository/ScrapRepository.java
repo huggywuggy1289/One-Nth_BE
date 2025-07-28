@@ -20,4 +20,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     Page<Scrap> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     Optional<Scrap> findByMemberIdAndPostId(Long memberId, Long postId);
+
+    boolean existsByPostIdAndMemberId(Long postId, Long memberId);
 }
