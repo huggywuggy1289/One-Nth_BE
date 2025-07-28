@@ -4,11 +4,15 @@ import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.settings.profile.controller.ProfileController;
 import com.onenth.OneNth.domain.member.settings.profile.converter.ProfileConverter;
+import com.onenth.OneNth.domain.member.settings.profile.dto.ProfileRequestDTO;
 import com.onenth.OneNth.domain.member.settings.profile.dto.ProfileResponseDTO;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import com.onenth.OneNth.global.aws.s3.AmazonS3Manager;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.sql.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,5 +48,15 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
         member.updateProfileImage(imageUrl);
 
         return ProfileConverter.toUpdateProfileImageResponseDTO(imageUrl);
+    }
+
+    @Override
+    public ProfileResponseDTO.UpdateNicknameResponseDTO updateNickname(Long userId, ProfileRequestDTO.UpdateNicknameRequestDTO request) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        member.updateNickname(request.getNickname());
+
+        return ProfileConverter.toUpdateProfileImageResponseDTO(member);
     }
 }

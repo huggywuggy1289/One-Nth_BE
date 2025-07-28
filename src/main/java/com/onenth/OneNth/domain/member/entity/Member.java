@@ -59,6 +59,10 @@ public class Member extends BaseEntity {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     //비밀번호 salt 암호화 메서드
     public void encodePassword(String password) {
         this.password = password;

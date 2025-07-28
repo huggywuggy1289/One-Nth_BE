@@ -11,4 +11,10 @@ public class ProfileResponseDTO {
         private String profileImageUrl;
     }
 
+    @Getter
+    @Builder
+    public static class UpdateNicknameResponseDTO {
+        private String nickname;
+    }
+
 }
