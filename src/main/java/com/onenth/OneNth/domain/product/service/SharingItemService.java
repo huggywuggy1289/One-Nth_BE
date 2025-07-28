@@ -75,6 +75,10 @@ public class SharingItemService {
                         .orElseGet(() -> tagRepository.save(Tag.builder().name(tag).build())))
                 .toList();
 
+        if (tagEntities.stream().count() > 5){
+            throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
+        }
+
         // 이미지 유효성 검사
         if (imageFiles == null || imageFiles.isEmpty()) {
             throw new IllegalArgumentException("상품 이미지는 최소 1장 이상 첨부해야 합니다.");
