@@ -69,10 +69,10 @@ public class ChatController {
         - chatRoomId: 조회하고자 하는 체팅방의 ID
         """
     )
-    @GetMapping("/messages")
+    @GetMapping("{chatRoomId}/messages")
     public ApiResponse<List<ChatResponseDTO.ChatMessageDTO>> getMyChatMessage(
             @AuthUser Long memberId,
-            @RequestParam("chatRoomId") Long chatRoomId){
+            @PathVariable("chatRoomId") Long chatRoomId){
         List<ChatResponseDTO.ChatMessageDTO> result = chatQueryService.getMyChatMessageList(memberId, chatRoomId);
         return ApiResponse.onSuccess(result);
     }
