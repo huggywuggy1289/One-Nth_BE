@@ -11,4 +11,14 @@ public class ChatConverter {
                 .ChatRoomName(chatRoom.getName())
                 .build();
     }
+
+    public static ChatResponseDTO.ChatRoomPreviewDTO toChatRoomPreviewDTO (
+            ChatRoom chatRoom, Long targetMemberId) {
+        return ChatResponseDTO.ChatRoomPreviewDTO.builder()
+                .chatRoomId(chatRoom.getId())
+                .chatRoomType(chatRoom.getChatRoomType())
+                .chatRoomName(chatRoom.getName())
+                .opponentId(targetMemberId)
+                .build();
+    }
 }

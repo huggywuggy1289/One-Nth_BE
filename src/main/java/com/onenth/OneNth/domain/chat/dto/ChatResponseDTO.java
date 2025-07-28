@@ -1,9 +1,9 @@
 package com.onenth.OneNth.domain.chat.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.onenth.OneNth.domain.chat.entity.enums.ChatRoomType;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 public class ChatResponseDTO {
 
@@ -14,5 +14,19 @@ public class ChatResponseDTO {
     public static class ChatRoomResponseDTO{
         Long ChatRoomId;
         String ChatRoomName;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChatRoomPreviewDTO {
+        private Long chatRoomId;
+        private ChatRoomType chatRoomType;
+        private String chatRoomName;
+        private Long opponentId;
+        private String lastMessageContent;
+        private LocalDateTime lastMessageTime;
     }
 }

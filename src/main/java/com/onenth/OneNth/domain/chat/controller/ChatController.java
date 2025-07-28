@@ -3,12 +3,15 @@ package com.onenth.OneNth.domain.chat.controller;
 import com.onenth.OneNth.domain.chat.dto.ChatResponseDTO;
 import com.onenth.OneNth.domain.chat.entity.enums.ChatRoomType;
 import com.onenth.OneNth.domain.chat.service.ChatCommandService;
+import com.onenth.OneNth.domain.chat.service.ChatQueryService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/chats")
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChatController {
 
     private final ChatCommandService chatCommandService;
+    private final ChatQueryService chatQueryService;
 
     @Operation(
             summary = "채팅방 Name 조회 API",
@@ -38,6 +42,23 @@ public class ChatController {
             @RequestParam("chatRoomType")  ChatRoomType chatRoomType) {
         ChatResponseDTO.ChatRoomResponseDTO result
                 = chatCommandService.getChatRoomName(memberId, targetMemberId, chatRoomType);
+        return ApiResponse.onSuccess(result);
+    }
+
+    @Operation(
+            summary = "참여중인 채팅방 목록 조회 API",
+            description = """
+        현재 사용자가 참여 중인 채팅방 목록을 반환합니다.
+        - chatRoomType: 조회하고자 하는 채팅방 리스트 유형
+           - DEAL: N분의1 채팅
+           - TIP_SHARE: 꿀팁 N분의1 채팅
+        """
+    )
+    @GetMapping("/rooms")
+    public ApiResponse<List<ChatResponseDTO.ChatRoomPreviewDTO>> getMyChatRoom(
+            @AuthUser Long memberId,
+            @RequestParam("chatRoomType")  ChatRoomType chatRoomType){
+        List<ChatResponseDTO.ChatRoomPreviewDTO> result = chatQueryService.getMyChatRoomList(memberId, chatRoomType);
         return ApiResponse.onSuccess(result);
     }
 }
