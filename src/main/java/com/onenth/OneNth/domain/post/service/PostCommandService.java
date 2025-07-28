@@ -9,5 +9,5 @@ import java.util.List;
 public interface PostCommandService {
     Long save(PostSaveRequestDTO requestDto, PostType postType, Long memberId, List<MultipartFile> images);
 
-    //Long update(PostUpdateRequestDTO requestDTO, PostType postType, Long memberId, List<MultipartFile> images);
+    void increaseViewCount(Long postId);
 }

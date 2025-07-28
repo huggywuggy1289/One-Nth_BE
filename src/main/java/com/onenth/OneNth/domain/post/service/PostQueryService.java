@@ -11,13 +11,13 @@ import org.springframework.data.domain.Pageable;
 public interface PostQueryService {
 
     // 게시글 상세 조회
-    public PostDetailResponseDTO getPostDetail(Long postId, Member member);
+    PostDetailResponseDTO getPostDetail(Long postId, Member member);
 
     // 게시글 목록 조회 (regionName 또는 keyword로)
     Page<PostListResponseDTO> getPostList(
             PostType postType,
-            String regionName,   // 지역 필터링용 (nullable)
-            String keyword,      // 키워드 검색용 (nullable)
-            Pageable pageable    // 페이징
+            String regionName,
+            String keyword,
+            Pageable pageable
     );
 }

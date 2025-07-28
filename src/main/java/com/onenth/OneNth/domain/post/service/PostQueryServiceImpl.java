@@ -77,8 +77,6 @@ public class PostQueryServiceImpl implements PostQueryService {
         boolean scrapStatus = postScrapRepository.existsByPostIdAndMemberId(postId, member.getId());
         List<String> imageUrls = postImageRepository.findUrlsByPost(post);
 
-        post.increaseViewCount(); // 조회수 증가 (Entity 메서드)
-
         return PostDetailResponseDTO.builder()
                 .postId(post.getId().toString())
                 .nickname(post.getMember().getNickname())
