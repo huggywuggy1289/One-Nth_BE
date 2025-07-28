@@ -47,8 +47,12 @@ public enum ErrorStatus implements BaseErrorCode {
     //게시글 관련
     NOT_FOUND_POST(HttpStatus.NOT_FOUND, "POST_001", "게시글을 찾을 수 없습니다."),
 
+    // 알림 관련
     ALERT_SETTING_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALERT_SETTING001", "해당 사용자의 알림 설정 정보가 존재하지 않습니다."),
     UNEXPECTED_ALERT_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "ALERT_002", "지원하지 않는 AlertType입니다."),
+
+    // 프로필 이미지 관련
+    INVALID_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE001", "프로필 이미지가 비어 있거나 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
