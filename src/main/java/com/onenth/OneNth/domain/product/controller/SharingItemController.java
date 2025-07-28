@@ -88,4 +88,17 @@ public class SharingItemController {
         return ApiResponse.onSuccess(results);
     }
 
+    @Operation(
+            summary = "함께 나눠요 단일 상품 조회",
+            description = "ID를 기준으로 함께 나눠요 상품의 상세 정보를 조회합니다."
+    )
+    @GetMapping("/{sharingItemId}")
+    public ApiResponse<SharingItemResponseDTO.GetResponse> getSharingItemDetail(
+            @PathVariable Long sharingItemId,
+            @AuthUser Long userId
+    ) {
+        SharingItemResponseDTO.GetResponse detail = sharingItemService.getItemDetail(sharingItemId, userId);
+        return ApiResponse.onSuccess(detail);
+    }
+
 }

@@ -1,11 +1,13 @@
 package com.onenth.OneNth.domain.product.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
+import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
@@ -221,6 +223,41 @@ public class SharingItemService {
 
 
     // 단일 상품 리스트 조회
+    @Transactional(readOnly = true)
+    public SharingItemResponseDTO.GetResponse getItemDetail(Long sharingItemId, Long userId) {
+        SharingItem item = sharingItemRepository.findById(sharingItemId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 함께 나눠요 상품입니다."));
+
+        Member member = item.getMember();
+        boolean isVerified = true; // 추후 확장 가능
+        String regionName = item.getRegion().getRegionName();
+
+        // 이미지 목록 직접 조회
+        List<String> imageUrls = itemImageRepository.findBySharingItemId(sharingItemId)
+                .stream()
+                .map(ItemImage::getUrl)
+                .toList();
+
+        // 태그 문자열 리스트 추출
+        List<String> tags = item.getTags().stream()
+                .map(Tag::getName)
+                .toList();
+
+        return SharingItemResponseDTO.GetResponse.builder()
+                .id(item.getId())
+                .title(item.getTitle())
+                .quantity(item.getQuantity())
+                .price(item.getPrice())
+                .itemCategory(item.getItemCategory())
+                .expirationDate(item.getExpirationDate())
+                .isAvailable(item.getIsAvailable())
+                .purchaseMethod(item.getPurchaseMethod())
+                .regionName(regionName)
+                .imageUrls(imageUrls)
+                .tags(tags)
+                .writerNickname(member.getNickname())
+                .build();
+    }
 
 
 }

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ItemImageRepository extends JpaRepository<ItemImage, Long> {
     List<ItemImage> findByPurchaseItemId(Long purchaseItemId);
+
+    List<ItemImage> findBySharingItemId(Long sharingItemId);
 }
