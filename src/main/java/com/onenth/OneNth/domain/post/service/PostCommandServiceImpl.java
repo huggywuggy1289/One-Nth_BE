@@ -11,6 +11,8 @@ import com.onenth.OneNth.domain.post.repository.PostImageRepository;
 import com.onenth.OneNth.domain.post.repository.PostRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import com.onenth.OneNth.global.aws.s3.AmazonS3Manager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -61,5 +63,13 @@ public class PostCommandServiceImpl implements PostCommandService {
         }
 
         return postRepository.save(post).getId();
+    }
+
+    // 조회수 증가 메서드
+    @Transactional
+    public void increaseViewCount(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_POST));
+        post.increaseViewCount();
     }
 }

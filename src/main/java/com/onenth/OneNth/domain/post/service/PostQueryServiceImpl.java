@@ -6,7 +6,6 @@ import com.onenth.OneNth.domain.post.dto.PostListResponseDTO;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
 import com.onenth.OneNth.domain.post.repository.*;
-import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -77,8 +76,6 @@ public class PostQueryServiceImpl implements PostQueryService {
         int likeCount = (int) postLikeRepository.countByPost(post);
         boolean scrapStatus = postScrapRepository.existsByPostIdAndMemberId(postId, member.getId());
         List<String> imageUrls = postImageRepository.findUrlsByPost(post);
-
-        post.increaseViewCount(); // 조회수 증가 (Entity 메서드)
 
         return PostDetailResponseDTO.builder()
                 .postId(post.getId().toString())
