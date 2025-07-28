@@ -84,7 +84,8 @@ public class GeneralAlertController {
 
     @Operation(
             summary =  "알림 설정 전체 조회 API",
-            description = "사용자 설정 중 모든 알림 설정을 조회하는 API입니다. 응답으로 스크랩 알림 활성화 여부, 리뷰 알림 활성화 여부, 키워드 알림 목록 및 활성화 여부를 포함한 리스트을 반환합니다."
+            description = "사용자 설정 중 모든 알림 설정을 조회하는 API입니다. 응답으로 스크랩 알림 활성화 여부, 리뷰 알림 활성화 여부, 키워드 알림 목록 및 활성화 여부를 포함한 리스트을 반환합니다. " +
+                    "이때 키워드 알림 목록은 키워드 타입(region/product)에 관계없이 알림을 등록한 순서대로 반환됩니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 알람 설정 전체 조회 성공"),
