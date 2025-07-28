@@ -43,6 +43,10 @@ public enum ErrorStatus implements BaseErrorCode {
     PRODUCT_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT004", "등록 가능한 키워드 알림은 최대 5개입니다."),
     PRODUCT_KEYWORD_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT005", "이미 알림으로 등록한 키워드입니다."),
     PRODUCT_KEYWORD_NOT_FOUND_OR_NOT_YOURS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT006", "해당 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
+
+    // 사용자 차단 관련
+    BLOCK_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK001", "차단 대상 사용자가 존재하지 않습니다."),
+    BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK002", "차단한 사용자 목록에 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
