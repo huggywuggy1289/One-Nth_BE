@@ -5,6 +5,8 @@ import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
 import com.onenth.OneNth.domain.member.entity.EmailVerificationCode;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
+import com.onenth.OneNth.domain.member.repository.memberAlertSettingRepository.MemberAlertSettingRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailService;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVerificationService;
@@ -37,7 +39,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final JwtTokenProvider jwtTokenProvider;
     private final ScrapRepository scrapRepository;
     private final LikeRepository likeRepository;
-
+    private final MemberAlertSettingRepository memberAlertSettingRepository;
     @Override
     public MemberResponseDTO.SignupResultDTO signupMember(MemberRequestDTO.SignupDTO request) {
 
@@ -62,7 +64,18 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         member.encodePassword(passwordEncoder.encode(request.getPassword()));
 
         // 5. 회원 저장
-        return MemberConverter.toSignupResultDTO(memberRepository.save(member));
+        Member savedMember = memberRepository.save(member);
+
+        // 알림설정 생성 (기본값 ON)
+        MemberAlertSetting alertSetting = MemberAlertSetting.builder()
+                .member(savedMember)
+                .chatAlerts(true)
+                .scrapAlerts(true)
+                .reviewAlerts(true)
+                .build();
+        memberAlertSettingRepository.save(alertSetting);
+
+        return MemberConverter.toSignupResultDTO(savedMember);
     }
 
     @Override

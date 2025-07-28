@@ -3,7 +3,7 @@ package com.onenth.OneNth.domain.product.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
-import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
+import com.onenth.OneNth.domain.member.repository.memberRegionRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.SharingItem;

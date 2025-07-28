@@ -84,7 +84,7 @@ public class MemberRestController {
      */
     @Operation(
             summary = "마이페이지- 내가 스크랩한 게시글 조회 API",
-            description = "사용자가 스크랩한 게시글 조회 API 입니다. 현재 페이지 번호를 쿼리스트링으로 보내주세요."
+            description = "사용자가 스크랩한 게시글 조회 API 입니다. 현재 페이지 번호와 사이즈를 쿼리스트링으로 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -109,7 +109,7 @@ public class MemberRestController {
      */
     @Operation(
             summary = "마이페이지- 내가 공감한 게시글 조회 API",
-            description = "사용자가 스크랩한 게시글 조회 API 입니다. 현재 페이지 번호를 쿼리스트링으로 보내주세요."
+            description = "사용자가 공감한 게시글 조회 API 입니다. 현재 페이지 번호와 사이즈를 쿼리스트링으로 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),

@@ -4,7 +4,7 @@ import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
-import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
+import com.onenth.OneNth.domain.member.repository.memberRegionRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;

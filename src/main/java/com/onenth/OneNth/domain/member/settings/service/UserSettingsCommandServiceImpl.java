@@ -2,7 +2,7 @@ package com.onenth.OneNth.domain.member.settings.service;
 
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberRegion;
-import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
+import com.onenth.OneNth.domain.member.repository.memberRegionRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.settings.converter.UserSettingsConverter;
 import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
