@@ -85,7 +85,6 @@ public class PurchaseItemService {
                 .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
                 .getRegion();
 
-        // 태그 필드추가 + #조건 추가
         List<Tag> tagEntities = tags.stream()
                 .peek(tagName -> {
                     if (!tagName.startsWith("#")) {
@@ -96,6 +95,9 @@ public class PurchaseItemService {
                         .orElseGet(() -> tagRepository.save(Tag.builder().name(tagName).build())))
                 .toList();
 
+        if (tagEntities.stream().count() > 5){
+            throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
+        }
 
         PurchaseItem purchaseItem = PurchaseItem.builder()
                 .name(title)
