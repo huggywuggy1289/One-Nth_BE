@@ -14,6 +14,7 @@ import com.onenth.OneNth.global.apiPayload.exception.handler.ChatHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Stream;
 
@@ -27,7 +28,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
 
     public ChatResponseDTO.ChatRoomResponseDTO getChatRoomName(Long memberId, Long targetMemberId, ChatRoomType chatRoomType) {
         if (memberId == targetMemberId) {
-            throw new ChatHandler(ErrorStatus.CHAT_SELF_ROOM_NOT_ALLOWED);
+            throw new ChatHandler(ErrorStatus.CHAT_ROOM_NOT_FOUND);
         }
 
         Member member = memberRepository.findById(memberId)
@@ -52,6 +53,22 @@ public class ChatCommandServiceImpl implements ChatCommandService {
                                     .build()));
                     return ChatConverter.toChatRoomResponseDTO(newChatRoom);
                 });
+    }
+
+    @Override
+    @Transactional
+    public void leaveChatRoom(Long memberId, Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findWithChatRoomMembersById(chatRoomId)
+                .orElseThrow(() -> new ChatHandler(ErrorStatus.CHAT_ROOM_NOT_FOUND));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        ChatRoomMember chatRoomMember = chatRoom.getChatRoomMembers().stream()
+                .filter(crm -> crm.getMember().getId().equals(memberId))
+                .findFirst()
+                .orElseThrow(() -> new ChatHandler(ErrorStatus._FORBIDDEN));
+
+        member.getChatRoomMembers().remove(chatRoomMember);
     }
 
     private String generateChatRoomName(Long id1, Long id2, ChatRoomType type) {

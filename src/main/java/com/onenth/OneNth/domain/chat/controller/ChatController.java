@@ -76,4 +76,19 @@ public class ChatController {
         List<ChatResponseDTO.ChatMessageDTO> result = chatQueryService.getMyChatMessageList(memberId, chatRoomId);
         return ApiResponse.onSuccess(result);
     }
+
+    @Operation(
+            summary = "채팅방 나가기 API",
+            description = """
+        특정 채팅방에서 현재 사용자를 나가게합니다. 본인이 참여 중인 채팅방이 아니라면 권한이 없습니다.
+        - chatRoomId: 나가고자 하는 체팅방의 ID
+        """
+    )
+    @DeleteMapping("/{chatRoomId}/leave")
+    public ApiResponse<String> leaveChatRoom(
+            @AuthUser Long memberId,
+            @PathVariable("chatRoomId") Long chatRoomId) {
+        chatCommandService.leaveChatRoom(memberId, chatRoomId);
+        return ApiResponse.onSuccess("채팅방에서 나갔습니다.");
+    }
 }

@@ -50,7 +50,9 @@ public class ChatQueryServiceImpl implements ChatQueryService {
                             .findFirst()
                             .orElse(null);
 
-                    ChatResponseDTO.ChatRoomPreviewDTO dto = toChatRoomPreviewDTO(chatRoom,opponent.getId());
+                    Long opponentId = opponent == null ? null : opponent.getId();
+
+                    ChatResponseDTO.ChatRoomPreviewDTO dto = toChatRoomPreviewDTO(chatRoom,opponentId);
 
                     if (lastMessage != null) {
                         dto.setLastMessageContent(lastMessage.getContent());
@@ -65,7 +67,7 @@ public class ChatQueryServiceImpl implements ChatQueryService {
     @Override
     public List<ChatResponseDTO.ChatMessageDTO> getMyChatMessageList(Long memberId, Long chatRoomID) {
         ChatRoom chatRoom = chatRoomRepository.findWithChatMessagesById(chatRoomID)
-                .orElseThrow(()-> new ChatHandler(ErrorStatus.CHAT_SELF_ROOM_NOT_FOUND));
+                .orElseThrow(()-> new ChatHandler(ErrorStatus.CHAT_ROOM_NOT_FOUND));
 
         boolean isParticipant = chatRoom.getChatRoomMembers().stream()
                 .anyMatch(crm -> crm.getMember().getId().equals(memberId));
