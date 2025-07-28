@@ -174,11 +174,10 @@ public class PostRestController {
     )
     @GetMapping("/{postId}")
     public ApiResponse<PostDetailResponseDTO> getPostDetail(
-            @PathVariable Long postId,
-            @AuthUser Member member
+            @AuthUser Member member,
+            @PathVariable("postId") Long postId
             ) {
         PostDetailResponseDTO response = postQueryService.getPostDetail(postId, member);
         return ApiResponse.onSuccess(response);
     }
-
 }
