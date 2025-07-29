@@ -1,10 +1,13 @@
 package com.onenth.OneNth.domain.product.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
+import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
+import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
@@ -13,6 +16,7 @@ import com.onenth.OneNth.domain.product.repository.itemRepository.ItemImageRepos
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
+import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import com.onenth.OneNth.domain.product.entity.Tag;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
@@ -20,10 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
 
 import java.io.IOException;
 import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SharingItemService {
@@ -31,6 +38,8 @@ public class SharingItemService {
     private final ItemImageRepository itemImageRepository;
     private final MemberRegionRepository memberRegionRepository;
     private final TagRepository tagRepository;
+    private final RegionRepository regionRepository;
+
     private final AmazonS3 amazonS3;
 
     @Value("${AWS_S3_BUCKET}")
@@ -59,7 +68,6 @@ public class SharingItemService {
                 .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
                 .getRegion();
 
-        // 태그 유효성 검사
         List<Tag> tagEntities = dto.getTags().stream()
                 .peek(tag -> {
                     if (!tag.startsWith("#")) {
@@ -69,6 +77,10 @@ public class SharingItemService {
                 .map(tag -> tagRepository.findByName(tag)
                         .orElseGet(() -> tagRepository.save(Tag.builder().name(tag).build())))
                 .toList();
+
+        if (tagEntities.stream().count() > 5){
+            throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
+        }
 
         // 이미지 유효성 검사
         if (imageFiles == null || imageFiles.isEmpty()) {
@@ -103,7 +115,7 @@ public class SharingItemService {
                 .status(Status.DEFAULT)
                 .tags(new ArrayList<>())
                 .build();
-
+        sharingItem.getTags().addAll(tagEntities); // +
         sharingItemRepository.save(sharingItem);
 
         // 이미지 업로드 처리
@@ -146,4 +158,106 @@ public class SharingItemService {
 
         return sharingItem.getId();
     }
+
+    // 전체 상품 리스트 조회
+    @Transactional(readOnly = true)
+    public List<SharingItemListDTO> searchItems(String keyword, Long userId) {
+        List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
+                .stream()
+                .map(r -> r.getRegion().getId())
+                .toList();
+
+        List<SharingItem> items = new ArrayList<>();
+
+        if (keyword.startsWith("#")) {
+            // 태그 검색 (설정 지역 내)
+            String tag = keyword;
+            items = sharingItemRepository.findByRegionAndTag(regionIds, tag);
+        } else if (isCategory(keyword)) {
+            // 카테고리 검색 (설정 지역 내)
+            items = sharingItemRepository.findByRegionAndCategory(regionIds, keyword);
+        } else if (isRegion(keyword)) {
+            // 지역명 검색 (전국)
+            items = sharingItemRepository.findByRegionName(keyword);
+        }
+
+        items.forEach(i ->
+                log.info("📦 [item: {}] ↔ [region: {}]", i.getTitle(),
+                        i.getRegion() != null ? i.getRegion().getRegionName() : "null")
+        );
+
+        return items.stream()
+                .map(SharingItemListDTO::fromEntity)
+                .toList();
+    }
+
+    // 상품명 검색++++
+    public List<SharingItemListDTO> searchByTitleAndSelectedRegions(String keyword, List<Integer> regionIds) {
+        if (regionIds == null || regionIds.isEmpty()) {
+            // 전국 검색: 지역 조건 없이 상품명만 검색
+            return sharingItemRepository.findByTitleContainingIgnoreCase(keyword)
+                    .stream()
+                    .map(SharingItemListDTO::fromEntity)
+                    .toList();
+        }
+
+        return sharingItemRepository.searchByTitleAndRegion(keyword, regionIds)
+                .stream()
+                .map(SharingItemListDTO::fromEntity)
+                .toList();
+    }
+
+
+    private boolean isCategory(String keyword) {
+        try {
+            ItemCategory.valueOf(keyword.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private boolean isRegion(String keyword) {
+        return regionRepository.findByRegionNameContaining(keyword).isPresent();
+    }
+
+
+    // 단일 상품 리스트 조회
+    @Transactional(readOnly = true)
+    public SharingItemResponseDTO.GetResponse getItemDetail(Long sharingItemId, Long userId) {
+        SharingItem item = sharingItemRepository.findById(sharingItemId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 함께 나눠요 상품입니다."));
+
+        Member member = item.getMember();
+        boolean isVerified = true; // 추후 확장 가능
+        String regionName = item.getRegion().getRegionName();
+
+        // 이미지 목록 직접 조회
+        List<String> imageUrls = itemImageRepository.findBySharingItemId(sharingItemId)
+                .stream()
+                .map(ItemImage::getUrl)
+                .toList();
+
+        // 태그 문자열 리스트 추출
+        List<String> tags = item.getTags().stream()
+                .map(Tag::getName)
+                .toList();
+
+        return SharingItemResponseDTO.GetResponse.builder()
+                .id(item.getId())
+                .title(item.getTitle())
+                .quantity(item.getQuantity())
+                .price(item.getPrice())
+                .itemCategory(item.getItemCategory())
+                .expirationDate(item.getExpirationDate())
+                .isAvailable(item.getIsAvailable())
+                .purchaseMethod(item.getPurchaseMethod())
+                .regionName(regionName)
+                .imageUrls(imageUrls)
+                .tags(tags)
+                .writerNickname(member.getNickname())
+                .build();
+    }
+
+
 }

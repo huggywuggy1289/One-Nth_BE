@@ -12,7 +12,7 @@ import java.util.List;
 @Getter @Setter
 public class PurchaseItemRequestDTO {
     @NotBlank
-    private String title;
+    private String name;
     @NotNull
     private PurchaseMethod purchaseMethod;
     @NotNull
