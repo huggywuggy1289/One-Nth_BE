@@ -19,15 +19,12 @@ public class ChatRoom extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 500, nullable = false)
+    @Column(length = 500, nullable = false, unique = true)
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatRoomType chatRoomType;
-
-    @Column(nullable = false)
-    private Boolean isConfirmed = false;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();

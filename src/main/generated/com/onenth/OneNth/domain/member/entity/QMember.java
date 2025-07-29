@@ -24,6 +24,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<com.onenth.OneNth.domain.alert.entity.Alert, com.onenth.OneNth.domain.alert.entity.QAlert> alerts = this.<com.onenth.OneNth.domain.alert.entity.Alert, com.onenth.OneNth.domain.alert.entity.QAlert>createList("alerts", com.onenth.OneNth.domain.alert.entity.Alert.class, com.onenth.OneNth.domain.alert.entity.QAlert.class, PathInits.DIRECT2);
 
+    public final ListPath<com.onenth.OneNth.domain.chat.entity.ChatRoomMember, com.onenth.OneNth.domain.chat.entity.QChatRoomMember> chatRoomMembers = this.<com.onenth.OneNth.domain.chat.entity.ChatRoomMember, com.onenth.OneNth.domain.chat.entity.QChatRoomMember>createList("chatRoomMembers", com.onenth.OneNth.domain.chat.entity.ChatRoomMember.class, com.onenth.OneNth.domain.chat.entity.QChatRoomMember.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -48,6 +50,8 @@ public class QMember extends EntityPathBase<Member> {
     public final ListPath<com.onenth.OneNth.domain.post.entity.PostComment, com.onenth.OneNth.domain.post.entity.QPostComment> postComments = this.<com.onenth.OneNth.domain.post.entity.PostComment, com.onenth.OneNth.domain.post.entity.QPostComment>createList("postComments", com.onenth.OneNth.domain.post.entity.PostComment.class, com.onenth.OneNth.domain.post.entity.QPostComment.class, PathInits.DIRECT2);
 
     public final ListPath<com.onenth.OneNth.domain.post.entity.Post, com.onenth.OneNth.domain.post.entity.QPost> posts = this.<com.onenth.OneNth.domain.post.entity.Post, com.onenth.OneNth.domain.post.entity.QPost>createList("posts", com.onenth.OneNth.domain.post.entity.Post.class, com.onenth.OneNth.domain.post.entity.QPost.class, PathInits.DIRECT2);
+
+    public final StringPath profileImageUrl = createString("profileImageUrl");
 
     public final ListPath<com.onenth.OneNth.domain.product.entity.PurchaseItem, com.onenth.OneNth.domain.product.entity.QPurchaseItem> purchaseItems = this.<com.onenth.OneNth.domain.product.entity.PurchaseItem, com.onenth.OneNth.domain.product.entity.QPurchaseItem>createList("purchaseItems", com.onenth.OneNth.domain.product.entity.PurchaseItem.class, com.onenth.OneNth.domain.product.entity.QPurchaseItem.class, PathInits.DIRECT2);
 

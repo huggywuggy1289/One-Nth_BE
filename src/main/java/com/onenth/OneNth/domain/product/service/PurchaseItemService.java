@@ -7,6 +7,7 @@ import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
+import com.onenth.OneNth.domain.product.dto.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
@@ -50,68 +51,56 @@ public class PurchaseItemService {
 
     // 같이사요 상품 등록
     @Transactional
-    public long registerItem(
-            String title,
-            String purchaseMethod,
-            String itemCategory,
-            String purchaseUrl,
-            String expirationDate,
-            Integer originPrice,
-            List<MultipartFile> imageFiles,
-            List<String> tags, // +
-            Long userId
-    ) {
-
-        // 카테고리 파싱
-        ItemCategory category = ItemCategory.valueOf(itemCategory.trim());
+    public long registerItem(PurchaseItemRequestDTO dto, List<MultipartFile> imageFiles, Long userId) {
 
         // 소비기한 유효성 체크
-        if (category == ItemCategory.FOOD) {
-            if (expirationDate == null || expirationDate.trim().isEmpty()) {
+        if (dto.getItemCategory() == ItemCategory.FOOD) {
+            if (dto.getExpirationDate() == null) {
                 throw new IllegalArgumentException("식품 카테고리 상품은 소비기한을 입력해야 합니다.");
             }
         } else {
-            if (expirationDate != null && !expirationDate.trim().isEmpty()) {
+            if (dto.getExpirationDate() != null) {
                 throw new IllegalArgumentException("식품 이외의 상품은 소비기한을 입력할 수 없습니다.");
             }
         }
 
-        // feature/#1병합 후 회원연동
+        // 회원 및 지역 조회
         Member member = Member.builder().id(userId).build();
-        // 이어서 회원가입시 등록된 대표지역도 주입
         Region region = memberRegionRepository.findByMemberId(userId)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
                 .getRegion();
 
-        // 태그 필드추가 + #조건 추가
-        List<Tag> tagEntities = tags.stream()
-                .peek(tagName -> {
-                    if (!tagName.startsWith("#")) {
-                        throw new IllegalArgumentException("태그는 반드시 #으로 시작해야 합니다: " + tagName);
+        // 태그 유효성 검사 및 저장
+        List<Tag> tagEntities = dto.getTags().stream()
+                .peek(tag -> {
+                    if (!tag.startsWith("#")) {
+                        throw new IllegalArgumentException("태그는 반드시 #으로 시작해야 합니다: " + tag);
                     }
                 })
-                .map(tagName -> tagRepository.findByName(tagName)
-                        .orElseGet(() -> tagRepository.save(Tag.builder().name(tagName).build())))
+                .map(tag -> tagRepository.findByName(tag)
+                        .orElseGet(() -> tagRepository.save(Tag.builder().name(tag).build())))
                 .toList();
 
+        if (tagEntities.size() > 5) {
+            throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
+        }
 
+        // PurchaseItem 생성
         PurchaseItem purchaseItem = PurchaseItem.builder()
-                .name(title)
-                .purchaseMethod(PurchaseMethod.valueOf(purchaseMethod))
-                .itemCategory(ItemCategory.valueOf(itemCategory.trim().replace(",", "")))
-                .purchaseLocation(purchaseUrl)
-                .expirationDate(expirationDate != null && !expirationDate.trim().isEmpty()
-                        ? LocalDate.parse(expirationDate)
-                        : null)
-                .price(originPrice)
+                .name(dto.getName())
+                .purchaseMethod(dto.getPurchaseMethod())
+                .itemCategory(dto.getItemCategory())
+                .purchaseLocation(dto.getPurchaseUrl())
+                .expirationDate(dto.getExpirationDate())
+                .price(dto.getOriginPrice())
                 .status(Status.DEFAULT)
-                .member(member)             // 회원 연동 시 주석 해제
-                .region(region)             // 지역 연동 시 주석 해제
-                .tags(new ArrayList<>()) // +
+                .member(member)
+                .region(region)
+                .tags(new ArrayList<>())
                 .build();
-        purchaseItem.getTags().addAll(tagEntities); // +
+        purchaseItem.getTags().addAll(tagEntities);
         purchaseItemRepository.save(purchaseItem);
 
         // 이미지 유효성 검사
@@ -119,12 +108,11 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("상품 이미지는 최소 1장 이상 첨부해야 합니다.");
         }
 
-        // 유효한 파일만 개수 체크
         long validFileCount = imageFiles.stream()
                 .filter(f -> f != null && !f.isEmpty())
                 .count();
 
-        if (validFileCount == 0) {
+        if (validFileCount < 1) {
             throw new IllegalArgumentException("상품 이미지는 최소 1장 이상 첨부해야 합니다.");
         }
 
@@ -132,12 +120,7 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("이미지는 최대 3장까지 업로드할 수 있습니다.");
         }
 
-        // nullable true로 하는 대신에 폼에 맞는 쪽 값 검증
-        if (purchaseItem == null){
-            throw new IllegalArgumentException("같이사요는 PurchaseItem 반드시 지정하세요.");
-        }
-
-        // 이미지 업로드 처리 (S3 업로드로 변경)
+        // 이미지 업로드 (S3)
         imageFiles.stream()
                 .filter(f -> f != null && !f.isEmpty())
                 .forEach(file -> {
@@ -150,7 +133,6 @@ public class PurchaseItemService {
                         metadata.setContentType(file.getContentType());
 
                         amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
-
                         String s3Url = amazonS3.getUrl(bucketName, s3Key).toString();
 
                         // 디버깅
@@ -160,11 +142,9 @@ public class PurchaseItemService {
                         } else {
                             System.out.println(s3Key + " : 존재합니다");
                         }
-
-                        // DB저장
                         ItemImage image = ItemImage.builder()
                                 .purchaseItem(purchaseItem)
-                                .url(s3Url) // S3 URL을 저장
+                                .url(s3Url)
                                 .itemType(ItemType.PURCHASE)
                                 .build();
 
@@ -173,7 +153,6 @@ public class PurchaseItemService {
                         throw new RuntimeException("S3 파일 업로드 실패: " + e.getMessage());
                     }
                 });
-
 
         return purchaseItem.getId();
     }
@@ -215,6 +194,22 @@ public class PurchaseItemService {
     private boolean isRegion(String keyword){
         return regionRepository.findByRegionNameContaining(keyword).isPresent();
     }
+
+    // 상품명 검색++++
+    @Transactional(readOnly = true)
+    public List<PurchaseItemListDTO> searchByTitleWithRegions(String keyword, List<Integer> regionIds) {
+        List<PurchaseItem> items;
+
+        if (regionIds == null || regionIds.isEmpty()) {
+            // 전국 검색
+            items = purchaseItemRepository.findByNameContainingIgnoreCase(keyword);
+        } else {
+            items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
+        }
+
+        return items.stream().map(PurchaseItemListDTO::fromEntity).toList();
+    }
+
 
 
     // 단일 상품 리스트 조회

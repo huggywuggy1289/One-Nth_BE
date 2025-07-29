@@ -28,7 +28,7 @@ public class PurchaseItemListDTO {
                                 ? entity.getItemImages().get(0).getUrl()
                                 : null
                 )
-                .isBookmarked(false) // TODO: 북마크 여부는 추후 구현
+                .isBookmarked(false)
                 .build();
     }
 }
