@@ -77,6 +77,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            pkill -f 'java -jar.*myapp.jar' || true
-            sleep 2
+            if lsof -i:8080 -t >/dev/null; then
+            kill -9 $(lsof -i:8080 -t)
+            fi
             nohup java -jar /home/${{ secrets.EC2_USERNAME }}/app/myapp.jar > /home/${{ secrets.EC2_USERNAME }}/app/app.log 2>&1 &
