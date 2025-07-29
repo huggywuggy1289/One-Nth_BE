@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.member.repository.memberRepository;
 
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.enums.LoginType;
+import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     Optional<Member> findByEmail(String email);
 
     Optional<Member> findById(Long id);
+
+    Optional<Member> findByEmailAndStatus(String email, MemberStatus status);
 
     Optional<Member> findBySocialIdAndLoginType(String socialId, LoginType loginType);
 

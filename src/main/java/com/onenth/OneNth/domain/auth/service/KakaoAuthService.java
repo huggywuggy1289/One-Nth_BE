@@ -5,7 +5,9 @@ import com.onenth.OneNth.domain.auth.dto.KakaoResponseDTO;
 import com.onenth.OneNth.domain.auth.dto.KakaoUserInfo;
 import com.onenth.OneNth.domain.member.converter.MemberConverter;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
 import com.onenth.OneNth.domain.member.entity.enums.LoginType;
+import com.onenth.OneNth.domain.member.repository.memberAlertSettingRepository.MemberAlertSettingRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
@@ -35,6 +37,7 @@ public class KakaoAuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RegionRepository regionRepository;
+    private final MemberAlertSettingRepository memberAlertSettingRepository;
 
 
     // 카카오 로그인 요청 처리 서비스
@@ -80,8 +83,18 @@ public class KakaoAuthService {
 
         Member member = MemberConverter.toMember(request, region);
 
+        // 카카오 멤버 정보 저장
+        Member savedMember = memberRepository.save(member);
 
-        memberRepository.save(member);
+        // 알림설정 생성 (기본값 ON)
+        MemberAlertSetting alertSetting = MemberAlertSetting.builder()
+                .member(savedMember)
+                .chatAlerts(true)
+                .scrapAlerts(true)
+                .reviewAlerts(true)
+                .build();
+        memberAlertSettingRepository.save(alertSetting);
+
 
         // 소셜 회원 가입 완료 후 로그인 처리
         Authentication authentication = new UsernamePasswordAuthenticationToken(

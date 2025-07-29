@@ -6,6 +6,7 @@ import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
 import com.onenth.OneNth.domain.member.entity.EmailVerificationCode;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
+import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
 import com.onenth.OneNth.domain.member.repository.memberAlertSettingRepository.MemberAlertSettingRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailService;
@@ -22,7 +23,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static com.onenth.OneNth.domain.post.entity.QScrap.scrap;
@@ -80,8 +83,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Override
     public MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.LoginRequestDTO request) {
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("해당 이메일과 일치하는 사용자가 없습니다."));
+        Member member = memberRepository.findByEmailAndStatus(request.getEmail(), MemberStatus.ACTIVE)
+                .orElseThrow(() -> new RuntimeException("존재하지 않거나 탈퇴한 회원입니다."));
 
         if(!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
@@ -140,5 +143,16 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         return MemberResponseDTO.CancelScrapOrLikeResponseDTO.builder()
                 .isSuccess(true)
                 .build();
+    }
+
+    @Transactional
+    @Override
+    public void withdrawMember(Long memberId) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+
+        member.setStatus(MemberStatus.INACTIVE);
+        member.setInactiveDate(LocalDateTime.now());
     }
 }

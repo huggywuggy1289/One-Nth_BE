@@ -64,6 +64,24 @@ public class MemberRestController {
     }
 
     /**
+     *  회원 탈퇴 (soft delete)
+     */
+    @Operation(
+            summary = "회원 탈퇴 (soft delete) API",
+            description = "회원탈퇴를 진행합니다. 탈퇴한 회원은 로그인할 수 없습니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/withdraw")
+    public ApiResponse<String> withdrawMember(
+            @Parameter(hidden = true) @AuthUser Long memberId) {
+        memberCommandService.withdrawMember(memberId);
+        return ApiResponse.onSuccess("회원 탈퇴가 완료되었습니다.");
+    }
+
+    /**
      *  이메일 인증 후 비밀번호 재설정 API
      */
     @Operation(
