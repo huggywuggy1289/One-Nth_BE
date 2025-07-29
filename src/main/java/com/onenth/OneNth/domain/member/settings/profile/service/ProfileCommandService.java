@@ -9,4 +9,6 @@ public interface ProfileCommandService {
     ProfileResponseDTO.UpdateProfileImageResponseDTO updateProfileImage(Long userId, MultipartFile image);
 
     ProfileResponseDTO.UpdateNicknameResponseDTO updateNickname(Long userId, ProfileRequestDTO.UpdateNicknameRequestDTO request);
+
+    Void updatePassword(Long userId, ProfileRequestDTO.UpdatePasswordRequestDTO request);
 }

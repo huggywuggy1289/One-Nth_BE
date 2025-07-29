@@ -16,4 +16,12 @@ public class ProfileRequestDTO {
         private String nickname;
     }
 
+    @Getter
+    @NoArgsConstructor
+    public static class UpdatePasswordRequestDTO {
+        @Schema(description = "변경할 비밀번호", example = "abcd1234!")
+        @NotBlank(message = "변경할 비밀번호는 필수입니다.")
+        private String password;
+    }
+
 }

@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.sql.Update;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 
     private final MemberRepository memberRepository;
     private final AmazonS3Manager amazonS3Manager;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ProfileResponseDTO.UpdateProfileImageResponseDTO updateProfileImage(Long userId, MultipartFile image) {
@@ -58,5 +60,15 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
         member.updateNickname(request.getNickname());
 
         return ProfileConverter.toUpdateProfileImageResponseDTO(member);
+    }
+
+    @Override
+    public Void updatePassword(Long userId, ProfileRequestDTO.UpdatePasswordRequestDTO request) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        member.encodePassword(passwordEncoder.encode(request.getPassword()));
+
+        return null;
     }
 }

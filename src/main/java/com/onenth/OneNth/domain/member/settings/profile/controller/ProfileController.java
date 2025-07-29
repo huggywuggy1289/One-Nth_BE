@@ -61,4 +61,21 @@ public class ProfileController {
     ) {
         return ApiResponse.onSuccess(profileCommandService.updateNickname(userId, request));
     }
+
+    @Operation(
+            summary =  "사용자 비밀번호 변경 API",
+            description = "사용자 설정 중 비밀번호를 변경하는 API입니다. 응답으로 아무것도 반환하지 않습니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 사용자 닉네임 변경 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PatchMapping("/password")
+    public ApiResponse<Void> updatePassword(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @Valid @RequestBody ProfileRequestDTO.UpdatePasswordRequestDTO request
+    ) {
+        return ApiResponse.onSuccess(profileCommandService.updatePassword(userId, request));
+    }
 }
