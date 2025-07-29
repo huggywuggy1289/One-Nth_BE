@@ -41,7 +41,7 @@ public class UserSettingsController {
     @PostMapping("/regions")
     public ApiResponse<UserSettingsResponseDTO.AddMyRegionResponseDTO> addMyRegion(
             @Parameter(hidden=true) @AuthUser Long userId,
-             @RequestBody UserSettingsRequestDTO.AddMyRegionRequestDTO request
+            @Valid @RequestBody UserSettingsRequestDTO.AddMyRegionRequestDTO request
     ) {
         return ApiResponse.onSuccess(userSettingsCommandService.addMyRegion(userId, request));
     }
