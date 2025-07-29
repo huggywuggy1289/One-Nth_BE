@@ -1,0 +1,10 @@
+name: Deploy to Development Server
+
+on:
+  push:
+    branches: [ "develop" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
