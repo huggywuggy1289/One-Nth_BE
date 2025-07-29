@@ -70,8 +70,6 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            pkill -f 'java -jar /home/${{ secrets.EC2_USERNAME }}/app/myapp.jar' || true
-            nohup java -jar /home/${{ secrets.EC2_USERNAME }}/app/myapp.jar > /home/${{ secrets.EC2_USERNAME }}/app/app.log 2>&1 &
-            sleep 5
-            tail -n 20 /home/${{ secrets.EC2_USERNAME }}/app/app.log
+        script: |
+          pkill -f 'java -jar /home/${{ secrets.EC2_USERNAME }}/app/myapp.jar' || true
+          setsid java -jar /home/${{ secrets.EC2_USERNAME }}/app/myapp.jar > /home/${{ secrets.EC2_USERNAME }}/app/app.log 2>&1 < /dev/null &
