@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAl
 import com.onenth.OneNth.domain.member.settings.profile.dto.ProfileRequestDTO;
 import com.onenth.OneNth.domain.member.settings.profile.dto.ProfileResponseDTO;
 import com.onenth.OneNth.domain.member.settings.profile.service.ProfileCommandService;
+import com.onenth.OneNth.domain.member.settings.profile.service.ProfileQueryService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProfileController {
 
     private final ProfileCommandService profileCommandService;
+    private final ProfileQueryService profileQueryService;
 
     @Operation(
             summary =  "사용자 프로필 이미지 변경 API",
@@ -77,5 +79,21 @@ public class ProfileController {
             @Valid @RequestBody ProfileRequestDTO.UpdatePasswordRequestDTO request
     ) {
         return ApiResponse.onSuccess(profileCommandService.updatePassword(userId, request));
+    }
+
+    @Operation(
+            summary =  "사용자 내 프로필 조회 API",
+            description = "사용자 설정 중 내 프로필 조회 API입니다. 응답으로 프로필 사진, 닉네임을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 사용자 닉네임 변경 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @GetMapping("")
+    public ApiResponse<ProfileResponseDTO.GetMyProfileResponseDTO> getMyProfile(
+            @Parameter(hidden=true) @AuthUser Long userId
+    ) {
+        return ApiResponse.onSuccess(profileQueryService.getMyProfile(userId));
     }
 }

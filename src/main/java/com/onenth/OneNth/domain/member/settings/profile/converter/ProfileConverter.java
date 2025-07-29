@@ -16,4 +16,11 @@ public class ProfileConverter {
                 .nickname(member.getNickname())
                 .build();
     }
+
+    public static ProfileResponseDTO.GetMyProfileResponseDTO toGetMyProfileResponseDTO(Member member) {
+        return ProfileResponseDTO.GetMyProfileResponseDTO.builder()
+                .profileImageUrl(member.getProfileImageUrl())
+                .nickname(member.getNickname())
+                .build();
+    }
 }

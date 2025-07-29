@@ -17,4 +17,12 @@ public class ProfileResponseDTO {
         private String nickname;
     }
 
+    @Getter
+    @Builder
+    public static class GetMyProfileResponseDTO {
+        private String profileImageUrl;
+        private String nickname;
+    }
+
+
 }
