@@ -38,9 +38,10 @@ jobs:
         with:
           arguments: build -x test
 
-      - name: Rename JAR to myapp.jar
+      - name: Rename build artifact to myapp.jar
         run: |
-          mv build/libs/*.jar build/libs/myapp.jar
+          mv $(ls ./build/libs/*.jar | head -n 1) ./build/libs/myapp.jar
+        shell: bash
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -67,6 +68,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: build-artifacts/myapp.jar
           target: /home/${{ secrets.EC2_USERNAME }}/app/
+          strip_components: 1
 
       - name: Restart app on EC2
         uses: appleboy/ssh-action@v0.1.7
@@ -75,5 +77,6 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            pkill -f 'java -jar /home/${{ secrets.EC2_USERNAME }}/app/myapp.jar' || true
+            pkill -f 'java -jar.*myapp.jar' || true
+            sleep 2
             nohup java -jar /home/${{ secrets.EC2_USERNAME }}/app/myapp.jar > /home/${{ secrets.EC2_USERNAME }}/app/app.log 2>&1 &
