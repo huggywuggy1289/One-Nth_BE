@@ -54,6 +54,16 @@ public class Member extends BaseEntity {
     @Column(nullable=false)
     private boolean marketingAgree = false;
 
+    private String profileImageUrl;
+
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     //비밀번호 salt 암호화 메서드
     public void encodePassword(String password) {
         this.password = password;
