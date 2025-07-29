@@ -4,9 +4,12 @@ import com.onenth.OneNth.domain.member.entity.Block;
 import com.onenth.OneNth.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BlockRepository extends JpaRepository<Block, Long> {
 
     Optional<Block> findByMemberAndBlockedMember(Member member, Member blockedMember);
+
+    List<Block> findAllByMember(Member member);
 }
