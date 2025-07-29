@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.member.entity;
 
 import com.onenth.OneNth.domain.alert.entity.Alert;
+import com.onenth.OneNth.domain.chat.entity.ChatRoomMember;
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.member.entity.enums.LoginType;
 import com.onenth.OneNth.domain.post.entity.Post;
@@ -97,4 +98,6 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseItem> purchaseItems = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
 }
