@@ -47,7 +47,7 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
 
         memberRegionRepository.save(memberRegion);
 
-        return UserSettingsConverter.toAddMyRegionResponseDTO(memberRegion.getRegion());
+        return UserSettingsConverter.toAddMyRegionResponseDTO(memberRegion);
     }
 
     @Override

@@ -21,10 +21,11 @@ public class UserSettingsConverter {
         return memberRegion;
     }
 
-    public static UserSettingsResponseDTO.AddMyRegionResponseDTO toAddMyRegionResponseDTO(Region region) {
+    public static UserSettingsResponseDTO.AddMyRegionResponseDTO toAddMyRegionResponseDTO(MemberRegion memberRegion) {
         return UserSettingsResponseDTO.AddMyRegionResponseDTO.builder()
-                .regionId(region.getId())
-                .regionName(region.getRegionName())
+                .regionId(memberRegion.getRegion().getId())
+                .regionName(memberRegion.getRegion().getRegionName())
+                .isMain(memberRegion.isMain())
                 .build();
     }
 
@@ -34,10 +35,11 @@ public class UserSettingsConverter {
                 .build();
     }
 
-    public static UserSettingsResponseDTO.RegionSummary toRegionSummary(Region region) {
+    public static UserSettingsResponseDTO.RegionSummary toRegionSummary(MemberRegion memberRegion) {
         return UserSettingsResponseDTO.RegionSummary.builder()
-                .regionId(region.getId())
-                .regionName(region.getRegionName())
+                .regionId(memberRegion.getRegion().getId())
+                .regionName(memberRegion.getRegion().getRegionName())
+                .isMain(memberRegion.isMain())
                 .build();
     }
 

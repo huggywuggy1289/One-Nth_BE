@@ -33,7 +33,7 @@ public class UserSettingsQueryServiceImpl implements UserSettingsQueryService {
 
         List<UserSettingsResponseDTO.RegionSummary> regionSummaryList = memberRegionList.stream()
                 .map(memberRegion ->
-                        UserSettingsConverter.toRegionSummary(memberRegion.getRegion())
+                        UserSettingsConverter.toRegionSummary(memberRegion)
                 ).collect(Collectors.toList());
 
         return UserSettingsConverter.toGetMyRegionsResponseDTO(regionSummaryList);

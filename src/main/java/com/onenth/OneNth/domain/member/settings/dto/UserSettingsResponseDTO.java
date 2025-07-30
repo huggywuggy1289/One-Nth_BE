@@ -12,6 +12,7 @@ public class UserSettingsResponseDTO {
     public static class AddMyRegionResponseDTO {
         private Integer regionId;
         private String regionName;
+        private boolean isMain;
     }
 
     @Getter
@@ -25,6 +26,7 @@ public class UserSettingsResponseDTO {
     public static class RegionSummary {
         private Integer regionId;
         private String regionName;
+        private boolean isMain;
     }
 
     @Getter

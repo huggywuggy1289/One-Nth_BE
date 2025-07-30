@@ -28,7 +28,7 @@ public class UserSettingsController {
 
     @Operation(
             summary = "우리 동네 추가 API",
-            description = "사용자 설정 중 우리 동네를 등록하는 API입니다. 응답으로 regionId와 regionName을 반환합니다."
+            description = "사용자 설정 중 우리 동네를 등록하는 API입니다. 응답으로 regionId와 regionName, main(해당 지역이 메인인지 여부)을 반환합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
@@ -68,7 +68,7 @@ public class UserSettingsController {
 
     @Operation(
             summary = "등록한 우리동네 지역 목록 조회 API",
-            description = "사용자 설정 중 우리 동네로 등록한 지역 목록을 조회하는 API입니다."
+            description = "사용자 설정 중 우리 동네로 등록한 지역 목록을 조회하는 API입니다. 응답으로 regionId와 regionName, main(해당 지역이 메인인지 여부)를 포함한 객체 list를 반환합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 우리 동네 지역 조회 성공", content = @Content(
@@ -78,7 +78,7 @@ public class UserSettingsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @GetMapping("")
-    public ApiResponse<UserSettingsResponseDTO.MyRegionListResponseDTO> deleteMyRegions(
+    public ApiResponse<UserSettingsResponseDTO.MyRegionListResponseDTO> getMyRegions(
             @Parameter(hidden=true) @AuthUser Long userId
     ) {
         return ApiResponse.onSuccess(userSettingsQueryService.getMyRegions(userId));
@@ -86,7 +86,7 @@ public class UserSettingsController {
 
     @Operation(
             summary = "특정 동네 메인으로 등록 API",
-            description = "사용자 설정 중 특정 동네를 메인에 표시할 지역으로 등록하는 API입니다. 응답으로 regionId와 regionName, isMain(메인 여부)을 반환합니다."
+            description = "사용자 설정 중 특정 동네를 메인에 표시할 지역으로 등록하는 API입니다. 응답으로 regionId와 regionName, main(메인 여부)을 반환합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
