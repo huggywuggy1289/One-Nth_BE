@@ -58,6 +58,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 프로필 이미지 관련
     INVALID_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE001", "프로필 이미지가 비어 있거나 존재하지 않습니다."),
+
+    // 사용자 차단 관련
+    BLOCK_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK001", "차단 대상 사용자가 존재하지 않습니다."),
+    BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK002", "차단한 사용자 목록에 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
