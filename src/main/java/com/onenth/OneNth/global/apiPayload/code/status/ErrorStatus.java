@@ -34,6 +34,7 @@ public enum ErrorStatus implements BaseErrorCode {
     REGION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "MEMBER_REGION001", "등록 가능한 지역은 최대 3개입니다."),
     REGION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER_REGION002", "이미 등록한 지역입니다."),
     MEMBER_REGION_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER_REGION003", "해당 사용자가 등록하지 않은 지역입니다."),
+    CANNOT_DELETE_MAIN_REGION(HttpStatus.BAD_REQUEST, "MEMBER_REGION004", "메인으로 등록된 지역은 삭제할 수 없습니다."),
 
     // 지역 키워드 알림 관련
     REGION_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT001", "등록 가능한 지역 알림은 최대 3개입니다."),

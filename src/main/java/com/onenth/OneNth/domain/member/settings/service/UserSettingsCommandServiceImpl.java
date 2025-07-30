@@ -62,7 +62,9 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
         MemberRegion memberRegion = memberRegionRepository.findByMemberAndRegion(member, region)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_REGION_NOT_FOUND));
 
-        // TODO: 메인 지역 삭제 방지 로직은 추후 메인 지역 등록하는 로직 이슈에서 추가 예정
+        if (memberRegion.isMain()) {
+            throw new GeneralException(ErrorStatus.CANNOT_DELETE_MAIN_REGION);
+        }
 
         member.getMemberRegions().remove(memberRegion);
         memberRegionRepository.delete(memberRegion);
