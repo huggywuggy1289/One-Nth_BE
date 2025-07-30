@@ -1,6 +1,5 @@
 package com.onenth.OneNth.domain.post.repository.scrapRepository;
 
-import com.onenth.OneNth.domain.post.entity.Like;
 import com.onenth.OneNth.domain.post.entity.Scrap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
