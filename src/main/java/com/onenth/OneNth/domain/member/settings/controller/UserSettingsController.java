@@ -17,9 +17,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "사용자 설정 중 우리동네 관련 API", description = "우리동네 등록, 삭제, 목록 조회, 메인으로 등록  API")
+@Tag(name = "사용자 설정 - 우리동네 관련 API", description = "우리동네 등록, 인증, 삭제, 목록 조회, 메인으로 등록  API")
 @RestController
-@RequestMapping("/api/user-settings")
+@RequestMapping("/api/user-settings/regions")
 @RequiredArgsConstructor
 public class UserSettingsController {
 
@@ -38,7 +38,7 @@ public class UserSettingsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER_REGION002", description = "이미 등록한 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @PostMapping("/regions")
+    @PostMapping("")
     public ApiResponse<UserSettingsResponseDTO.AddMyRegionResponseDTO> addMyRegion(
             @Parameter(hidden=true) @AuthUser Long userId,
             @Valid @RequestBody UserSettingsRequestDTO.AddMyRegionRequestDTO request
@@ -57,7 +57,7 @@ public class UserSettingsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER_REGION003", description = "해당 사용자가 등록하지 않은 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @DeleteMapping("/regions/{regionId}")
+    @DeleteMapping("/{regionId}")
     public ApiResponse<Void> deleteMyRegion(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionId
@@ -77,10 +77,29 @@ public class UserSettingsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @GetMapping("/regions")
+    @GetMapping("")
     public ApiResponse<UserSettingsResponseDTO.MyRegionListResponseDTO> deleteMyRegions(
             @Parameter(hidden=true) @AuthUser Long userId
     ) {
         return ApiResponse.onSuccess(userSettingsQueryService.getMyRegions(userId));
+    }
+
+    @Operation(
+            summary = "특정 동네 메인으로 등록 API",
+            description = "사용자 설정 중 특정 동네를 메인에 표시할 지역으로 등록하는 API입니다. 응답으로 regionId와 regionName, isMain(메인 여부)을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER_REGION003", description = "해당 사용자가 등록하지 않은 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PatchMapping("/{regionId}")
+    public ApiResponse<UserSettingsResponseDTO.UpdateMainRegionResponseDTO> updateMainRegion(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @PathVariable Long regionId
+    ) {
+        return ApiResponse.onSuccess(userSettingsCommandService.updateMainRegion(userId, regionId));
     }
 }

@@ -26,4 +26,12 @@ public class UserSettingsResponseDTO {
         private Integer regionId;
         private String regionName;
     }
+
+    @Getter
+    @Builder
+    public static class UpdateMainRegionResponseDTO {
+        private Integer regionId;
+        private String regionName;
+        private boolean isMain;
+    }
 }

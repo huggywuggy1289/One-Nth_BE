@@ -29,6 +29,10 @@ public class QMemberRegion extends EntityPathBase<MemberRegion> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final BooleanPath isMain = createBoolean("isMain");
+
+    public final BooleanPath isVerified = createBoolean("isVerified");
+
     public final QMember member;
 
     public final com.onenth.OneNth.domain.region.entity.QRegion region;

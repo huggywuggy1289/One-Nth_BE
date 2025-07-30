@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -65,6 +67,25 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
         member.getMemberRegions().remove(memberRegion);
         memberRegionRepository.delete(memberRegion);
 
+    }
+
+    @Override
+    public UserSettingsResponseDTO.UpdateMainRegionResponseDTO updateMainRegion(Long userId, Long regionId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Optional<MemberRegion> currentMainOpt = memberRegionRepository.findByMemberAndIsMain(member, true);
+        currentMainOpt.ifPresent(currentMain -> currentMain.setMain(false));
+
+        Region region = regionRepository.findById(regionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.REGION_NOT_FOUND));
+
+        MemberRegion memberRegion = memberRegionRepository.findByMemberAndRegion(member, region)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_REGION_NOT_FOUND));
+
+        memberRegion.setMain(true);
+
+        return UserSettingsConverter.toUpdateMainRegionResponseDTO(memberRegion);
     }
 
 }

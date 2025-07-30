@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 public class UserSettingsRequestDTO {
 
     @Getter
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class AddMyRegionRequestDTO {
         @NotNull
