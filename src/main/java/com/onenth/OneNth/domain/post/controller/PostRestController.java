@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Tag(name = "게시글 관련 API", description = "게시글 등록 API")
+@Tag(name = "게시글 관련 API", description = "생활꿀팁/할인정보/우리동네맛집 게시글 API")
 @RestController
 @RequestMapping("/api/post")
 @RequiredArgsConstructor
@@ -39,7 +39,7 @@ public class PostRestController {
     private final PostQueryService postQueryService;
 
     @Operation(
-            summary = "생활꿀팁/할인정보/우리동네맛집 게시글 등록 API",
+            summary = "게시글 등록 API",
             description = """
     생활꿀팁/할인정보/우리동네맛집 게시판의 게시글을 등록하는 API입니다.
     - 쿼리 파라미터 'postType'에 '게시글 종류'를 명시합니다.('DISCOUNT'(할인정보),'RESTAURANT'(우리동네맛집),'LIFE_TIP'(생활꿀팁))
@@ -180,5 +180,52 @@ public class PostRestController {
         postCommandService.increaseViewCount(postId);
         PostDetailResponseDTO response = postQueryService.getPostDetail(postId, member);
         return ApiResponse.onSuccess(response);
+    }
+
+    @Operation(
+            summary = "게시글 수정 API",
+            description = """
+    postId를 이용한 게시글 수정 API입니다. 본인이 작성한 게시글에 대해서만 수정 권한이 있습니다. 수정이 가능한 항목은 '제목, '내용', '주소', '장소명', '링크', '이미지'입니다.
+    
+    - 쿼리파라미터 postId에 게시글 ID를 전달합니다.
+    - 생활꿀팁의 경우, 'post' 필드에 변경하고자하는 제목, 내용, 링크 정보를 JSON 문자열로 포함해야 합니다.
+    - 할인정보/우리동네맛집의 경우, 'post' 필드에 변경하고자하는 제목, 내용, 주소, 장소명을 JSON 문자열로 포함해야 합니다.
+      (변경을 원하지 않는 항목의 경우, 꼭 "" 빈문자열로 전달해주세요!!! "string"으로 전달할 시 그대로 반영됩니다ㅠㅠ)
+    - 해당 게시글에 필요한 정보가 아닌 경우, 모두 자동 NULL 값 처리됩니다.
+    - 'images' 필드에는 최대 5장까지 게시글 이미지를 선택적으로 재업로드할 수 있습니다.
+ 
+    """
+    )
+    @PatchMapping(value = "/{postId}", consumes = "multipart/form-data")
+    public ApiResponse<PostSaveResponseDTO> updatePostWithImages(
+            @PathVariable Long postId,
+            @AuthUser Long memberId,
+            @RequestPart("post") PostSaveRequestDTO requestDto,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) {
+        Long updatedPostId = postCommandService.update(postId, requestDto, memberId, images);
+        return ApiResponse.of(SuccessStatus._OK, PostSaveResponseDTO.builder()
+
+                .postId(updatedPostId)
+                .createdAt(LocalDateTime.now())
+                .build());
+    }
+
+
+    @Operation(
+            summary = "게시글 삭제 API",
+            description = """
+    postId를 이용한 게시글 삭제 API입니다. 본인이 작성한 게시글에 대해서만 삭제 권한이 있습니다.
+    
+    - 쿼리파라미터 postId에 게시글 ID를 전달합니다.
+    """
+    )
+    @DeleteMapping("/{postId}")
+    public ApiResponse<Void> deletePost(
+            @PathVariable Long postId,
+            @AuthUser Long memberId
+    ) {
+        postCommandService.delete(postId, memberId);
+        return ApiResponse.of(SuccessStatus._OK, null);
     }
 }
