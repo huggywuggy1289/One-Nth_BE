@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 public class MemberRegion extends BaseEntity {
 
     @Id
@@ -20,7 +21,14 @@ public class MemberRegion extends BaseEntity {
     @JoinColumn(name = "region_id", nullable = false)
     private Region region;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    public static MemberRegion of(Member member, Region region) {
+        return MemberRegion.builder()
+                .member(member)
+                .region(region)
+                .build();
+    }
 }
