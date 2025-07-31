@@ -215,7 +215,7 @@ public class PurchaseItemService {
         }
 
     private boolean isRegion(String keyword){
-        return regionRepository.findByRegionNameContaining(keyword).isPresent();
+        return !regionRepository.findByRegionNameContaining(keyword).isEmpty();
     }
 
     // 상품명 검색++++

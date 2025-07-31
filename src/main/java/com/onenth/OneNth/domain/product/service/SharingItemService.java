@@ -243,10 +243,9 @@ public class SharingItemService {
         }
     }
 
-    private boolean isRegion(String keyword) {
-        return regionRepository.findByRegionNameContaining(keyword).isPresent();
+    private boolean isRegion(String keyword){
+        return !regionRepository.findByRegionNameContaining(keyword).isEmpty();
     }
-
 
     // 단일 상품 리스트 조회
     @Transactional(readOnly = true)
