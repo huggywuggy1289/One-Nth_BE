@@ -90,4 +90,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
+
+    private String profileImageUrl;
+
+    @Column(nullable = false)
+    private boolean verified;
 }
