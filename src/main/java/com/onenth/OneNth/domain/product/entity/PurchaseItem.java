@@ -36,7 +36,7 @@ public class PurchaseItem extends BaseEntity {
     @Column(nullable = false)
     private ItemCategory itemCategory;
 
-    @Column(length = 300, nullable = false)
+    @Column(length = 300, nullable = true)
     private String purchaseLocation;
 
     private LocalDate expirationDate;

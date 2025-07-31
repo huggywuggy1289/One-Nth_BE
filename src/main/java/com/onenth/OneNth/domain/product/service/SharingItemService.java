@@ -11,6 +11,7 @@ import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
+import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.repository.itemRepository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
@@ -105,9 +106,22 @@ public class SharingItemService {
             throw new IllegalArgumentException("이미지는 최대 3장까지 업로드할 수 있습니다.");
         }
 
-        GeoCodingResult geo = geoCodingService.getCoordinatesFromAddress(dto.getSharingLocation());
-        if (geo == null) {
-            throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+        GeoCodingResult geo = null;
+
+        if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
+            if (dto.getSharingLocation() == null || dto.getSharingLocation().isBlank()) {
+                throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
+            }
+
+            geo = geoCodingService.getCoordinatesFromAddress(dto.getSharingLocation());
+            if (geo == null) {
+                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+            }
+        } else {
+            // 온라인일 경우엔 주소 없어야 함
+            if (dto.getSharingLocation() != null && !dto.getSharingLocation().isBlank()) {
+                throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
+            }
         }
 
         SharingItem sharingItem = SharingItem.builder()
@@ -122,9 +136,9 @@ public class SharingItemService {
                 .region(region)
                 .status(Status.DEFAULT)
                 .tags(new ArrayList<>())
-//                .sharingLocation(dto.getSharingLocation())
-//                .latitude(geo.getLatitude()) // 위도 추가
-//                .longitude(geo.getLongitude()) // 경도 추가
+                .sharingLocation(dto.getSharingLocation())
+                .latitude(geo != null ? geo.getLatitude() : null) // 위도 추가
+                .longitude(geo != null ? geo.getLongitude() : null) // 경도 추가
                 .build();
         sharingItem.getTags().addAll(tagEntities); // +
         sharingItemRepository.save(sharingItem);

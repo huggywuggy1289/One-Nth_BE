@@ -48,7 +48,6 @@ public class SharingItemRequestDTO {
     @NotEmpty
     private List<String> tags;
 
-    @NotBlank
-    private String sharingLocation; // 지도마커때문에 추가
+    private String sharingLocation;
 }
 

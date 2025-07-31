@@ -75,8 +75,7 @@ public class SharingItem extends BaseEntity {
     private List<Tag> tags = new ArrayList<>();
 
     // +
-
-    @Column(length = 300, nullable = false)
+    @Column(length = 300, nullable = true)
     private String sharingLocation;
 
     @Column
