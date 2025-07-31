@@ -1,7 +1,10 @@
 package com.onenth.OneNth.domain.product.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +17,8 @@ public class PurchaseItemRequestDTO {
     @NotBlank
     private String name;
     @NotNull
+    @Enumerated(EnumType.STRING)
+    @JsonProperty("purchaseMethod")
     private PurchaseMethod purchaseMethod;
     @NotNull
     private ItemCategory itemCategory;
