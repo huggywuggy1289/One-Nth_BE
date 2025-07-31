@@ -285,6 +285,8 @@ public class SharingItemService {
                 .imageUrls(imageUrls)
                 .tags(tags)
                 .writerNickname(member.getNickname())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
                 .build();
     }
 

@@ -36,5 +36,8 @@ public class PurchaseItemResponseDTO {
         private ItemCategory itemCategory;
         private PurchaseMethod purchaseMethod;
         private Integer originPrice;
+
+        private Double latitude;
+        private Double longitude;
     }
 }

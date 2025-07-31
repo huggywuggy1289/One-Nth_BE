@@ -274,6 +274,8 @@ public class PurchaseItemService {
                 .itemCategory(item.getItemCategory())
                 .purchaseMethod(item.getPurchaseMethod())
                 .originPrice(item.getPrice())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
                 .build();
     }
 

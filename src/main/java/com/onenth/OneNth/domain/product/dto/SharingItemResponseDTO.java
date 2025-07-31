@@ -38,6 +38,9 @@ public class SharingItemResponseDTO {
         private List<String> imageUrls;
         private List<String> tags;
         private String writerNickname;
+
+        private Double latitude;
+        private Double longitude;
     }
 }
 
