@@ -19,7 +19,8 @@ public class Block extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
 
-    @Column(nullable=false)
-    private Long blockedId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blocked_id", nullable = false)
+    private Member blockedMember;
 }
 
