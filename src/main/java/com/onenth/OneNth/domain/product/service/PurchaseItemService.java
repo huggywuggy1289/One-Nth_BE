@@ -202,7 +202,10 @@ public class PurchaseItemService {
 
         if (regionIds == null || regionIds.isEmpty()) {
             // 전국 검색
-            items = purchaseItemRepository.findByNameContainingIgnoreCase(keyword);
+            items = purchaseItemRepository.findByNameContainingIgnoreCase(keyword)
+                    .stream()
+                    .filter(i -> i.getStatus() != Status.COMPLETED)
+                    .toList(); // +
         } else {
             items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
         }
@@ -219,7 +222,11 @@ public class PurchaseItemService {
         PurchaseItem item = purchaseItemRepository.findById(groupPurchaseId)
                 .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
 
-        Member member = item.getMember();  // 이미 포함돼 있음
+        Member member = item.getMember();
+
+        if (item.getStatus() == Status.COMPLETED) {
+            throw new NotFoundException("이미 거래 완료된 상품입니다.");
+        }
 
         boolean isVerified = true;
         String profileImageUrl = null;

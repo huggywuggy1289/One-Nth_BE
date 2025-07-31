@@ -94,7 +94,9 @@ public class PurchaseItemController {
             - `지역명` : 설정과 무관하게 특정 지역명으로 검색
             """
     )
-    @GetMapping("/{groupPurchaseId}")
+  
+    @GetMapping("t /{groupPurchaseId}")
+
     public ApiResponse<PurchaseItemResponseDTO.GetPurchaseItemResponseDTO> getGroupPurchaseDetail(
             @PathVariable Long groupPurchaseId,
             @AuthUser Long userId

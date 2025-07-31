@@ -66,6 +66,8 @@ public class QMember extends EntityPathBase<Member> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
+    public final BooleanPath verified = createBoolean("verified");
+
     public QMember(String variable) {
         super(Member.class, forVariable(variable));
     }

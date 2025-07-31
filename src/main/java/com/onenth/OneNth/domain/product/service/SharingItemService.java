@@ -197,6 +197,7 @@ public class SharingItemService {
             // 전국 검색: 지역 조건 없이 상품명만 검색
             return sharingItemRepository.findByTitleContainingIgnoreCase(keyword)
                     .stream()
+                    .filter(i -> i.getStatus() != Status.COMPLETED) // +
                     .map(SharingItemListDTO::fromEntity)
                     .toList();
         }
@@ -229,8 +230,12 @@ public class SharingItemService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 함께 나눠요 상품입니다."));
 
         Member member = item.getMember();
-        boolean isVerified = true; // 추후 확장 가능
+        boolean isVerified = true;
         String regionName = item.getRegion().getRegionName();
+
+        if (item.getStatus() == Status.COMPLETED) {
+            throw new NotFoundException("이미 거래 완료된 상품입니다.");
+        }
 
         // 이미지 목록 직접 조회
         List<String> imageUrls = itemImageRepository.findBySharingItemId(sharingItemId)
