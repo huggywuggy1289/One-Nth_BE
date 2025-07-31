@@ -64,6 +64,8 @@ public class QPost extends EntityPathBase<Post> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
+    public final NumberPath<Integer> viewCount = createNumber("viewCount", Integer.class);
+
     public QPost(String variable) {
         this(Post.class, forVariable(variable), INITS);
     }

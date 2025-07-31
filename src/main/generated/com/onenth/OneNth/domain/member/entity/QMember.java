@@ -24,6 +24,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<com.onenth.OneNth.domain.alert.entity.Alert, com.onenth.OneNth.domain.alert.entity.QAlert> alerts = this.<com.onenth.OneNth.domain.alert.entity.Alert, com.onenth.OneNth.domain.alert.entity.QAlert>createList("alerts", com.onenth.OneNth.domain.alert.entity.Alert.class, com.onenth.OneNth.domain.alert.entity.QAlert.class, PathInits.DIRECT2);
 
+    public final ListPath<com.onenth.OneNth.domain.chat.entity.ChatRoomMember, com.onenth.OneNth.domain.chat.entity.QChatRoomMember> chatRoomMembers = this.<com.onenth.OneNth.domain.chat.entity.ChatRoomMember, com.onenth.OneNth.domain.chat.entity.QChatRoomMember>createList("chatRoomMembers", com.onenth.OneNth.domain.chat.entity.ChatRoomMember.class, com.onenth.OneNth.domain.chat.entity.QChatRoomMember.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 

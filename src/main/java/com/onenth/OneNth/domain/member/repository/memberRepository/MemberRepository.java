@@ -27,9 +27,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     @Query("SELECT m FROM Member m LEFT JOIN FETCH m.memberRegions WHERE m.id = :id")
     Optional<Member> findByIdWithRegions(@Param("id") Long id);
 
-    @EntityGraph(attributePaths = {"purchaseReviews"})
-    Optional<Member> findWithPurchaseReviewsById(Long id);
-
-    @EntityGraph(attributePaths = {"sharingReviews"})
-    Optional<Member> findWithSharingReviewsById(Long id);
+    @EntityGraph(attributePaths = {"chatRoomMembers"})
+    Optional<Member> findWithChatRoomsById(Long memberId);
 }
