@@ -73,4 +73,15 @@ public class SharingItem extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags = new ArrayList<>();
+
+    // +
+
+    @Column(length = 300, nullable = false)
+    private String sharingLocation;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

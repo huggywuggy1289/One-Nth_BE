@@ -69,4 +69,10 @@ public class PurchaseItem extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags = new ArrayList<>();// +
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

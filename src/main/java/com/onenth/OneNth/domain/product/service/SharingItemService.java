@@ -17,6 +17,8 @@ import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
+import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
 import com.onenth.OneNth.domain.product.entity.Tag;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
@@ -39,6 +41,7 @@ public class SharingItemService {
     private final MemberRegionRepository memberRegionRepository;
     private final TagRepository tagRepository;
     private final RegionRepository regionRepository;
+    private final GeoCodingService geoCodingService;
 
     private final AmazonS3 amazonS3;
 
@@ -102,6 +105,11 @@ public class SharingItemService {
             throw new IllegalArgumentException("이미지는 최대 3장까지 업로드할 수 있습니다.");
         }
 
+        GeoCodingResult geo = geoCodingService.getCoordinatesFromAddress(dto.getSharingLocation());
+        if (geo == null) {
+            throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+        }
+
         SharingItem sharingItem = SharingItem.builder()
                 .title(dto.getTitle())
                 .quantity(dto.getQuantity())
@@ -114,6 +122,9 @@ public class SharingItemService {
                 .region(region)
                 .status(Status.DEFAULT)
                 .tags(new ArrayList<>())
+//                .sharingLocation(dto.getSharingLocation())
+//                .latitude(geo.getLatitude()) // 위도 추가
+//                .longitude(geo.getLongitude()) // 경도 추가
                 .build();
         sharingItem.getTags().addAll(tagEntities); // +
         sharingItemRepository.save(sharingItem);

@@ -21,12 +21,13 @@ import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.Purch
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
+import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class PurchaseItemService {
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
     private  final TagRepository tagRepository; // +
     private final RegionRepository regionRepository;
+    private final GeoCodingService geoCodingService;
 
     //s3 연동
     private final AmazonS3 amazonS3;
@@ -87,6 +89,25 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
         }
 
+        // 장소입력 유효성
+        GeoCodingResult geo = null;
+
+        if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
+            if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
+                throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
+            }
+
+            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
+            if (geo == null) {
+                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+            }
+        } else {
+            // 온라인일 경우엔 주소 없어야 함
+            if (dto.getPurchaseLocation() != null && !dto.getPurchaseLocation().isBlank()) {
+                throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
+            }
+        }
+
         // PurchaseItem 생성
         PurchaseItem purchaseItem = PurchaseItem.builder()
                 .name(dto.getName())
@@ -99,6 +120,8 @@ public class PurchaseItemService {
                 .member(member)
                 .region(region)
                 .tags(new ArrayList<>())
+                .latitude(geo != null ? geo.getLatitude() : null) // 위도 추가
+                .longitude(geo != null ? geo.getLongitude() : null) // 경도 추가
                 .build();
         purchaseItem.getTags().addAll(tagEntities);
         purchaseItemRepository.save(purchaseItem);

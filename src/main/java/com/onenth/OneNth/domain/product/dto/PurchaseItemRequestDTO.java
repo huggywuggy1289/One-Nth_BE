@@ -19,7 +19,6 @@ public class PurchaseItemRequestDTO {
     private ItemCategory itemCategory;
     @NotBlank
     private String purchaseUrl;
-    @NotBlank
     private String purchaseLocation;
     private LocalDate expirationDate;
     @NotNull
