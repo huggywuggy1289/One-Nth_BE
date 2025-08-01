@@ -27,7 +27,7 @@ public class PurchaseItemRequestDTO {
     private String purchaseLocation;
     private LocalDate expirationDate;
     @NotNull
-    private Integer originPrice;
+    private Integer price;
     @Size(max = 3)
     private List<@NotBlank String> imageUrls;
     @NotEmpty
