@@ -17,6 +17,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -73,4 +74,14 @@ public class SharingItem extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags = new ArrayList<>();
+
+    // +
+    @Column(length = 300, nullable = true)
+    private String sharingLocation;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

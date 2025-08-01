@@ -21,12 +21,14 @@ import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.Purch
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
+import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
+import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class PurchaseItemService {
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
     private  final TagRepository tagRepository; // +
     private final RegionRepository regionRepository;
+    private final GeoCodingService geoCodingService;
 
     //s3 연동
     private final AmazonS3 amazonS3;
@@ -87,6 +90,25 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
         }
 
+        // 장소입력 유효성
+        GeoCodingResult geo = null;
+
+        if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
+            if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
+                throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
+            }
+
+            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
+            if (geo == null) {
+                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+            }
+        } else {
+            // 온라인일 경우엔 주소 없어야 함
+            if (dto.getPurchaseLocation() != null && !dto.getPurchaseLocation().isBlank()) {
+                throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
+            }
+        }
+
         // PurchaseItem 생성
         PurchaseItem purchaseItem = PurchaseItem.builder()
                 .name(dto.getName())
@@ -101,6 +123,34 @@ public class PurchaseItemService {
                 .tags(new ArrayList<>())
                 .build();
         purchaseItem.getTags().addAll(tagEntities);
+
+        // ONLINE이면 대표지역 위도경도 설정
+        if (dto.getPurchaseMethod().equals(PurchaseMethod.ONLINE)) {
+            Region mainRegion = memberRegionRepository.findByMemberId(userId)
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("대표 지역이 없습니다."))
+                    .getRegion();
+
+            if (mainRegion.getLatitude() == null || mainRegion.getLongitude() == null) {
+                GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(mainRegion.getRegionName());
+                if (regionGeo == null) {
+                    throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
+                }
+
+                mainRegion.setLatitude(regionGeo.getLatitude());
+                mainRegion.setLongitude(regionGeo.getLongitude());
+                regionRepository.save(mainRegion);
+            }
+
+            purchaseItem.setLatitude(mainRegion.getLatitude());
+            purchaseItem.setLongitude(mainRegion.getLongitude());
+
+            System.out.println(">> DTO.getPurchaseMethod(): " + dto.getPurchaseMethod());
+            System.out.println(">> equals ONLINE? " + PurchaseMethod.ONLINE.equals(dto.getPurchaseMethod()));
+        }
+
+        // 폼 최종저장
         purchaseItemRepository.save(purchaseItem);
 
         // 이미지 유효성 검사
@@ -192,7 +242,7 @@ public class PurchaseItemService {
         }
 
     private boolean isRegion(String keyword){
-        return regionRepository.findByRegionNameContaining(keyword).isPresent();
+        return !regionRepository.findByRegionNameContaining(keyword).isEmpty();
     }
 
     // 상품명 검색++++
@@ -251,6 +301,8 @@ public class PurchaseItemService {
                 .itemCategory(item.getItemCategory())
                 .purchaseMethod(item.getPurchaseMethod())
                 .originPrice(item.getPrice())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
                 .build();
     }
 

@@ -16,6 +16,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -36,7 +37,7 @@ public class PurchaseItem extends BaseEntity {
     @Column(nullable = false)
     private ItemCategory itemCategory;
 
-    @Column(length = 300, nullable = false)
+    @Column(length = 300, nullable = true)
     private String purchaseLocation;
 
     private LocalDate expirationDate;
@@ -69,4 +70,10 @@ public class PurchaseItem extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags = new ArrayList<>();// +
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.post.controller;
 
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.post.dto.PostDetailResponseDTO;
 import com.onenth.OneNth.domain.post.dto.PostListResponseDTO;
 import com.onenth.OneNth.domain.post.dto.PostSaveRequestDTO;
@@ -100,12 +101,16 @@ public class PostRestController {
                 requestDto.setLongitude(result.getLongitude());
                 requestDto.setRegionName(result.getRegionName());
 
-                regionRepository.findByRegionNameContaining(result.getRegionName())
-                        .ifPresent(region -> requestDto.setRegionId(region.getId()));
+                // 기존 ifPresent → 다수 결과 예외 방지
+                List<Region> regions = regionRepository.findByRegionNameContaining(result.getRegionName());
+                if (!regions.isEmpty()) {
+                    requestDto.setRegionId(regions.get(0).getId()); // 가장 첫 번째 결과를 사용
+                }
 
             } catch (Exception e) {
                 throw new RuntimeException("좌표 조회 실패: " + e.getMessage(), e);
             }
+
         } else {
             requestDto.setLatitude(null);
             requestDto.setLongitude(null);

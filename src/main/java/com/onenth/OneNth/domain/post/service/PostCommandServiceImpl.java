@@ -97,8 +97,11 @@ public class PostCommandServiceImpl implements PostCommandService {
                     requestDto.setLongitude(result.getLongitude());
                     requestDto.setRegionName(result.getRegionName());
 
-                    regionRepository.findByRegionNameContaining(result.getRegionName())
-                            .ifPresent(region -> requestDto.setRegionId(region.getId()));
+                    // 기존 ifPresent → 예외 가능성 있음
+                    List<Region> matchedRegions = regionRepository.findByRegionNameContaining(result.getRegionName());
+                    if (!matchedRegions.isEmpty()) {
+                        requestDto.setRegionId(matchedRegions.get(0).getId());
+                    }
                 }
             }
         }

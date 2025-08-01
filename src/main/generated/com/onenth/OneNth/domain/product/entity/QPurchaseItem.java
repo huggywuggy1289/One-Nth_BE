@@ -35,6 +35,10 @@ public class QPurchaseItem extends EntityPathBase<PurchaseItem> {
 
     public final ListPath<ItemImage, QItemImage> itemImages = this.<ItemImage, QItemImage>createList("itemImages", ItemImage.class, QItemImage.class, PathInits.DIRECT2);
 
+    public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
+
+    public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
+
     public final com.onenth.OneNth.domain.member.entity.QMember member;
 
     public final StringPath name = createString("name");

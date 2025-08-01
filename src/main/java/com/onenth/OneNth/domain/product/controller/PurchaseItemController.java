@@ -95,7 +95,7 @@ public class PurchaseItemController {
             """
     )
   
-    @GetMapping("t /{groupPurchaseId}")
+    @GetMapping("/{groupPurchaseId}")
 
     public ApiResponse<PurchaseItemResponseDTO.GetPurchaseItemResponseDTO> getGroupPurchaseDetail(
             @PathVariable Long groupPurchaseId,

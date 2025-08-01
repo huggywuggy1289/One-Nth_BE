@@ -26,6 +26,10 @@ public class QRegion extends EntityPathBase<Region> {
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
+    public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
+
+    public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
+
     public final StringPath regionName = createString("regionName");
 
     //inherited
