@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.post.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
+import com.onenth.OneNth.domain.common.QBaseEntity;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.member.entity.Member;
