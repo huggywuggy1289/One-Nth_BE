@@ -25,6 +25,7 @@ import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
 import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PurchaseItemService {
@@ -232,6 +234,37 @@ public class PurchaseItemService {
         return PurchaseItemConverter.toPurchaseItemListDTOs(items);
     }
 
+    // 상품명 검색++++
+    @Transactional(readOnly = true)
+    public List<PurchaseItemListDTO> searchByTitleInUserRegions(String keyword, Long userId) {
+
+        // 검색 요청 정보
+        log.info("검색 요청 - keyword: {}, userId: {}", keyword, userId);
+
+        // 사용자 설정 지역 ID 추출
+        List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
+                .stream()
+                .map(r -> r.getRegion().getId())
+                .toList();
+
+        log.info("사용자 설정 지역 ID 목록: {}", regionIds);
+
+        // 상품 검색
+        List<PurchaseItem> items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
+
+        // 검색 결과 확인
+        for (PurchaseItem item : items) {
+            log.info("검색 결과 - id: {}, name: {}, regionId: {}, status: {}",
+                    item.getId(), item.getName(), item.getRegion().getId(), item.getStatus());
+        }
+
+        // 거래 완료 제외 후 변환
+        return items.stream()
+                .filter(i -> i.getStatus() != Status.COMPLETED)
+                .map(PurchaseItemListDTO::fromEntity)
+                .toList();
+    }
+
     private boolean isCategory(String keyword) {
         try {
             ItemCategory.valueOf(keyword.toUpperCase());
@@ -243,24 +276,6 @@ public class PurchaseItemService {
 
     private boolean isRegion(String keyword){
         return !regionRepository.findByRegionNameContaining(keyword).isEmpty();
-    }
-
-    // 상품명 검색++++
-    @Transactional(readOnly = true)
-    public List<PurchaseItemListDTO> searchByTitleWithRegions(String keyword, List<Integer> regionIds) {
-        List<PurchaseItem> items;
-
-        if (regionIds == null || regionIds.isEmpty()) {
-            // 전국 검색
-            items = purchaseItemRepository.findByNameContainingIgnoreCase(keyword)
-                    .stream()
-                    .filter(i -> i.getStatus() != Status.COMPLETED)
-                    .toList(); // +
-        } else {
-            items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
-        }
-
-        return items.stream().map(PurchaseItemListDTO::fromEntity).toList();
     }
 
 
