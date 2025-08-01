@@ -137,10 +137,32 @@ public class SharingItemService {
                 .status(Status.DEFAULT)
                 .tags(new ArrayList<>())
                 .sharingLocation(dto.getSharingLocation())
-                .latitude(geo != null ? geo.getLatitude() : null) // 위도 추가
-                .longitude(geo != null ? geo.getLongitude() : null) // 경도 추가
                 .build();
         sharingItem.getTags().addAll(tagEntities); // +
+
+        // ONLINE이면 대표지역 위도경도 설정
+        if (dto.getPurchaseMethod() == PurchaseMethod.ONLINE) {
+            if (region.getLatitude() == null || region.getLongitude() == null) {
+                GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(region.getRegionName());
+                if (regionGeo == null) {
+                    throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
+                }
+                region.setLatitude(regionGeo.getLatitude());
+                region.setLongitude(regionGeo.getLongitude());
+                regionRepository.save(region);
+            }
+
+            sharingItem.setLatitude(region.getLatitude());
+            sharingItem.setLongitude(region.getLongitude());
+        } else {
+            if (geo == null) {
+                throw new IllegalArgumentException("OFFLINE 주소에서 위도/경도를 가져올 수 없습니다.");
+            }
+
+            sharingItem.setLatitude(geo.getLatitude());
+            sharingItem.setLongitude(geo.getLongitude());
+        }
+
         sharingItemRepository.save(sharingItem);
 
         // 이미지 업로드 처리

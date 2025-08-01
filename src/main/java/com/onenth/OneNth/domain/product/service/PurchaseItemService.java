@@ -124,7 +124,7 @@ public class PurchaseItemService {
                 .build();
         purchaseItem.getTags().addAll(tagEntities);
 
-        // 2. ONLINE이면 대표지역 위도경도 설정
+        // ONLINE이면 대표지역 위도경도 설정
         if (dto.getPurchaseMethod().equals(PurchaseMethod.ONLINE)) {
             Region mainRegion = memberRegionRepository.findByMemberId(userId)
                     .stream()
