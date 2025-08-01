@@ -9,6 +9,7 @@ import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.repository.Pr
 import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.repository.RegionKeywordAlertRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
+import com.onenth.OneNth.domain.member.settings.alert.keywordAlert.util.KeywordAlertSortUtil;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -134,7 +135,7 @@ public class KeywordAlertCommandServiceImpl implements KeywordAlertCommandServic
         List<ProductKeywordAlert> productKeywordAlertList = findProductAlertsByIds(productKeywordIds, member);
         List<RegionKeywordAlert> regionKeywordAlertList = findRegionAlertsByIds(regionKeywordIds, member);
 
-        List<Object> mergedAlerts = mergeAndSortAlerts(productKeywordAlertList, regionKeywordAlertList);
+        List<Object> mergedAlerts = KeywordAlertSortUtil.mergeAndSortAlerts(productKeywordAlertList, regionKeywordAlertList);
 
         List<KeywordAlertResponseDTO.AlertSummary> alertSummaryList = mergedAlerts.stream()
                 .map(alert -> KeywordAlertConverter.toAlertSummary(alert))
@@ -173,20 +174,5 @@ public class KeywordAlertCommandServiceImpl implements KeywordAlertCommandServic
                     return regionKeywordAlertRepository.findByIdAndMember(id, member)
                             .orElseThrow(() -> new GeneralException(ErrorStatus.REGION_KEYWORD_NOT_FOUND_OR_NOT_YOURS));
                 }).collect(Collectors.toList());
-    }
-
-    private List<Object> mergeAndSortAlerts(List<ProductKeywordAlert> productKeywordAlertList, List<RegionKeywordAlert> regionKeywordAlertList) {
-        List<Object> mergedAlerts = new ArrayList<>();
-        mergedAlerts.addAll(productKeywordAlertList);
-        mergedAlerts.addAll(regionKeywordAlertList);
-
-        mergedAlerts.sort(Comparator.comparing(alert ->
-                        (alert instanceof ProductKeywordAlert)
-                                ? ((ProductKeywordAlert) alert).getCreatedAt()
-                                : ((RegionKeywordAlert) alert).getCreatedAt(),
-                Comparator.reverseOrder())
-        );
-
-        return mergedAlerts;
     }
 }

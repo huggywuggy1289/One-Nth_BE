@@ -12,10 +12,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "사용자 설정 중 우리동네 관련 API", description = "우리동네 등록, 삭제, 목록 조회, 메인으로 등록  API")
 @RestController
 @RequestMapping("/api/user-settings")
 @RequiredArgsConstructor

@@ -16,6 +16,9 @@ public class PurchaseItemListDTO {
     private String thumbnailUrl;   // 썸네일 이미지 URL
     private boolean isBookmarked;  // 북마크(스크랩) 여부
 
+    private Double latitude;
+    private Double longitude;
+
     // 서비스에서 dto변환 로직이 길어지는 것을 방지하기위해 이쪽에 배치
     public static PurchaseItemListDTO fromEntity(PurchaseItem entity) {
         return PurchaseItemListDTO.builder()
@@ -28,7 +31,9 @@ public class PurchaseItemListDTO {
                                 ? entity.getItemImages().get(0).getUrl()
                                 : null
                 )
-                .isBookmarked(false) // TODO: 북마크 여부는 추후 구현
+                .latitude(entity.getLongitude())
+                .longitude(entity.getLongitude())
+                .isBookmarked(false)
                 .build();
     }
 }

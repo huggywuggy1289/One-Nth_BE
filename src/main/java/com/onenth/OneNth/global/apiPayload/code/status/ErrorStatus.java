@@ -12,6 +12,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "USER_4002", "금지된 요청입니다."),
+    _BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON403", "입력값이 유효하지 않습니다."),
 
     // 회원 관련
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER001", "존재하지 않는 사용자입니다."),
@@ -43,6 +44,24 @@ public enum ErrorStatus implements BaseErrorCode {
     PRODUCT_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT004", "등록 가능한 키워드 알림은 최대 5개입니다."),
     PRODUCT_KEYWORD_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT005", "이미 알림으로 등록한 키워드입니다."),
     PRODUCT_KEYWORD_NOT_FOUND_OR_NOT_YOURS(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT006", "해당 키워드 알림이 존재하지 않거나 접근 권한이 없습니다"),
+
+    // 채팅 관련
+    CHAT_ROOM_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "CHAT_ROOM001", "자기 자신과의 채팅방 생성은 불가능합니다."),
+    CHAT_ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHAT_ROOM002", "채팅방이 존재하지 않습니다."),
+
+    //게시글 관련
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, "POST_001", "게시글을 찾을 수 없습니다."),
+
+    // 알림 관련
+    ALERT_SETTING_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALERT_SETTING001", "해당 사용자의 알림 설정 정보가 존재하지 않습니다."),
+    UNEXPECTED_ALERT_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "ALERT_002", "지원하지 않는 AlertType입니다."),
+
+    // 프로필 이미지 관련
+    INVALID_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "PROFILE001", "프로필 이미지가 비어 있거나 존재하지 않습니다."),
+
+    // 사용자 차단 관련
+    BLOCK_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK001", "차단 대상 사용자가 존재하지 않습니다."),
+    BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK002", "차단한 사용자 목록에 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;

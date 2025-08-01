@@ -2,11 +2,13 @@ package com.onenth.OneNth.domain.product.controller;
 
 import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
+import com.onenth.OneNth.domain.product.dto.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -26,26 +28,24 @@ public class PurchaseItemController {
     // 상품등록
     @Operation(
             summary = "같이 사요 상품 등록 API",
-            description = "같이 사요 상품을 등록합니다."
+            description = """
+        같이 사요 상품을 등록합니다.
+
+        - 소비기한은 식품 카테고리(FOOD)일 때만 필수입니다.
+        - 이미지는 최소 1장 이상, 최대 3장까지 첨부 가능합니다.
+        - 태그는 반드시 #으로 시작해야 합니다.
+        """
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<PurchaseItemResponseDTO.registerPurchaseItemResponseDTO> registerPurchaseItem(
-            @RequestParam("title") String title,
-            @RequestParam("purchaseMethod") String purchaseMethod,
-            @RequestParam("itemCategory") String itemCategory,
-            @RequestParam("purchaseUrl") String purchaseUrl,
-            @RequestParam(value = "expirationDate", required = false) String expirationDate, // 필수 여부 X
-            @RequestParam("originPrice") Integer originPrice,
-            @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
-            @RequestParam("tags") List<String> tags,
-            @AuthUser Long userId) {
-
-        Long savedItemId = purchaseItemService.registerItem(
-                title, purchaseMethod, itemCategory, purchaseUrl,
-                expirationDate, originPrice, imageFiles, tags, userId);
-
+            @RequestPart("data") @Valid PurchaseItemRequestDTO dto,
+            @RequestPart(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+            @AuthUser Long userId
+    ) {
+        Long savedItemId = purchaseItemService.registerItem(dto, imageFiles, userId);
         return ApiResponse.onSuccess(PurchaseItemConverter.toRegisterPurchaseItemResponseDTO(savedItemId));
     }
+
 
     // 상품 검색
     @Operation(
@@ -64,6 +64,25 @@ public class PurchaseItemController {
         return ResponseEntity.ok(ApiResponse.onSuccess(result));
     }
 
+    // 상품검색(상품명)
+    @GetMapping("/title")
+    @Operation(
+            summary = "같이사요 상품명 검색 (지역 필터 포함)",
+            description = """
+    - 입력한 keyword를 상품명(name)에 대해 LIKE 검색합니다.
+    - regionIds를 지정하면 해당 지역 ID 내에서만 필터링합니다.
+    - regionIds를 생략하면 전국 단위 검색이 수행됩니다.
+    """
+    )
+    public ApiResponse<List<PurchaseItemListDTO>> searchByTitle(
+            @RequestParam String keyword,
+            @RequestParam(required = false) List<Integer> regionIds
+    ) {
+        List<PurchaseItemListDTO> results = purchaseItemService.searchByTitleWithRegions(keyword, regionIds);
+        return ApiResponse.onSuccess(results);
+    }
+
+
     // 단일 상품 검색
     @Operation(
             summary = "같이사요 단일 상품조회",
@@ -75,7 +94,9 @@ public class PurchaseItemController {
             - `지역명` : 설정과 무관하게 특정 지역명으로 검색
             """
     )
-    @GetMapping("/group-purchases/{groupPurchaseId}")
+  
+    @GetMapping("/{groupPurchaseId}")
+
     public ApiResponse<PurchaseItemResponseDTO.GetPurchaseItemResponseDTO> getGroupPurchaseDetail(
             @PathVariable Long groupPurchaseId,
             @AuthUser Long userId

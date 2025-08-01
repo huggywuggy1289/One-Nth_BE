@@ -46,6 +46,13 @@ public class Post extends BaseEntity {
     @Column(length = 300)
     private String link;
 
+    @Column(nullable = false)
+    private int viewCount = 0;
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
@@ -68,4 +75,32 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> like = new ArrayList<>();
+
+    public void update(String title, String content, String link, String address, String placeName, Double latitude, Double longitude, String regionName) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        if (link != null) {
+            this.link = link;
+        }
+        if (address != null) {
+            this.address = address;
+        }
+        if (placeName != null) {
+            this.placeName = placeName;
+        }
+        if (latitude != null) {
+            this.latitude = latitude;
+        }
+        if (longitude != null) {
+            this.longitude = longitude;
+        }
+        if (regionName != null) {
+            this.regionName = regionName;
+        }
+    }
+
 }

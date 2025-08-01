@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.member.entity;
 
+import com.onenth.OneNth.domain.alert.entity.AlertType;
 import com.onenth.OneNth.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,4 +28,21 @@ public class MemberAlertSetting extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
+
+    public void enableAlerts(AlertType alertType) {
+        switch (alertType) {
+            case CHAT -> chatAlerts = true;
+            case REVIEW -> reviewAlerts = true;
+            case SCRAP -> scrapAlerts = true;
+        }
+    }
+
+    public void disableAlerts(AlertType alertType) {
+        switch (alertType) {
+            case CHAT -> chatAlerts = false;
+            case REVIEW -> reviewAlerts = false;
+            case SCRAP -> scrapAlerts = false;
+        }
+    }
+
 }
