@@ -239,18 +239,25 @@ public class SharingItemService {
     }
 
     // 상품명 검색++++
-    public List<SharingItemListDTO> searchByTitleAndSelectedRegions(String keyword, List<Integer> regionIds) {
-        if (regionIds == null || regionIds.isEmpty()) {
-            // 전국 검색: 지역 조건 없이 상품명만 검색
-            return sharingItemRepository.findByTitleContainingIgnoreCase(keyword)
-                    .stream()
-                    .filter(i -> i.getStatus() != Status.COMPLETED) // +
-                    .map(SharingItemListDTO::fromEntity)
-                    .toList();
+    @Transactional(readOnly = true)
+    public List<SharingItemListDTO> searchByTitleInUserRegions(String keyword, Long userId) {
+
+        // 1. 유저 ID 기반 지역 목록 조회
+        List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
+                .stream()
+                .map(r -> r.getRegion().getId())
+                .toList();
+
+        if (regionIds.isEmpty()) {
+            throw new IllegalStateException("사용자의 지역 정보가 존재하지 않습니다.");
         }
 
-        return sharingItemRepository.searchByTitleAndRegion(keyword, regionIds)
-                .stream()
+        // 2. 지역 필터 + 키워드 기반 상품명 LIKE 검색
+        List<SharingItem> items = sharingItemRepository.searchByTitleAndRegion(keyword, regionIds);
+
+        // 3. 거래 완료 제외 후 DTO 변환
+        return items.stream()
+                .filter(i -> i.getStatus() != Status.COMPLETED)
                 .map(SharingItemListDTO::fromEntity)
                 .toList();
     }
