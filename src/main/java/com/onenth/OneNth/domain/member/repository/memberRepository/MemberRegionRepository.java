@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.member.repository.memberRegionRepository;
+package com.onenth.OneNth.domain.member.repository.memberRepository;
 
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberRegion;

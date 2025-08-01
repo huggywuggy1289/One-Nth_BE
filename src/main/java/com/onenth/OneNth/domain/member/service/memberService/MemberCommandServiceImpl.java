@@ -7,7 +7,7 @@ import com.onenth.OneNth.domain.member.entity.EmailVerificationCode;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
 import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
-import com.onenth.OneNth.domain.member.repository.memberAlertSettingRepository.MemberAlertSettingRepository;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.repository.MemberAlertSettingRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailService;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVerificationService;

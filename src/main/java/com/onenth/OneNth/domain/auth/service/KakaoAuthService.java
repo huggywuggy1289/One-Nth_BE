@@ -7,7 +7,8 @@ import com.onenth.OneNth.domain.member.converter.MemberConverter;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
 import com.onenth.OneNth.domain.member.entity.enums.LoginType;
-import com.onenth.OneNth.domain.member.repository.memberAlertSettingRepository.MemberAlertSettingRepository;
+import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.repository.MemberAlertSettingRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
@@ -47,8 +48,13 @@ public class KakaoAuthService {
 
         Optional<Member> member = memberRepository.findBySocialIdAndLoginType(userInfo.getId(), LoginType.KAKAO);
 
+
         //member 에 객체가 들어있는지 확인
         if (member.isPresent()) {
+
+            if (member.get().getStatus() == MemberStatus.INACTIVE) {
+                throw new RuntimeException("탈퇴한 회원입니다.");
+            }
             //이미 가입한적 있다면 로그인 완료
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     member.get().getId(),

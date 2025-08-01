@@ -41,9 +41,6 @@ public class Member extends BaseEntity {
     @Column(length=10, nullable=false)
     private String nickname;
 
-//    @Column(nullable=false)
-//    private LocalDate birthday;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LoginType loginType;

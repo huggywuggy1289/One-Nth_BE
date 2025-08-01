@@ -4,7 +4,6 @@ import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
-import com.onenth.OneNth.domain.member.repository.memberRegionRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
 
 import java.io.IOException;
 import java.util.*;
