@@ -147,12 +147,16 @@ public class PurchaseItemService {
 
             purchaseItem.setLatitude(mainRegion.getLatitude());
             purchaseItem.setLongitude(mainRegion.getLongitude());
-
-            System.out.println(">> DTO.getPurchaseMethod(): " + dto.getPurchaseMethod());
-            System.out.println(">> equals ONLINE? " + PurchaseMethod.ONLINE.equals(dto.getPurchaseMethod()));
+        } else {
+        if (geo == null) {
+            throw new IllegalArgumentException("OFFLINE 주소에서 위도/경도를 가져올 수 없습니다.");
         }
 
-        // 폼 최종저장
+        purchaseItem.setLatitude(geo.getLatitude());
+        purchaseItem.setLongitude(geo.getLongitude());
+    }
+
+    // 폼 최종저장
         purchaseItemRepository.save(purchaseItem);
 
         // 이미지 유효성 검사
