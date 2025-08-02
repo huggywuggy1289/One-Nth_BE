@@ -24,4 +24,7 @@ public interface MemberCommandService {
 
     //공감한 글 취소
     MemberResponseDTO.CancelScrapOrLikeResponseDTO cancelLike(Long memberId, Long postId);
+
+    //회원탈퇴 구현(soft delete)
+    void withdrawMember(Long memberId);
 }

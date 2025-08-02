@@ -18,6 +18,9 @@ public class SharingItemListDTO {
     private String thumbnailUrl;    // 썸네일 이미지 URL
     private boolean isBookmarked;   // 북마크 여부 (스크랩 여부)
 
+    private Double latitude;
+    private Double longitude;
+
     public static SharingItemListDTO fromEntity(SharingItem entity) {
         return SharingItemListDTO.builder()
                 .id(entity.getId())
@@ -29,6 +32,8 @@ public class SharingItemListDTO {
                                 ? entity.getItemImages().get(0).getUrl()
                                 : null
                 )
+                .latitude(entity.getLongitude())
+                .longitude(entity.getLongitude())
                 .isBookmarked(false)
                 .build();
     }

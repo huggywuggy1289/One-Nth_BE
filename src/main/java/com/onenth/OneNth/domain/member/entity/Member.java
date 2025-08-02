@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.alert.entity.Alert;
 import com.onenth.OneNth.domain.chat.entity.ChatRoomMember;
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.member.entity.enums.LoginType;
+import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.PostComment;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
@@ -12,7 +13,7 @@ import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.review.SharingReview;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,19 +41,29 @@ public class Member extends BaseEntity {
     @Column(length=10, nullable=false)
     private String nickname;
 
-//    @Column(nullable=false)
-//    private LocalDate birthday;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LoginType loginType;
 
     private String socialId;
 
-    private LocalDate inactiveDate;
+    @Enumerated(EnumType.STRING)
+    private MemberStatus status = MemberStatus.ACTIVE;
+
+    private LocalDateTime inactiveDate;
 
     @Column(nullable=false)
     private boolean marketingAgree = false;
+
+    private String profileImageUrl;
+
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
     //비밀번호 salt 암호화 메서드
     public void encodePassword(String password) {
@@ -90,8 +101,6 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
-
-    private String profileImageUrl;
 
     @Column(nullable = false)
     private boolean verified;

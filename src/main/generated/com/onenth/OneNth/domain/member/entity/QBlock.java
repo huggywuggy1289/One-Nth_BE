@@ -24,7 +24,7 @@ public class QBlock extends EntityPathBase<Block> {
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
-    public final NumberPath<Long> blockedId = createNumber("blockedId", Long.class);
+    public final QMember blockedMember;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
@@ -54,6 +54,7 @@ public class QBlock extends EntityPathBase<Block> {
 
     public QBlock(Class<? extends Block> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.blockedMember = inits.isInitialized("blockedMember") ? new QMember(forProperty("blockedMember")) : null;
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }
 

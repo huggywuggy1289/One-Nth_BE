@@ -37,6 +37,10 @@ public class QSharingItem extends EntityPathBase<SharingItem> {
 
     public final ListPath<ItemImage, QItemImage> itemImages = this.<ItemImage, QItemImage>createList("itemImages", ItemImage.class, QItemImage.class, PathInits.DIRECT2);
 
+    public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
+
+    public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
+
     public final com.onenth.OneNth.domain.member.entity.QMember member;
 
     public final NumberPath<Integer> price = createNumber("price", Integer.class);
@@ -46,6 +50,8 @@ public class QSharingItem extends EntityPathBase<SharingItem> {
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
 
     public final com.onenth.OneNth.domain.region.entity.QRegion region;
+
+    public final StringPath sharingLocation = createString("sharingLocation");
 
     public final ListPath<com.onenth.OneNth.domain.product.entity.review.SharingReview, com.onenth.OneNth.domain.product.entity.review.QSharingReview> sharingReviews = this.<com.onenth.OneNth.domain.product.entity.review.SharingReview, com.onenth.OneNth.domain.product.entity.review.QSharingReview>createList("sharingReviews", com.onenth.OneNth.domain.product.entity.review.SharingReview.class, com.onenth.OneNth.domain.product.entity.review.QSharingReview.class, PathInits.DIRECT2);
 

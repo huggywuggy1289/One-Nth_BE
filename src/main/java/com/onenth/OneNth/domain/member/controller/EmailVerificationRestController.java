@@ -88,6 +88,6 @@ public class EmailVerificationRestController {
     @PostMapping("/password/verify-code")
     public ApiResponse<String> verifyPasswordFindCode(@RequestBody MemberRequestDTO.VerifyCodeRequestDTO request) {
         emailVerificationService.verifyCode(request.getEmail(), request.getCode());
-        return ApiResponse.onSuccess("이메일 인증이 완료되었습니다. 비밀번호를 재설정 해주세요");
+        return ApiResponse.onSuccess("이메일 인증이 완료되었습니다. 비밀번호를 재설정 해주세요.");
     }
 }

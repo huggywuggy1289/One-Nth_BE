@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PurchaseItemRepository  extends JpaRepository<PurchaseItem, Long>, PurchaseItemRepositoryCustom {
     List<PurchaseItem> findByMember(Member member);
@@ -24,4 +25,11 @@ public interface PurchaseItemRepository  extends JpaRepository<PurchaseItem, Lon
     // 상품명(전체 조회)
     List<PurchaseItem> findByNameContainingIgnoreCase(String keyword);
 
+    @Query("""
+    SELECT p
+    FROM PurchaseItem p
+    JOIN FETCH p.region
+    WHERE p.id = :id
+    """)
+    Optional<PurchaseItem> findWithRegionById(@Param("id") Long id);
 }

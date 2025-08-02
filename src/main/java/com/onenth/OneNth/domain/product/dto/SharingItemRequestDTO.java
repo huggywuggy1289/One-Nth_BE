@@ -1,7 +1,10 @@
 package com.onenth.OneNth.domain.product.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -37,6 +40,8 @@ public class SharingItemRequestDTO {
     private Boolean isAvailable;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
+    @JsonProperty("purchaseMethod")
     private PurchaseMethod purchaseMethod;
 
     @NotNull
@@ -47,5 +52,7 @@ public class SharingItemRequestDTO {
 
     @NotEmpty
     private List<String> tags;
+
+    private String sharingLocation;
 }
 

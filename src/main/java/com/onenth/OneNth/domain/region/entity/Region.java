@@ -6,6 +6,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,4 +18,11 @@ public class Region extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String regionName;
+
+    // ONLINE일 경우
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

@@ -21,18 +21,20 @@ import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.Purch
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
+import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PurchaseItemService {
@@ -42,6 +44,7 @@ public class PurchaseItemService {
     private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
     private  final TagRepository tagRepository; // +
     private final RegionRepository regionRepository;
+    private final GeoCodingService geoCodingService;
 
     //s3 연동
     private final AmazonS3 amazonS3;
@@ -87,6 +90,25 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
         }
 
+        // 장소입력 유효성
+        GeoCodingResult geo = null;
+
+        if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
+            if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
+                throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
+            }
+
+            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
+            if (geo == null) {
+                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+            }
+        } else {
+            // 온라인일 경우엔 주소 없어야 함
+            if (dto.getPurchaseLocation() != null && !dto.getPurchaseLocation().isBlank()) {
+                throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
+            }
+        }
+
         // PurchaseItem 생성
         PurchaseItem purchaseItem = PurchaseItem.builder()
                 .name(dto.getName())
@@ -94,13 +116,45 @@ public class PurchaseItemService {
                 .itemCategory(dto.getItemCategory())
                 .purchaseLocation(dto.getPurchaseUrl())
                 .expirationDate(dto.getExpirationDate())
-                .price(dto.getOriginPrice())
+                .price(dto.getPrice())
                 .status(Status.DEFAULT)
                 .member(member)
                 .region(region)
                 .tags(new ArrayList<>())
                 .build();
         purchaseItem.getTags().addAll(tagEntities);
+
+        // ONLINE이면 대표지역 위도경도 설정
+        if (dto.getPurchaseMethod().equals(PurchaseMethod.ONLINE)) {
+            Region mainRegion = memberRegionRepository.findByMemberId(userId)
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("대표 지역이 없습니다."))
+                    .getRegion();
+
+            if (mainRegion.getLatitude() == null || mainRegion.getLongitude() == null) {
+                GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(mainRegion.getRegionName());
+                if (regionGeo == null) {
+                    throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
+                }
+
+                mainRegion.setLatitude(regionGeo.getLatitude());
+                mainRegion.setLongitude(regionGeo.getLongitude());
+                regionRepository.save(mainRegion);
+            }
+
+            purchaseItem.setLatitude(mainRegion.getLatitude());
+            purchaseItem.setLongitude(mainRegion.getLongitude());
+        } else {
+        if (geo == null) {
+            throw new IllegalArgumentException("OFFLINE 주소에서 위도/경도를 가져올 수 없습니다.");
+        }
+
+        purchaseItem.setLatitude(geo.getLatitude());
+        purchaseItem.setLongitude(geo.getLongitude());
+    }
+
+    // 폼 최종저장
         purchaseItemRepository.save(purchaseItem);
 
         // 이미지 유효성 검사
@@ -182,6 +236,37 @@ public class PurchaseItemService {
         return PurchaseItemConverter.toPurchaseItemListDTOs(items);
     }
 
+    // 상품명 검색++++
+    @Transactional(readOnly = true)
+    public List<PurchaseItemListDTO> searchByTitleInUserRegions(String keyword, Long userId) {
+
+        // 검색 요청 정보
+        log.info("검색 요청 - keyword: {}, userId: {}", keyword, userId);
+
+        // 사용자 설정 지역 ID 추출
+        List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
+                .stream()
+                .map(r -> r.getRegion().getId())
+                .toList();
+
+        log.info("사용자 설정 지역 ID 목록: {}", regionIds);
+
+        // 상품 검색
+        List<PurchaseItem> items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
+
+        // 검색 결과 확인
+        for (PurchaseItem item : items) {
+            log.info("검색 결과 - id: {}, name: {}, regionId: {}, status: {}",
+                    item.getId(), item.getName(), item.getRegion().getId(), item.getStatus());
+        }
+
+        // 거래 완료 제외 후 변환
+        return items.stream()
+                .filter(i -> i.getStatus() != Status.COMPLETED)
+                .map(PurchaseItemListDTO::fromEntity)
+                .toList();
+    }
+
     private boolean isCategory(String keyword) {
         try {
             ItemCategory.valueOf(keyword.toUpperCase());
@@ -192,25 +277,7 @@ public class PurchaseItemService {
         }
 
     private boolean isRegion(String keyword){
-        return regionRepository.findByRegionNameContaining(keyword).isPresent();
-    }
-
-    // 상품명 검색++++
-    @Transactional(readOnly = true)
-    public List<PurchaseItemListDTO> searchByTitleWithRegions(String keyword, List<Integer> regionIds) {
-        List<PurchaseItem> items;
-
-        if (regionIds == null || regionIds.isEmpty()) {
-            // 전국 검색
-            items = purchaseItemRepository.findByNameContainingIgnoreCase(keyword)
-                    .stream()
-                    .filter(i -> i.getStatus() != Status.COMPLETED)
-                    .toList(); // +
-        } else {
-            items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
-        }
-
-        return items.stream().map(PurchaseItemListDTO::fromEntity).toList();
+        return !regionRepository.findByRegionNameContaining(keyword).isEmpty();
     }
 
 
@@ -250,7 +317,9 @@ public class PurchaseItemService {
                 .writerVerified(isVerified)
                 .itemCategory(item.getItemCategory())
                 .purchaseMethod(item.getPurchaseMethod())
-                .originPrice(item.getPrice())
+                .price(item.getPrice())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.post.repository.likeRepository;
 
 import com.onenth.OneNth.domain.post.entity.Like;
+import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +21,6 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Page<Like> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     Optional<Like> findByMemberIdAndPostId(Long memberId, Long postId);
+
+    long countByPost(Post post);
 }

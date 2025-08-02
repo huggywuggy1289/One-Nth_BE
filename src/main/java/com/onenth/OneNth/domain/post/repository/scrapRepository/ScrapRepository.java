@@ -1,6 +1,5 @@
 package com.onenth.OneNth.domain.post.repository.scrapRepository;
 
-import com.onenth.OneNth.domain.post.entity.Like;
 import com.onenth.OneNth.domain.post.entity.Scrap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +19,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     Page<Scrap> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     Optional<Scrap> findByMemberIdAndPostId(Long memberId, Long postId);
+
+    boolean existsByPostIdAndMemberId(Long postId, Long memberId);
 }

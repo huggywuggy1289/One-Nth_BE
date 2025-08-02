@@ -25,4 +25,13 @@ public interface SharingItemRepository extends JpaRepository<SharingItem, Long>,
 
     // 상품명(전체 조회)
     List<SharingItem> findByTitleContainingIgnoreCase(String keyword);
+
+    @Query("""
+    SELECT s
+    FROM SharingItem s
+    JOIN FETCH s.region
+    WHERE s.id = :id
+    """)
+    Optional<SharingItem> findWithRegionById(@Param("id") Long id);
+
 }

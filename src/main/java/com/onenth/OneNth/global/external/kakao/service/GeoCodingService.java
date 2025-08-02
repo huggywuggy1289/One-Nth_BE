@@ -56,7 +56,7 @@ public class GeoCodingService {
                 String region3 = addressNode.path("region_3depth_name").asText();
                 String fullRegionName = region1 + " " + region2 + " " + region3;
 
-                return new GeoCodingResult(longitude, latitude, fullRegionName);
+                return new GeoCodingResult(latitude, longitude, fullRegionName);
 
             } else {
                 System.err.println("⚠️ 주소 결과 없음: " + address);
