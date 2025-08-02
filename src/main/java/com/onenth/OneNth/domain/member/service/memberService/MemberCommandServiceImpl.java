@@ -5,6 +5,9 @@ import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
 import com.onenth.OneNth.domain.member.entity.EmailVerificationCode;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
+import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.repository.MemberAlertSettingRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailService;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVerificationService;
@@ -20,7 +23,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static com.onenth.OneNth.domain.post.entity.QScrap.scrap;
@@ -37,7 +42,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final JwtTokenProvider jwtTokenProvider;
     private final ScrapRepository scrapRepository;
     private final LikeRepository likeRepository;
-
+    private final MemberAlertSettingRepository memberAlertSettingRepository;
     @Override
     public MemberResponseDTO.SignupResultDTO signupMember(MemberRequestDTO.SignupDTO request) {
 
@@ -62,13 +67,24 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         member.encodePassword(passwordEncoder.encode(request.getPassword()));
 
         // 5. 회원 저장
-        return MemberConverter.toSignupResultDTO(memberRepository.save(member));
+        Member savedMember = memberRepository.save(member);
+
+        // 알림설정 생성 (기본값 ON)
+        MemberAlertSetting alertSetting = MemberAlertSetting.builder()
+                .member(savedMember)
+                .chatAlerts(true)
+                .scrapAlerts(true)
+                .reviewAlerts(true)
+                .build();
+        memberAlertSettingRepository.save(alertSetting);
+
+        return MemberConverter.toSignupResultDTO(savedMember);
     }
 
     @Override
     public MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.LoginRequestDTO request) {
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("해당 이메일과 일치하는 사용자가 없습니다."));
+        Member member = memberRepository.findByEmailAndStatus(request.getEmail(), MemberStatus.ACTIVE)
+                .orElseThrow(() -> new RuntimeException("존재하지 않거나 탈퇴한 회원입니다."));
 
         if(!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
@@ -127,5 +143,16 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         return MemberResponseDTO.CancelScrapOrLikeResponseDTO.builder()
                 .isSuccess(true)
                 .build();
+    }
+
+    @Transactional
+    @Override
+    public void withdrawMember(Long memberId) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+
+        member.setStatus(MemberStatus.INACTIVE);
+        member.setInactiveDate(LocalDateTime.now());
     }
 }
