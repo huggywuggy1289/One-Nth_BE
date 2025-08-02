@@ -116,7 +116,7 @@ public class PurchaseItemService {
                 .itemCategory(dto.getItemCategory())
                 .purchaseLocation(dto.getPurchaseUrl())
                 .expirationDate(dto.getExpirationDate())
-                .price(dto.getOriginPrice())
+                .price(dto.getPrice())
                 .status(Status.DEFAULT)
                 .member(member)
                 .region(region)
@@ -317,7 +317,7 @@ public class PurchaseItemService {
                 .writerVerified(isVerified)
                 .itemCategory(item.getItemCategory())
                 .purchaseMethod(item.getPurchaseMethod())
-                .originPrice(item.getPrice())
+                .price(item.getPrice())
                 .latitude(item.getLatitude())
                 .longitude(item.getLongitude())
                 .build();
