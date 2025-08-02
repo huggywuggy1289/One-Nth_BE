@@ -42,7 +42,7 @@ spring:
             client-secret: ${KAKAO_CLIENT_SECRET}
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/api/auth/kakao/callback"
+            redirect-uri: kakaob915f02e5deddf0811e43b08afbdbe41://oauth
             scope:
               - profile_nickname
               - account_email
@@ -81,6 +81,7 @@ cloud:
       secretKey: ${AWS_SECRET_ACCESS_KEY}
 kakao:
   client_id: ${KAKAO_CLIENT_ID}
-  redirect_uri: http://localhost:8080/api/auth/kakao/callback
+  redirect_uri: kakaob915f02e5deddf0811e43b08afbdbe41://oauth
+
   api:
     key: ${KAKAO_REST_API_KEY}

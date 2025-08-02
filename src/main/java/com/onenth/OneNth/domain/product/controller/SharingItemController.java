@@ -10,6 +10,7 @@ import com.onenth.OneNth.domain.product.service.SharingItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/sharing-items")
 @RequiredArgsConstructor
+@Tag(name = "함께나눠요 관련 API", description = "함께나눠요 상품 등록, 상품 조회 관련 API 지원")
 public class SharingItemController {
 
     private final SharingItemService sharingItemService;

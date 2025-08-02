@@ -6,6 +6,7 @@ import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberRegion;
 import com.onenth.OneNth.domain.member.entity.enums.LoginType;
+import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
 import com.onenth.OneNth.domain.post.entity.Like;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
@@ -29,6 +30,7 @@ public class MemberConverter {
                 .password(request.getPassword())
                 .nickname(request.getNickname())
                 .loginType(LoginType.NORMAL)
+                .status(MemberStatus.ACTIVE)
                 .memberRegions(new ArrayList<>())
                 .marketingAgree(request.getMarketingAgree())
                 .build();
@@ -52,6 +54,7 @@ public class MemberConverter {
                 .socialId(request.getSocialId())
                 .nickname(request.getNickname())
                 .loginType(LoginType.KAKAO)
+                .status(MemberStatus.ACTIVE)
                 .memberRegions(new ArrayList<>())
                 .marketingAgree(request.getMarketingAgree())
                 .build();
