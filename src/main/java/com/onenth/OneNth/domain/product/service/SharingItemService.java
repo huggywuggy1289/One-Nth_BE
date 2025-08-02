@@ -5,10 +5,12 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
+import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
@@ -18,6 +20,9 @@ import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
+import com.onenth.OneNth.global.apiPayload.exception.handler.PurchasingItemHandler;
 import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
 import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +44,7 @@ public class SharingItemService {
     private final SharingItemRepository sharingItemRepository;
     private final ItemImageRepository itemImageRepository;
     private final MemberRegionRepository memberRegionRepository;
+    private final MemberRepository memberRepository;
     private final TagRepository tagRepository;
     private final RegionRepository regionRepository;
     private final GeoCodingService geoCodingService;
@@ -318,5 +324,18 @@ public class SharingItemService {
                 .build();
     }
 
+    @Transactional
+    public void changeItemStatus(Long groupPurchaseId, Long memberId, Status status) {
 
+        SharingItem item = sharingItemRepository.findById(groupPurchaseId)
+                .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.PURCHASE_ITEM_NOT_FOUND));
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        if(!item.getMember().equals(member)) {
+            throw new MemberHandler(ErrorStatus._FORBIDDEN);
+        }
+        item.setStatus(status);
+    }
 }
