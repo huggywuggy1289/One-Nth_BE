@@ -8,6 +8,7 @@ import com.onenth.OneNth.domain.product.service.PurchaseItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/group-purchases")
 @RequiredArgsConstructor
+@Tag(name = "같이사요 관련 API", description = "같이사요 상품 등록, 상품 조회 관련 API 지원")
 public class PurchaseItemController {
 
     private final PurchaseItemService purchaseItemService;
