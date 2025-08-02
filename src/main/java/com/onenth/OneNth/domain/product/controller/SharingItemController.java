@@ -4,8 +4,6 @@ import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
 import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
-import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
-import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.service.SharingItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
@@ -16,12 +14,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -53,7 +49,7 @@ public class SharingItemController {
 
     // 상품 검색
     @Operation(
-            summary = "함께나눠요 상품 검색",
+            summary = "함께나눠요 상품 검색 API",
             description = """
                     키워드로 상품을 검색합니다.
                     
@@ -74,7 +70,7 @@ public class SharingItemController {
 
     // 상품검색(상품명)
     @Operation(
-            summary = "상품명 기반 지역 선택 검색",
+            summary = "상품명 기반 지역 선택 검색 API",
             description = """
                     - 설정한 3개 지역 내 상품명으로 검색
                     """
@@ -91,7 +87,7 @@ public class SharingItemController {
     }
 
     @Operation(
-            summary = "함께 나눠요 단일 상품 조회",
+            summary = "함께 나눠요 단일 상품 조회 API",
             description = "ID를 기준으로 함께 나눠요 상품의 상세 정보를 조회합니다."
     )
     @GetMapping("/{sharingItemId}")

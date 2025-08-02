@@ -4,7 +4,6 @@ import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;
-import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
@@ -54,7 +53,7 @@ public class PurchaseItemController {
 
     // 상품 검색
     @Operation(
-            summary = "같이사요 상품 검색",
+            summary = "같이사요 상품 검색 API",
             description = """
             키워드로 상품을 검색합니다.
             """
@@ -72,7 +71,7 @@ public class PurchaseItemController {
     // 상품검색(상품명)
     @GetMapping("/title")
     @Operation(
-            summary = "상품명 기반 지역 설정 검색",
+            summary = "상품명 기반 지역 설정 검색 API",
             description = "- 사용자가 설정한 3개 지역 내에서만 상품명을 기준으로 검색"
     )
     public ApiResponse<List<PurchaseItemListDTO>> searchByTitleWithUserRegion(
@@ -85,7 +84,7 @@ public class PurchaseItemController {
 
     // 단일 상품 검색
     @Operation(
-            summary = "같이사요 단일 상품조회",
+            summary = "같이사요 단일 상품조회 API",
             description = """
             상품의 상세조회를 합니다.
             
