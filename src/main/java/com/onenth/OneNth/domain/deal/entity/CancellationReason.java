@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.transaction.entity;
+package com.onenth.OneNth.domain.deal.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import jakarta.persistence.*;
@@ -22,5 +22,5 @@ public class CancellationReason extends BaseEntity {
     private String reasonText;
 
     @OneToMany(mappedBy = "cancellationReason", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TransactionCancellationReason> transactionCancellationReasonList = new ArrayList<>();
+    private List<DealCancellationReason> dealCancellationReasonList = new ArrayList<>();
 }

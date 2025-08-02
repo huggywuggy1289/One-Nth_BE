@@ -1,4 +1,4 @@
-package com.onenth.OneNth.domain.transaction.entity;
+package com.onenth.OneNth.domain.deal.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import jakarta.persistence.*;
@@ -9,15 +9,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransactionCancellationReason extends BaseEntity {
+public class DealCancellationReason extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cancelled_transaction_id", nullable = false)
-    private CancelledTransaction cancelledTransaction;
+    @JoinColumn(name = "cancelled_deal_id", nullable = false)
+    private CancelledDeal cancelledDeal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cancellation_reason_id", nullable = false)

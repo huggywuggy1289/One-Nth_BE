@@ -1,29 +1,21 @@
-package com.onenth.OneNth.domain.transaction.entity;
+package com.onenth.OneNth.domain.deal.entity;
 
-import com.onenth.OneNth.domain.chat.entity.ChatRoom;
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Transaction extends BaseEntity {
+public class Deal extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_room_id", nullable = false)
-    private ChatRoom chatRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_item_id")
@@ -33,8 +25,8 @@ public class Transaction extends BaseEntity {
     @JoinColumn(name = "sharing_item_id")
     private SharingItem sharingItem;
 
-    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
-    private TransactionConfirmation transactionConfirmation;
+    @OneToOne(mappedBy = "deal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private DealConfirmation dealConfirmation;
 
     @PrePersist
     @PreUpdate

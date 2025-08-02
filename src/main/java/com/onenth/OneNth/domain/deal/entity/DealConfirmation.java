@@ -1,7 +1,7 @@
-package com.onenth.OneNth.domain.transaction.entity;
+package com.onenth.OneNth.domain.deal.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
-import com.onenth.OneNth.domain.transaction.entity.enums.TradeType;
+import com.onenth.OneNth.domain.deal.entity.enums.TradeType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransactionCompletion extends BaseEntity {
+public class DealConfirmation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction_Confirmation_id", nullable = false)
-    private TransactionConfirmation transactionConfirmation;
+    @JoinColumn(name = "deal_id", nullable = false)
+    private Deal deal;
 
     @Column(nullable = false)
     private LocalDateTime tradeDate;
@@ -36,5 +36,7 @@ public class TransactionCompletion extends BaseEntity {
 
     @Column(nullable = false)
     private boolean isAccepted;
-}
 
+    @OneToOne(mappedBy = "dealConfirmation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private DealCompletion dealCompletion;
+}
