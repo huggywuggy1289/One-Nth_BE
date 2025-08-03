@@ -2,10 +2,6 @@ package com.onenth.OneNth.domain.member.service.memberService;
 
 import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
-import com.onenth.OneNth.domain.member.entity.Member;
-import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 
 public interface MemberCommandService {

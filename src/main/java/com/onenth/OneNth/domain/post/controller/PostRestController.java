@@ -1,7 +1,6 @@
 package com.onenth.OneNth.domain.post.controller;
 
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
-import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.service.memberService.MemberCommandService;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.post.dto.PostDetailResponseDTO;

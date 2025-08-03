@@ -1,6 +1,5 @@
 package com.onenth.OneNth.domain.post.service;
 
-import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.post.dto.PostDetailResponseDTO;
 import com.onenth.OneNth.domain.post.dto.PostListResponseDTO;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;

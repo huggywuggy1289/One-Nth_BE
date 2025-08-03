@@ -3,7 +3,6 @@ package com.onenth.OneNth.domain.member.service.memberService;
 import com.onenth.OneNth.domain.member.converter.MemberConverter;
 import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
-import com.onenth.OneNth.domain.member.entity.EmailVerificationCode;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
 import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
@@ -29,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-
-import static com.onenth.OneNth.domain.post.entity.QScrap.scrap;
 
 @Service
 @RequiredArgsConstructor
