@@ -1,6 +1,8 @@
 package com.onenth.OneNth.domain.post.controller;
 
+import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.service.memberService.MemberCommandService;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.post.dto.PostDetailResponseDTO;
 import com.onenth.OneNth.domain.post.dto.PostListResponseDTO;
@@ -38,6 +40,7 @@ public class PostRestController {
     private final GeoCodingService geoCodingService;
     private final RegionRepository regionRepository;
     private final PostQueryService postQueryService;
+    private final MemberCommandService memberCommandService;
 
     @Operation(
             summary = "게시글 등록 API",
@@ -146,6 +149,7 @@ public class PostRestController {
     )
     @GetMapping("/search")
     public ApiResponse<List<PostListResponseDTO>> searchPosts(
+            @AuthUser Long memberId,
             @RequestParam PostType postType,
             @RequestParam(required = false) String regionName,
             @RequestParam(required = false) String keyword,
@@ -159,9 +163,7 @@ public class PostRestController {
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-
-        Page<PostListResponseDTO> pageResult = postQueryService.getPostList(postType, regionName, keyword, pageable);
+        Page<PostListResponseDTO> pageResult = postQueryService.getPostList(memberId, postType, regionName, keyword, pageable);
         List<PostListResponseDTO> contentList = pageResult.getContent();
 
         return ApiResponse.onSuccess(contentList);
@@ -178,12 +180,11 @@ public class PostRestController {
     )
     @GetMapping("/{postId}")
     public ApiResponse<PostDetailResponseDTO> getPostDetail(
-            @AuthUser Member member,
+            @AuthUser Long memberId,
             @PathVariable("postId") Long postId
             ) {
-
         postCommandService.increaseViewCount(postId);
-        PostDetailResponseDTO response = postQueryService.getPostDetail(postId, member);
+        PostDetailResponseDTO response = postQueryService.getPostDetail(postId, memberId);
         return ApiResponse.onSuccess(response);
     }
 
@@ -232,5 +233,75 @@ public class PostRestController {
     ) {
         postCommandService.delete(postId, memberId);
         return ApiResponse.of(SuccessStatus._OK, null);
+    }
+
+    @Operation(
+            summary = "게시글 공감 등록 API",
+            description = """
+    postId를 이용한 게시글 공감 등록 API입니다.
+    
+    - 쿼리파라미터 postId에 게시글 ID를 전달합니다.
+    - 중복 공감은 되지 않습니다.
+    """
+    )
+    @PostMapping("/{postId}/like")
+    public ApiResponse<MemberResponseDTO.AddScrapOrLikeResponseDTO> addLike(
+            @PathVariable Long postId,
+            @AuthUser Long memberId
+    ) {
+        MemberResponseDTO.AddScrapOrLikeResponseDTO response = memberCommandService.addLike(memberId, postId);
+        return ApiResponse.onSuccess(response);
+    }
+
+    @Operation(
+            summary = "게시글 공감 삭제 API",
+            description = """
+    postId를 이용한 게시글 공감 삭제 API입니다.
+    
+    - 쿼리파라미터 postId에 게시글 ID를 전달합니다.
+    """
+    )
+    @DeleteMapping("/{postId}/like")
+    public ApiResponse<MemberResponseDTO.CancelScrapOrLikeResponseDTO> cancelLike(
+            @PathVariable Long postId,
+            @AuthUser Long memberId
+    ) {
+        MemberResponseDTO.CancelScrapOrLikeResponseDTO response = memberCommandService.cancelLike(memberId, postId);
+        return ApiResponse.onSuccess(response);
+    }
+
+    @Operation(
+            summary = "게시글 스크랩 등록 API",
+            description = """
+    postId를 이용한 게시글 스크랩 등록 API입니다.
+    
+    - 쿼리파라미터 postId에 게시글 ID를 전달합니다.
+    - 중복 스크랩은 되지 않습니다.
+    """
+    )
+    @PostMapping("/{postId}/scrap")
+    public ApiResponse<MemberResponseDTO.AddScrapOrLikeResponseDTO> addScrap(
+            @PathVariable Long postId,
+            @AuthUser Long memberId
+    ) {
+        MemberResponseDTO.AddScrapOrLikeResponseDTO response = memberCommandService.addScrap(memberId, postId);
+        return ApiResponse.onSuccess(response);
+    }
+
+    @Operation(
+            summary = "게시글 스크랩 삭제 API",
+            description = """
+    postId를 이용한 게시글 스크랩 삭제 API입니다.
+    
+    - 쿼리파라미터 postId에 게시글 ID를 전달합니다.
+    """
+    )
+    @DeleteMapping("/{postId}/scrap")
+    public ApiResponse<MemberResponseDTO.CancelScrapOrLikeResponseDTO> cancelScrap(
+            @PathVariable Long postId,
+            @AuthUser Long memberId
+    ) {
+        MemberResponseDTO.CancelScrapOrLikeResponseDTO response = memberCommandService.cancelScrap(memberId, postId);
+        return ApiResponse.onSuccess(response);
     }
 }

@@ -78,6 +78,14 @@ public class MemberResponseDTO {
         Boolean isSuccess;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AddScrapOrLikeResponseDTO {
+        Boolean isSuccess;
+    }
+
 //    @Builder
 //    @Getter
 //    @NoArgsConstructor

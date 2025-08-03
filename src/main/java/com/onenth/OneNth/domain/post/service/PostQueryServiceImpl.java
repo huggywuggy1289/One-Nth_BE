@@ -33,6 +33,7 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     @Override
     public Page<PostListResponseDTO> getPostList(
+            Long memberId,
             PostType postType,
             String regionName,
             String keyword,
@@ -52,10 +53,12 @@ public class PostQueryServiceImpl implements PostQueryService {
             }
         }
 
-        return posts.map(this::toPostListDTO);
+        return posts.map(post -> toPostListDTO(post, memberId));
     }
 
-    private PostListResponseDTO toPostListDTO(Post post) {
+    private PostListResponseDTO toPostListDTO(Post post, Long memberId) {
+        boolean scrapStatus = ScrapRepository.existsByPostIdAndMemberId(post.getId(), memberId);
+
         return PostListResponseDTO.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
@@ -63,7 +66,7 @@ public class PostQueryServiceImpl implements PostQueryService {
                 .commentCount(post.getPostComment().size())
                 .likeCount(post.getLike().size())
                 .viewCount(post.getViewCount())
-                .scrapStatus(false) // 로그인 사용자 로직 필요 시 수정
+                .scrapStatus(scrapStatus)
                 .createdAt(post.getCreatedAt().toString())
                 .build();
     }
@@ -72,13 +75,13 @@ public class PostQueryServiceImpl implements PostQueryService {
         return content.length() > 50 ? content.substring(0, 50) + "..." : content;
     }
 
-    public PostDetailResponseDTO getPostDetail(Long postId, Member member) {
+    public PostDetailResponseDTO getPostDetail(Long postId, Long memberId) {
         Post post = postRepository.findByIdWithMemberAndRegion(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND_POST));
 
         int commentCount = (int) CommentRepository.countByPost(post);
         int likeCount = (int) LikeRepository.countByPost(post);
-        boolean scrapStatus = ScrapRepository.existsByPostIdAndMemberId(postId, member.getId());
+        boolean scrapStatus = ScrapRepository.existsByPostIdAndMemberId(postId, memberId);
         List<String> imageUrls = imageRepository.findUrlsByPost(post);
 
         return PostDetailResponseDTO.builder()
