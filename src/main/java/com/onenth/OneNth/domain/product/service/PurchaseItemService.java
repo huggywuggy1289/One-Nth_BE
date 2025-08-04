@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
+import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemRequestDTO;
@@ -16,9 +17,11 @@ import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
 import com.onenth.OneNth.domain.product.repository.itemRepository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
+import com.onenth.OneNth.domain.product.repository.scrapRepository.PurchaseItemScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
@@ -32,7 +35,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,10 +46,13 @@ public class PurchaseItemService {
 
     private final PurchaseItemRepository purchaseItemRepository;
     private final ItemImageRepository itemImageRepository;
-    private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
-    private  final TagRepository tagRepository; // +
+    private final MemberRegionRepository memberRegionRepository;
+    private  final TagRepository tagRepository;
     private final RegionRepository regionRepository;
     private final GeoCodingService geoCodingService;
+    // +
+    private final MemberRepository memberRepository;
+    private final PurchaseItemScrapRepository scrapRepository;
 
     //s3 연동
     private final AmazonS3 amazonS3;
@@ -233,7 +241,13 @@ public class PurchaseItemService {
         }
         System.out.println("keyword: [" + keyword + "]");
 
-        return PurchaseItemConverter.toPurchaseItemListDTOs(items);
+        Set<Long> bookmarkedIds = scrapRepository.findByMemberId(userId).stream()
+                .map(scrap -> scrap.getPurchaseItem().getId())
+                .collect(Collectors.toSet());
+
+        log.info("유저 {}의 북마크 목록: {}", userId, bookmarkedIds);
+
+        return PurchaseItemConverter.toPurchaseItemListDTOs(items, bookmarkedIds);
     }
 
     // 상품명 검색++++
@@ -323,4 +337,26 @@ public class PurchaseItemService {
                 .build();
     }
 
+    // 북마크 추가
+    @Transactional
+    public void addScrap(Long purchaseItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
+
+        PurchaseItem item = purchaseItemRepository.findById(purchaseItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        if (scrapRepository.existsByMemberAndPurchaseItem(member, item)) {
+            throw new IllegalStateException("이미 스크랩한 상품입니다.");
+        }
+
+        PurchaseItemScrap scrap = PurchaseItemScrap.builder()
+                .member(member)
+                .purchaseItem(item)
+                .build();
+
+        log.info("스크랩 저장 완료: userId={}, itemId={}", userId, purchaseItemId);
+
+        scrapRepository.save(scrap);
+    }
 }

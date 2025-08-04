@@ -19,8 +19,12 @@ public class PurchaseItemListDTO {
     private Double latitude;
     private Double longitude;
 
-    // 서비스에서 dto변환 로직이 길어지는 것을 방지하기위해 이쪽에 배치
     public static PurchaseItemListDTO fromEntity(PurchaseItem entity) {
+        return fromEntity(entity, false); // 기본값 false로 위임
+    }
+
+    // 서비스에서 dto변환 로직이 길어지는 것을 방지하기위해 이쪽에 배치
+    public static PurchaseItemListDTO fromEntity(PurchaseItem entity, boolean isBookmarked) {
         return PurchaseItemListDTO.builder()
                 .id(entity.getId())
                 .category(entity.getItemCategory().name())
@@ -33,7 +37,7 @@ public class PurchaseItemListDTO {
                 )
                 .latitude(entity.getLongitude())
                 .longitude(entity.getLongitude())
-                .isBookmarked(false)
+                .isBookmarked(isBookmarked)
                 .build();
     }
 }

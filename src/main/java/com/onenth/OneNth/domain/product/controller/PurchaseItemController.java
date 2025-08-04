@@ -103,5 +103,18 @@ public class PurchaseItemController {
                 purchaseItemService.getItemDetail(groupPurchaseId, userId);
         return ApiResponse.onSuccess(detail);
     }
+
+    @Operation(
+            summary = "같이사요 스크랩 등록",
+            description = "특정 상품을 스크랩합니다. 이미 스크랩한 경우 예외 발생"
+    )
+    @PostMapping("/{groupPurchaseId}/scrap")
+    public ApiResponse<Void> addScrap(
+            @PathVariable("groupPurchaseId") Long purchaseItemId,
+            @AuthUser Long userId
+    ) {
+        purchaseItemService.addScrap(purchaseItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
 }
 

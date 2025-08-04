@@ -5,6 +5,7 @@ import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 
 import java.util.List;
+import java.util.Set;
 
 public class PurchaseItemConverter {
 
@@ -14,9 +15,9 @@ public class PurchaseItemConverter {
                 .build();
     }
 
-    public static List<PurchaseItemListDTO> toPurchaseItemListDTOs(List<PurchaseItem> items) {
+    public static List<PurchaseItemListDTO> toPurchaseItemListDTOs(List<PurchaseItem> items, Set<Long> bookmarkedIds) {
         return items.stream()
-                .map(PurchaseItemListDTO::fromEntity)
+                .map(item -> PurchaseItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
                 .toList();
     }
 }
