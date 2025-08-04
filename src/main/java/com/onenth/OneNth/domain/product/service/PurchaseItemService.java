@@ -259,10 +259,8 @@ public class PurchaseItemService {
     @Transactional(readOnly = true)
     public List<PurchaseItemListDTO> searchByTitleInUserRegions(String keyword, Long userId) {
 
-        // 검색 요청 정보
         log.info("검색 요청 - keyword: {}, userId: {}", keyword, userId);
 
-        // 사용자 설정 지역 ID 추출
         List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
                 .stream()
                 .map(r -> r.getRegion().getId())
@@ -270,19 +268,16 @@ public class PurchaseItemService {
 
         log.info("사용자 설정 지역 ID 목록: {}", regionIds);
 
-        // 상품 검색
         List<PurchaseItem> items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
 
-        // 검색 결과 확인
-        for (PurchaseItem item : items) {
-            log.info("검색 결과 - id: {}, name: {}, regionId: {}, status: {}",
-                    item.getId(), item.getName(), item.getRegion().getId(), item.getStatus());
-        }
+        List<PurchaseItemScrap> scraps = scrapRepository.findByUserId(userId);
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(s -> s.getPurchaseItem().getId())
+                .collect(Collectors.toSet());
 
-        // 거래 완료 제외 후 변환
         return items.stream()
                 .filter(i -> i.getStatus() != Status.COMPLETED)
-                .map(PurchaseItemListDTO::fromEntity)
+                .map(item -> PurchaseItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
                 .toList();
     }
 
