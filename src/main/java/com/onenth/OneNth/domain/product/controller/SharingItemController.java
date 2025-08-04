@@ -114,4 +114,13 @@ public class SharingItemController {
         return ApiResponse.onSuccess(null);
     }
 
+    @DeleteMapping("/{sharingItemId}/scrap")
+    @Operation(summary = "함께나눠요 상품 스크랩 삭제")
+    public ApiResponse<Void> removeSharingItemScrap(
+            @PathVariable("sharingItemId") Long sharingItemId,
+            @AuthUser Long userId
+    ) {
+        sharingItemService.removeScrap(sharingItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
 }

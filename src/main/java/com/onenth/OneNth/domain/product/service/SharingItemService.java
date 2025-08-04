@@ -11,6 +11,7 @@ import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
@@ -362,4 +363,19 @@ public class SharingItemService {
         scrapRepository.save(scrap);
     }
 
+    // 북마크 삭제
+    @Transactional
+    public void removeScrap(Long purchaseItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
+
+        SharingItem item = sharingItemRepository.findById(purchaseItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        SharingItemScrap scrap = scrapRepository.findByMemberIdAndSharingItemId(userId, purchaseItemId)
+                .orElseThrow(() -> new IllegalStateException("스크랩 정보가 존재하지 않습니다."));
+
+        scrapRepository.delete(scrap);
+        log.info("스크랩 삭제 완료: userId={}, itemId={}", userId, purchaseItemId);
+    }
 }
