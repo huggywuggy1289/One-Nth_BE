@@ -116,5 +116,14 @@ public class PurchaseItemController {
         purchaseItemService.addScrap(purchaseItemId, userId);
         return ApiResponse.onSuccess(null);
     }
+    @DeleteMapping("/{purchaseItemId}/scrap")
+    @Operation(summary = "같이사요 상품 스크랩 삭제")
+    public ApiResponse<Void> removeScrap(
+            @PathVariable("purchaseItemId") Long purchaseItemId,
+            @AuthUser Long userId
+    ) {
+        purchaseItemService.removeScrap(purchaseItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
 }
 

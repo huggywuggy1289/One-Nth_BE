@@ -359,4 +359,20 @@ public class PurchaseItemService {
 
         scrapRepository.save(scrap);
     }
+
+    // 북마크 삭제
+    @Transactional
+    public void removeScrap(Long purchaseItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
+
+        PurchaseItem item = purchaseItemRepository.findById(purchaseItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        PurchaseItemScrap scrap = scrapRepository.findByMemberIdAndPurchaseItemId(userId, purchaseItemId)
+                .orElseThrow(() -> new IllegalStateException("스크랩 정보가 존재하지 않습니다."));
+
+        scrapRepository.delete(scrap);
+        log.info("스크랩 삭제 완료: userId={}, itemId={}", userId, purchaseItemId);
+    }
 }

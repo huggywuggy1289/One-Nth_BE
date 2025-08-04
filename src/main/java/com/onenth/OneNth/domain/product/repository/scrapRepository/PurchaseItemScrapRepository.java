@@ -14,6 +14,10 @@ public interface PurchaseItemScrapRepository extends JpaRepository<PurchaseItemS
 
     boolean existsByMemberAndPurchaseItem(Member member, PurchaseItem item);
 
+    // POST
     @Query("SELECT s FROM PurchaseItemScrap s WHERE s.member.id = :userId")
     List<PurchaseItemScrap> findByUserId(@Param("userId") Long userId);
+
+    // DELETE
+    Optional<PurchaseItemScrap> findByMemberIdAndPurchaseItemId(Long memberId, Long purchaseItemId);
 }
