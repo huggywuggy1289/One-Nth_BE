@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
+import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
 import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
@@ -14,6 +15,7 @@ import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
 import com.onenth.OneNth.domain.product.entity.scrap.SharingItemScrap;
 import com.onenth.OneNth.domain.product.repository.itemRepository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
@@ -33,6 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -233,14 +237,21 @@ public class SharingItemService {
             items = sharingItemRepository.findByRegionName(keyword);
         }
 
-        items.forEach(i ->
-                log.info("📦 [item: {}] ↔ [region: {}]", i.getTitle(),
-                        i.getRegion() != null ? i.getRegion().getRegionName() : "null")
-        );
+        List<SharingItemScrap> scraps = scrapRepository.findByUserId(userId);
 
-        return items.stream()
-                .map(SharingItemListDTO::fromEntity)
-                .toList();
+        // 디버깅
+        System.out.println("스크랩 수: " + scraps.size());
+        for (SharingItemScrap scrap : scraps) {
+            System.out.println("스크랩된 아이템 ID: " + scrap.getSharingItem().getId());
+        }
+
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(s -> s.getSharingItem().getId())
+                .collect(Collectors.toSet());
+
+        log.info("유저 {}의 북마크 목록: {}", userId, bookmarkedIds);
+
+        return SharingItemConverter.toSharingItemListDTOs(items, bookmarkedIds);
     }
 
     // 상품명 검색++++
@@ -260,10 +271,15 @@ public class SharingItemService {
         // 2. 지역 필터 + 키워드 기반 상품명 LIKE 검색
         List<SharingItem> items = sharingItemRepository.searchByTitleAndRegion(keyword, regionIds);
 
+        List<SharingItemScrap> scraps = scrapRepository.findByUserId(userId);
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(s -> s.getSharingItem().getId())
+                .collect(Collectors.toSet());
+
         // 3. 거래 완료 제외 후 DTO 변환
         return items.stream()
                 .filter(i -> i.getStatus() != Status.COMPLETED)
-                .map(SharingItemListDTO::fromEntity)
+                .map(item -> SharingItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
                 .toList();
     }
 
