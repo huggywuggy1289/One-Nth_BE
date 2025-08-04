@@ -26,6 +26,7 @@ public class MemberResponseDTO {
     public static class LoginResultDTO {
         Long memberId;
         String accessToken;
+        String refreshToken;
     }
 
     @Builder
@@ -78,19 +79,11 @@ public class MemberResponseDTO {
         Boolean isSuccess;
     }
 
-//    @Builder
-//    @Getter
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    public static class likedPostListDTO {
-//
-//    }
-//
-//    @Builder
-//    @Getter
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    public static class likedPostPreviewDTO {
-//
-//    }
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class TokenReissueResultDTO {
+        String accessToken;
+    }
+
 }
