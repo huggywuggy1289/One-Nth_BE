@@ -17,7 +17,8 @@ import lombok.*;
 @Table(name = "purchase_item_scrap")
 public class PurchaseItemScrap {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

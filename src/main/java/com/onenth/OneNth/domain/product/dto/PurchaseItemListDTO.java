@@ -4,8 +4,10 @@ import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 public class PurchaseItemListDTO {
@@ -14,7 +16,7 @@ public class PurchaseItemListDTO {
     private String title;          // 상품명
     private String price;          // 가격
     private String thumbnailUrl;   // 썸네일 이미지 URL
-    private boolean isBookmarked;  // 북마크(스크랩) 여부
+    private boolean bookmarked;  // 북마크(스크랩) 여부
 
     private Double latitude;
     private Double longitude;
@@ -35,9 +37,9 @@ public class PurchaseItemListDTO {
                                 ? entity.getItemImages().get(0).getUrl()
                                 : null
                 )
-                .latitude(entity.getLongitude())
+                .latitude(entity.getLatitude())
                 .longitude(entity.getLongitude())
-                .isBookmarked(isBookmarked)
+                .bookmarked(isBookmarked)
                 .build();
     }
 }

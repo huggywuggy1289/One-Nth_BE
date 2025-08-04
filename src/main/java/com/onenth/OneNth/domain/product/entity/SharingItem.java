@@ -21,7 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "scrap")
 public class SharingItem extends BaseEntity {
 
     @Id

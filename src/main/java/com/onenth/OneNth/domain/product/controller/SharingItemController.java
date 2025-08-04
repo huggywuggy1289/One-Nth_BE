@@ -101,4 +101,17 @@ public class SharingItemController {
         return ApiResponse.onSuccess(detail);
     }
 
+    @Operation(
+            summary = "함께나눠요 스크랩 등록",
+            description = "특정 함께나눠요 상품을 스크랩합니다. 이미 스크랩한 경우 예외 발생"
+    )
+    @PostMapping("/{sharingItemId}/scrap")
+    public ApiResponse<Void> addSharingItemScrap(
+            @PathVariable("sharingItemId") Long sharingItemId,
+            @AuthUser Long userId
+    ) {
+        sharingItemService.addScrap(sharingItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
+
 }

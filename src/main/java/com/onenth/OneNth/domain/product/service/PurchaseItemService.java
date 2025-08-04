@@ -241,7 +241,12 @@ public class PurchaseItemService {
         }
         System.out.println("keyword: [" + keyword + "]");
 
-        Set<Long> bookmarkedIds = scrapRepository.findByMemberId(userId).stream()
+        List<PurchaseItemScrap> scraps = scrapRepository.findByUserId(userId);
+        System.out.println("스크랩 수: " + scraps.size());
+        for (PurchaseItemScrap scrap : scraps) {
+            System.out.println("스크랩된 아이템 ID: " + scrap.getPurchaseItem().getId());
+        }
+        Set<Long> bookmarkedIds = scraps.stream()
                 .map(scrap -> scrap.getPurchaseItem().getId())
                 .collect(Collectors.toSet());
 

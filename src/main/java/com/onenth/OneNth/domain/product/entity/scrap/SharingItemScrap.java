@@ -18,7 +18,7 @@ import lombok.*;
 public class SharingItemScrap {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,7 +26,7 @@ public class SharingItemScrap {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchase_item_id", nullable = false)
+    @JoinColumn(name = "sharing_item_id", nullable = false)
     private SharingItem sharingItem;
 
     private LocalDateTime createdAt;

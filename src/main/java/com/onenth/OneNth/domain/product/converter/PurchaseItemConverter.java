@@ -15,6 +15,7 @@ public class PurchaseItemConverter {
                 .build();
     }
 
+    // 북마크 여부 포함 변환
     public static List<PurchaseItemListDTO> toPurchaseItemListDTOs(List<PurchaseItem> items, Set<Long> bookmarkedIds) {
         return items.stream()
                 .map(item -> PurchaseItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
