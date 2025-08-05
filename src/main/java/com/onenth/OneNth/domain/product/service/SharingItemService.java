@@ -5,17 +5,23 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
+import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
+import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
 import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
+import com.onenth.OneNth.domain.product.entity.scrap.SharingItemScrap;
 import com.onenth.OneNth.domain.product.repository.itemRepository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
+import com.onenth.OneNth.domain.product.repository.scrapRepository.SharingItemScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
@@ -30,6 +36,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -42,6 +50,9 @@ public class SharingItemService {
     private final TagRepository tagRepository;
     private final RegionRepository regionRepository;
     private final GeoCodingService geoCodingService;
+    //+
+    private final SharingItemScrapRepository scrapRepository;
+    private final MemberRepository memberRepository;
 
     private final AmazonS3 amazonS3;
 
@@ -227,14 +238,21 @@ public class SharingItemService {
             items = sharingItemRepository.findByRegionName(keyword);
         }
 
-        items.forEach(i ->
-                log.info("📦 [item: {}] ↔ [region: {}]", i.getTitle(),
-                        i.getRegion() != null ? i.getRegion().getRegionName() : "null")
-        );
+        List<SharingItemScrap> scraps = scrapRepository.findByUserId(userId);
 
-        return items.stream()
-                .map(SharingItemListDTO::fromEntity)
-                .toList();
+        // 디버깅
+        System.out.println("스크랩 수: " + scraps.size());
+        for (SharingItemScrap scrap : scraps) {
+            System.out.println("스크랩된 아이템 ID: " + scrap.getSharingItem().getId());
+        }
+
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(s -> s.getSharingItem().getId())
+                .collect(Collectors.toSet());
+
+        log.info("유저 {}의 북마크 목록: {}", userId, bookmarkedIds);
+
+        return SharingItemConverter.toSharingItemListDTOs(items, bookmarkedIds);
     }
 
     // 상품명 검색++++
@@ -254,10 +272,15 @@ public class SharingItemService {
         // 2. 지역 필터 + 키워드 기반 상품명 LIKE 검색
         List<SharingItem> items = sharingItemRepository.searchByTitleAndRegion(keyword, regionIds);
 
+        List<SharingItemScrap> scraps = scrapRepository.findByUserId(userId);
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(s -> s.getSharingItem().getId())
+                .collect(Collectors.toSet());
+
         // 3. 거래 완료 제외 후 DTO 변환
         return items.stream()
                 .filter(i -> i.getStatus() != Status.COMPLETED)
-                .map(SharingItemListDTO::fromEntity)
+                .map(item -> SharingItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
                 .toList();
     }
 
@@ -317,6 +340,42 @@ public class SharingItemService {
                 .longitude(item.getLongitude())
                 .build();
     }
+    // 스크랩 설정
+    @Transactional
+    public void addScrap(Long sharingItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
 
+        SharingItem item = sharingItemRepository.findById(sharingItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
 
+        if (scrapRepository.existsByMemberAndSharingItem(member, item)) {
+            throw new IllegalStateException("이미 스크랩한 상품입니다.");
+        }
+
+        SharingItemScrap scrap = SharingItemScrap.builder()
+                .member(member)
+                .sharingItem(item)
+                .build();
+
+        log.info("스크랩 저장 완료: userId={}, sharingItemId={}", userId, sharingItemId);
+
+        scrapRepository.save(scrap);
+    }
+
+    // 북마크 삭제
+    @Transactional
+    public void removeScrap(Long purchaseItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
+
+        SharingItem item = sharingItemRepository.findById(purchaseItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        SharingItemScrap scrap = scrapRepository.findByMemberIdAndSharingItemId(userId, purchaseItemId)
+                .orElseThrow(() -> new IllegalStateException("스크랩 정보가 존재하지 않습니다."));
+
+        scrapRepository.delete(scrap);
+        log.info("스크랩 삭제 완료: userId={}, itemId={}", userId, purchaseItemId);
+    }
 }
