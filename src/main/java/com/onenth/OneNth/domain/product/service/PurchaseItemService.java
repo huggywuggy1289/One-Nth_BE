@@ -77,11 +77,18 @@ public class PurchaseItemService {
 
         // 회원 및 지역 조회
         Member member = Member.builder().id(userId).build();
-        Region region = memberRegionRepository.findByMemberId(userId)
+
+        // 등록한 주소명 문자열 기반으로 region 찾아 매핑
+        GeoCodingResult geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
+        if (geo == null) {
+            throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+        }
+
+        Region region = regionRepository.findByRegionNameContaining(dto.getPurchaseLocation())
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
-                .getRegion();
+                .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다."));
+
 
         // 태그 유효성 검사 및 저장
         List<Tag> tagEntities = dto.getTags().stream()
@@ -99,8 +106,6 @@ public class PurchaseItemService {
         }
 
         // 장소입력 유효성
-        GeoCodingResult geo = null;
-
         if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
             if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
                 throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");

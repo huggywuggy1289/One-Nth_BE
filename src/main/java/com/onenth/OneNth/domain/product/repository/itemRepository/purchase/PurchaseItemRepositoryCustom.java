@@ -12,4 +12,7 @@ public interface PurchaseItemRepositoryCustom {
     List<PurchaseItem> findByRegionsAndCategory(List<Integer> regionIds, String category);
     // 지역명
     List<PurchaseItem> findByRegionsName(String regionName);
+
+    // 상품명 + 지역 필터 검색
+    List<PurchaseItem> searchByTitleAndRegion(String keyword, List<Integer> regionIds);
 }

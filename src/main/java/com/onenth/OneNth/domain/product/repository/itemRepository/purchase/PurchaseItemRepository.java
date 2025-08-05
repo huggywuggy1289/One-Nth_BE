@@ -17,17 +17,6 @@ public interface PurchaseItemRepository  extends JpaRepository<PurchaseItem, Lon
     @Query("""
     SELECT p
     FROM PurchaseItem p
-    WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-      AND p.region.id IN :regionIds
-    """)
-    List<PurchaseItem> searchByTitleAndRegion(@Param("keyword") String keyword, @Param("regionIds") List<Integer> regionIds);
-
-    // 상품명(전체 조회)
-    List<PurchaseItem> findByNameContainingIgnoreCase(String keyword);
-
-    @Query("""
-    SELECT p
-    FROM PurchaseItem p
     JOIN FETCH p.region
     WHERE p.id = :id
     """)

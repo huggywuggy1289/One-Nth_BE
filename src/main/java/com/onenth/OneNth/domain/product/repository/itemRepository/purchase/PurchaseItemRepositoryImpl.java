@@ -8,11 +8,16 @@ import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.region.entity.QRegion;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
+
 
 import java.util.List;
 
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom {
@@ -62,6 +67,29 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
                         region.regionName.like("%" + cleanKeyword + "%")
                                 .and(item.status.in(Status.DEFAULT, Status.IN_PROGRESS))
                 )
+                .fetch();
+    }
+
+    @Override
+    public List<PurchaseItem> searchByTitleAndRegion(String keyword, List<Integer> regionIds) {
+        log.info("QueryDSL searchByTitleAndRegion 실행");
+        QPurchaseItem item = QPurchaseItem.purchaseItem;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(item.name.containsIgnoreCase(keyword));
+        builder.and(item.status.in(Status.DEFAULT, Status.IN_PROGRESS));
+
+        if (regionIds != null && !regionIds.isEmpty()) {
+            builder.and(item.region.id.in(regionIds));
+        }
+        log.info("regionIds = {}", regionIds);
+        log.info("필터링된 쿼리 조건: name LIKE '%{}%', region.id in {}", keyword, regionIds);
+
+
+        return queryFactory
+                .selectFrom(item)
+                .join(item.region).fetchJoin()
+                .where(builder)
                 .fetch();
     }
 }

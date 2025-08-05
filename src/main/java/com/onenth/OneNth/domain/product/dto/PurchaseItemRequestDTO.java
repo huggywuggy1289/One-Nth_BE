@@ -32,4 +32,5 @@ public class PurchaseItemRequestDTO {
     private List<@NotBlank String> imageUrls;
     @NotEmpty
     private List<String> tags;
+    private Integer regionId;
 }
