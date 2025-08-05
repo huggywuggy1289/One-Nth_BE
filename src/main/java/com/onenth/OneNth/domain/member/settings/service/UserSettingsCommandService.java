@@ -10,4 +10,6 @@ public interface UserSettingsCommandService {
     void deleteMyRegion(Long userId, Long regionId);
 
     UserSettingsResponseDTO.UpdateMainRegionResponseDTO updateMainRegion(Long userId, Long regionId);
+
+    UserSettingsResponseDTO.VerifyMyRegionResponseDTO verifyMyRegion(Long userId, Long regionId, UserSettingsRequestDTO.VerifyMyRegionRequestDTO request);
 }

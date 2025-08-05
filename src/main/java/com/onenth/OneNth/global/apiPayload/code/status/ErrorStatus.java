@@ -63,6 +63,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 사용자 차단 관련
     BLOCK_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK001", "차단 대상 사용자가 존재하지 않습니다."),
     BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK002", "차단한 사용자 목록에 존재하지 않습니다."),
+
+    // 외부 API 관련
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "EXTERNAL_API_001", "외부 API 통신 중 문제가 발생했습니다."),
     ;
 
     private final HttpStatus httpStatus;

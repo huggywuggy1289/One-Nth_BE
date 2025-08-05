@@ -103,4 +103,25 @@ public class UserSettingsController {
     ) {
         return ApiResponse.onSuccess(userSettingsCommandService.updateMainRegion(userId, regionId));
     }
+
+    @Operation(
+            summary = "현위치 기반 우리동네 인증 API",
+            description = "사용자 설정 중 현위치 기반으로 특정 동네를 우리 동네 인증하는 API입니다. 응답으로 verified(인증 여부)와 detectedRegionName(사용자의 현위치), requestedRegionName(사용자가 인증 요청한 지역 위치)을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER_REGION003", description = "해당 사용자가 등록하지 않은 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXTERNAL_API_001", description = "외부 API 통신 중 문제가 발생했습니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @PatchMapping("/{regionId}/auth")
+    public ApiResponse<UserSettingsResponseDTO.VerifyMyRegionResponseDTO> verifyMyRegion(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @PathVariable Long regionId,
+            @Valid @RequestBody UserSettingsRequestDTO.VerifyMyRegionRequestDTO request
+    ) {
+        return ApiResponse.onSuccess(userSettingsCommandService.verifyMyRegion(userId, regionId, request));
+    }
 }

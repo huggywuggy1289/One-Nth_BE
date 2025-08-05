@@ -1,8 +1,11 @@
 package com.onenth.OneNth.domain.member.settings.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import javax.swing.text.Document;
 import java.util.List;
 
 public class UserSettingsResponseDTO {
@@ -35,5 +38,36 @@ public class UserSettingsResponseDTO {
         private Integer regionId;
         private String regionName;
         private boolean isMain;
+    }
+
+    @Getter
+    @Builder
+    public static class VerifyMyRegionResponseDTO {
+        private boolean isVerified;
+        private String detectedRegionName;
+        private String requestedRegionName;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class KakaoRegionResponseDTO {
+        private List<Document> documents;
+
+        @Getter
+        @NoArgsConstructor
+        public static class Document {
+            @JsonProperty("region_type")
+            private String regionType;
+
+            @JsonProperty("region_1depth_name")
+            private String region1DepthName;
+
+            @JsonProperty("region_2depth_name")
+            private String region2DepthName;
+
+            @JsonProperty("region_3depth_name")
+            private String region3DepthName;
+        }
+
     }
 }
