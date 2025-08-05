@@ -10,6 +10,7 @@ import com.onenth.OneNth.domain.product.service.SharingItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/sharing-items")
 @RequiredArgsConstructor
+@Tag(name = "함께나눠요 관련 API", description = "함께나눠요 상품 등록, 상품 조회 관련 API 지원")
 public class SharingItemController {
 
     private final SharingItemService sharingItemService;
@@ -72,9 +74,7 @@ public class SharingItemController {
     @Operation(
             summary = "상품명 기반 지역 선택 검색",
             description = """
-    - keyword에 해당하는 상품명을 LIKE 검색합니다.
-    - regionIds 파라미터에 선택한 지역 ID 리스트를 넘기면 해당 지역만 필터링합니다.
-    - 지역 선택을 안 하면 전국 검색입니다.
+    - 설정한 3개 지역 내 상품명으로 검색
     """
     )
 
@@ -84,7 +84,7 @@ public class SharingItemController {
             @RequestParam(required = false) List<Integer> regionIds,
             @AuthUser Long userId
     ) {
-        List<SharingItemListDTO> results = sharingItemService.searchByTitleAndSelectedRegions(keyword, regionIds);
+        List<SharingItemListDTO> results = sharingItemService.searchByTitleInUserRegions(keyword, userId);
         return ApiResponse.onSuccess(results);
     }
 
@@ -101,4 +101,26 @@ public class SharingItemController {
         return ApiResponse.onSuccess(detail);
     }
 
+    @Operation(
+            summary = "함께나눠요 스크랩 등록",
+            description = "특정 함께나눠요 상품을 스크랩합니다. 이미 스크랩한 경우 예외 발생"
+    )
+    @PostMapping("/{sharingItemId}/scrap")
+    public ApiResponse<Void> addSharingItemScrap(
+            @PathVariable("sharingItemId") Long sharingItemId,
+            @AuthUser Long userId
+    ) {
+        sharingItemService.addScrap(sharingItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
+
+    @DeleteMapping("/{sharingItemId}/scrap")
+    @Operation(summary = "함께나눠요 상품 스크랩 삭제")
+    public ApiResponse<Void> removeSharingItemScrap(
+            @PathVariable("sharingItemId") Long sharingItemId,
+            @AuthUser Long userId
+    ) {
+        sharingItemService.removeScrap(sharingItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
 }

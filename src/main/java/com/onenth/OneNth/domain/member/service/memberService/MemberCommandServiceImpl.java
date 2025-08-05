@@ -3,13 +3,17 @@ package com.onenth.OneNth.domain.member.service.memberService;
 import com.onenth.OneNth.domain.member.converter.MemberConverter;
 import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
-import com.onenth.OneNth.domain.member.entity.EmailVerificationCode;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
+import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
+import com.onenth.OneNth.domain.member.settings.alert.generalAlert.repository.MemberAlertSettingRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailService;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVerificationService;
 import com.onenth.OneNth.domain.post.entity.Like;
+import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
+import com.onenth.OneNth.domain.post.repository.PostRepository;
 import com.onenth.OneNth.domain.post.repository.likeRepository.LikeRepository;
 import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
@@ -20,10 +24,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
-
-import static com.onenth.OneNth.domain.post.entity.QScrap.scrap;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +39,10 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final EmailVerificationService emailVerificationService;
     private final EmailService emailService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PostRepository postRepository;
     private final ScrapRepository scrapRepository;
     private final LikeRepository likeRepository;
-
+    private final MemberAlertSettingRepository memberAlertSettingRepository;
     @Override
     public MemberResponseDTO.SignupResultDTO signupMember(MemberRequestDTO.SignupDTO request) {
 
@@ -62,13 +67,24 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         member.encodePassword(passwordEncoder.encode(request.getPassword()));
 
         // 5. 회원 저장
-        return MemberConverter.toSignupResultDTO(memberRepository.save(member));
+        Member savedMember = memberRepository.save(member);
+
+        // 알림설정 생성 (기본값 ON)
+        MemberAlertSetting alertSetting = MemberAlertSetting.builder()
+                .member(savedMember)
+                .chatAlerts(true)
+                .scrapAlerts(true)
+                .reviewAlerts(true)
+                .build();
+        memberAlertSettingRepository.save(alertSetting);
+
+        return MemberConverter.toSignupResultDTO(savedMember);
     }
 
     @Override
     public MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.LoginRequestDTO request) {
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("해당 이메일과 일치하는 사용자가 없습니다."));
+        Member member = memberRepository.findByEmailAndStatus(request.getEmail(), MemberStatus.ACTIVE)
+                .orElseThrow(() -> new RuntimeException("존재하지 않거나 탈퇴한 회원입니다."));
 
         if(!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
@@ -105,6 +121,35 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         return MemberResponseDTO.PasswordResetResultDTO.builder().isSuccess(true).build();
     }
 
+
+    @Override
+    public MemberResponseDTO.AddScrapOrLikeResponseDTO addScrap(Long memberId, Long postId) {
+        // 게시글 존재 여부 확인
+        postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글입니다."));
+
+        // 중복 스크랩 여부 확인
+        boolean exists = scrapRepository.existsByPostIdAndMemberId(postId, memberId);
+        if (exists) {
+            throw new RuntimeException("이미 스크랩한 글입니다.");
+        }
+
+        // 회원 여부 확인
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        Scrap scrap = Scrap.builder()
+                .member(member)
+                .post(Post.builder().id(postId).build())
+                .build();
+
+        scrapRepository.save(scrap);
+
+        return MemberResponseDTO.AddScrapOrLikeResponseDTO.builder()
+                .isSuccess(true)
+                .build();
+    }
+
     @Override
     public MemberResponseDTO.CancelScrapOrLikeResponseDTO cancelScrap(Long memberId, Long postId) {
         Scrap scrap = scrapRepository.findByMemberIdAndPostId(memberId, postId)
@@ -113,6 +158,34 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         scrapRepository.delete(scrap);
 
         return MemberResponseDTO.CancelScrapOrLikeResponseDTO.builder()
+                .isSuccess(true)
+                .build();
+    }
+
+    @Override
+    public MemberResponseDTO.AddScrapOrLikeResponseDTO addLike(Long memberId, Long postId) {
+        // 게시글 존재 여부 확인
+        postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글입니다."));
+
+        // 중복 공감 여부 확인
+        boolean exists = likeRepository.findByMemberIdAndPostId(memberId, postId).isPresent();
+        if (exists) {
+            throw new RuntimeException("이미 공감한 글입니다.");
+        }
+
+        // 회원 여부 확인
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        Like like = Like.builder()
+                .member(member)
+                .post(Post.builder().id(postId).build())
+                .build();
+
+        likeRepository.save(like);
+
+        return MemberResponseDTO.AddScrapOrLikeResponseDTO.builder()
                 .isSuccess(true)
                 .build();
     }
@@ -127,5 +200,16 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         return MemberResponseDTO.CancelScrapOrLikeResponseDTO.builder()
                 .isSuccess(true)
                 .build();
+    }
+
+    @Transactional
+    @Override
+    public void withdrawMember(Long memberId) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+
+        member.setStatus(MemberStatus.INACTIVE);
+        member.setInactiveDate(LocalDateTime.now());
     }
 }

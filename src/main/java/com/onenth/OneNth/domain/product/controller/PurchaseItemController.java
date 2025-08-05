@@ -8,6 +8,7 @@ import com.onenth.OneNth.domain.product.service.PurchaseItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/group-purchases")
 @RequiredArgsConstructor
+@Tag(name = "같이사요 관련 API", description = "같이사요 상품 등록, 상품 조회 관련 API 지원")
 public class PurchaseItemController {
 
     private final PurchaseItemService purchaseItemService;
@@ -67,18 +69,14 @@ public class PurchaseItemController {
     // 상품검색(상품명)
     @GetMapping("/title")
     @Operation(
-            summary = "같이사요 상품명 검색 (지역 필터 포함)",
-            description = """
-    - 입력한 keyword를 상품명(name)에 대해 LIKE 검색합니다.
-    - regionIds를 지정하면 해당 지역 ID 내에서만 필터링합니다.
-    - regionIds를 생략하면 전국 단위 검색이 수행됩니다.
-    """
+            summary = "상품명 기반 지역 설정 검색",
+            description = "- 사용자가 설정한 3개 지역 내에서만 상품명을 기준으로 검색"
     )
-    public ApiResponse<List<PurchaseItemListDTO>> searchByTitle(
+    public ApiResponse<List<PurchaseItemListDTO>> searchByTitleWithUserRegion(
             @RequestParam String keyword,
-            @RequestParam(required = false) List<Integer> regionIds
+            @AuthUser Long userId
     ) {
-        List<PurchaseItemListDTO> results = purchaseItemService.searchByTitleWithRegions(keyword, regionIds);
+        List<PurchaseItemListDTO> results = purchaseItemService.searchByTitleInUserRegions(keyword, userId);
         return ApiResponse.onSuccess(results);
     }
 
@@ -95,7 +93,7 @@ public class PurchaseItemController {
             """
     )
   
-    @GetMapping("t /{groupPurchaseId}")
+    @GetMapping("/{groupPurchaseId}")
 
     public ApiResponse<PurchaseItemResponseDTO.GetPurchaseItemResponseDTO> getGroupPurchaseDetail(
             @PathVariable Long groupPurchaseId,
@@ -104,6 +102,28 @@ public class PurchaseItemController {
         PurchaseItemResponseDTO.GetPurchaseItemResponseDTO detail =
                 purchaseItemService.getItemDetail(groupPurchaseId, userId);
         return ApiResponse.onSuccess(detail);
+    }
+
+    @Operation(
+            summary = "같이사요 스크랩 등록",
+            description = "특정 상품을 스크랩합니다. 이미 스크랩한 경우 예외 발생"
+    )
+    @PostMapping("/{groupPurchaseId}/scrap")
+    public ApiResponse<Void> addScrap(
+            @PathVariable("groupPurchaseId") Long purchaseItemId,
+            @AuthUser Long userId
+    ) {
+        purchaseItemService.addScrap(purchaseItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
+    @DeleteMapping("/{purchaseItemId}/scrap")
+    @Operation(summary = "같이사요 상품 스크랩 삭제")
+    public ApiResponse<Void> removeScrap(
+            @PathVariable("purchaseItemId") Long purchaseItemId,
+            @AuthUser Long userId
+    ) {
+        purchaseItemService.removeScrap(purchaseItemId, userId);
+        return ApiResponse.onSuccess(null);
     }
 }
 

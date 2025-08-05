@@ -33,7 +33,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final DatePath<java.time.LocalDate> inactiveDate = createDate("inactiveDate", java.time.LocalDate.class);
+    public final DateTimePath<java.time.LocalDateTime> inactiveDate = createDateTime("inactiveDate", java.time.LocalDateTime.class);
 
     public final EnumPath<com.onenth.OneNth.domain.member.entity.enums.LoginType> loginType = createEnum("loginType", com.onenth.OneNth.domain.member.entity.enums.LoginType.class);
 
@@ -62,6 +62,8 @@ public class QMember extends EntityPathBase<Member> {
     public final ListPath<com.onenth.OneNth.domain.product.entity.review.SharingReview, com.onenth.OneNth.domain.product.entity.review.QSharingReview> sharingReviews = this.<com.onenth.OneNth.domain.product.entity.review.SharingReview, com.onenth.OneNth.domain.product.entity.review.QSharingReview>createList("sharingReviews", com.onenth.OneNth.domain.product.entity.review.SharingReview.class, com.onenth.OneNth.domain.product.entity.review.QSharingReview.class, PathInits.DIRECT2);
 
     public final StringPath socialId = createString("socialId");
+
+    public final EnumPath<com.onenth.OneNth.domain.member.entity.enums.MemberStatus> status = createEnum("status", com.onenth.OneNth.domain.member.entity.enums.MemberStatus.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;

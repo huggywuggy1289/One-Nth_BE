@@ -16,9 +16,12 @@ public class SharingItemListDTO {
     private String title;           // 상품명
     private String price;           // 가격 (정수 -> 문자열 변환)
     private String thumbnailUrl;    // 썸네일 이미지 URL
-    private boolean isBookmarked;   // 북마크 여부 (스크랩 여부)
+    private boolean bookmarked;   // 북마크 여부 (스크랩 여부)
 
-    public static SharingItemListDTO fromEntity(SharingItem entity) {
+    private Double latitude;
+    private Double longitude;
+
+    public static SharingItemListDTO fromEntity(SharingItem entity, boolean isBookmarked) {
         return SharingItemListDTO.builder()
                 .id(entity.getId())
                 .category(entity.getItemCategory().name())
@@ -29,7 +32,9 @@ public class SharingItemListDTO {
                                 ? entity.getItemImages().get(0).getUrl()
                                 : null
                 )
-                .isBookmarked(false)
+                .latitude(entity.getLatitude())
+                .longitude(entity.getLongitude())
+                .bookmarked(isBookmarked)
                 .build();
     }
 }
