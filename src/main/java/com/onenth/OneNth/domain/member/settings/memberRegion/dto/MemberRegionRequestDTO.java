@@ -1,14 +1,12 @@
-package com.onenth.OneNth.domain.member.settings.dto;
+package com.onenth.OneNth.domain.member.settings.memberRegion.dto;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class UserSettingsRequestDTO {
+public class MemberRegionRequestDTO {
 
     @Getter
     @NoArgsConstructor

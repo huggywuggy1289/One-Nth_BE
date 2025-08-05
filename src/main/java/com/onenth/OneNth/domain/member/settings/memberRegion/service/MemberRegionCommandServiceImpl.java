@@ -1,13 +1,12 @@
-package com.onenth.OneNth.domain.member.settings.service;
+package com.onenth.OneNth.domain.member.settings.memberRegion.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberRegion;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
-import com.onenth.OneNth.domain.member.settings.converter.UserSettingsConverter;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
+import com.onenth.OneNth.domain.member.settings.memberRegion.converter.MemberRegionConverter;
+import com.onenth.OneNth.domain.member.settings.memberRegion.dto.MemberRegionRequestDTO;
+import com.onenth.OneNth.domain.member.settings.memberRegion.dto.MemberRegionResponseDTO;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -27,7 +26,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserSettingsCommandServiceImpl implements UserSettingsCommandService {
+public class MemberRegionCommandServiceImpl implements MemberRegionCommandService {
 
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
@@ -39,7 +38,7 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
     private final RegionRepository regionRepository;
 
     @Override
-    public UserSettingsResponseDTO.AddMyRegionResponseDTO addMyRegion(Long userId, UserSettingsRequestDTO.AddMyRegionRequestDTO request) {
+    public MemberRegionResponseDTO.AddMyRegionResponseDTO addMyRegion(Long userId, MemberRegionRequestDTO.AddMyRegionRequestDTO request) {
 
         Member member = memberRepository.findByIdWithRegions(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -55,11 +54,11 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
             throw new GeneralException(ErrorStatus.REGION_ALREADY_EXISTS);
         }
 
-        MemberRegion memberRegion = UserSettingsConverter.toMemberRegion(member, region);
+        MemberRegion memberRegion = MemberRegionConverter.toMemberRegion(member, region);
 
         memberRegionRepository.save(memberRegion);
 
-        return UserSettingsConverter.toAddMyRegionResponseDTO(memberRegion);
+        return MemberRegionConverter.toAddMyRegionResponseDTO(memberRegion);
     }
 
     @Override
@@ -84,7 +83,7 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
     }
 
     @Override
-    public UserSettingsResponseDTO.UpdateMainRegionResponseDTO updateMainRegion(Long userId, Long regionId) {
+    public MemberRegionResponseDTO.UpdateMainRegionResponseDTO updateMainRegion(Long userId, Long regionId) {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -99,11 +98,11 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
 
         memberRegion.setMain(true);
 
-        return UserSettingsConverter.toUpdateMainRegionResponseDTO(memberRegion);
+        return MemberRegionConverter.toUpdateMainRegionResponseDTO(memberRegion);
     }
 
     @Override
-    public UserSettingsResponseDTO.VerifyMyRegionResponseDTO verifyMyRegion(Long userId, Long regionId, UserSettingsRequestDTO.VerifyMyRegionRequestDTO request){
+    public MemberRegionResponseDTO.VerifyMyRegionResponseDTO verifyMyRegion(Long userId, Long regionId, MemberRegionRequestDTO.VerifyMyRegionRequestDTO request){
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -121,20 +120,20 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<UserSettingsResponseDTO.KakaoRegionResponseDTO> response = restTemplate.exchange(
+        ResponseEntity<MemberRegionResponseDTO.KakaoRegionResponseDTO> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 entity,
-                UserSettingsResponseDTO.KakaoRegionResponseDTO.class
+                MemberRegionResponseDTO.KakaoRegionResponseDTO.class
         );
 
-        UserSettingsResponseDTO.KakaoRegionResponseDTO responseBody = response.getBody();
+        MemberRegionResponseDTO.KakaoRegionResponseDTO responseBody = response.getBody();
 
         if (responseBody == null || responseBody.getDocuments() == null || responseBody.getDocuments().isEmpty()) {
             throw new GeneralException(ErrorStatus.EXTERNAL_API_ERROR);
         }
 
-        UserSettingsResponseDTO.KakaoRegionResponseDTO.Document doc = responseBody
+        MemberRegionResponseDTO.KakaoRegionResponseDTO.Document doc = responseBody
                 .getDocuments()
                 .get(0);
 
@@ -143,7 +142,7 @@ public class UserSettingsCommandServiceImpl implements UserSettingsCommandServic
                 doc.getRegion2DepthName(),
                 doc.getRegion3DepthName());
 
-        return UserSettingsResponseDTO.VerifyMyRegionResponseDTO.builder()
+        return MemberRegionResponseDTO.VerifyMyRegionResponseDTO.builder()
                 .isVerified(detectedRegionName.equals(region.getRegionName()))
                 .detectedRegionName(detectedRegionName)
                 .requestedRegionName(region.getRegionName())

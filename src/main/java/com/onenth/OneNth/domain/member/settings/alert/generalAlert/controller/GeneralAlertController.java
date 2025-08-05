@@ -4,8 +4,6 @@ import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAl
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAlertResponseDTO;
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.service.GeneralAlertCommandService;
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.service.GeneralAlertQueryService;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;

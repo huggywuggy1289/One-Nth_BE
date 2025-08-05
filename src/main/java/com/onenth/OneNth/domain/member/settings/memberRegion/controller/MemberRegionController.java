@@ -1,9 +1,9 @@
-package com.onenth.OneNth.domain.member.settings.controller;
+package com.onenth.OneNth.domain.member.settings.memberRegion.controller;
 
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
-import com.onenth.OneNth.domain.member.settings.service.UserSettingsCommandService;
-import com.onenth.OneNth.domain.member.settings.service.UserSettingsQueryService;
+import com.onenth.OneNth.domain.member.settings.memberRegion.dto.MemberRegionRequestDTO;
+import com.onenth.OneNth.domain.member.settings.memberRegion.dto.MemberRegionResponseDTO;
+import com.onenth.OneNth.domain.member.settings.memberRegion.service.MemberRegionCommandService;
+import com.onenth.OneNth.domain.member.settings.memberRegion.service.MemberRegionQueryService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
@@ -16,21 +16,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "사용자 설정 - 우리동네 관련 API", description = "우리동네 등록, 인증, 삭제, 목록 조회, 메인으로 등록  API")
+@Tag(name = "사용자 설정 - 우리동네 관련 API", description = "우리동네 등록, 인증, 삭제, 목록 조회, 메인으로 등록, 지역 목록 검색 API")
 @RestController
 @RequestMapping("/api/user-settings/regions")
 @RequiredArgsConstructor
 @Validated
-public class UserSettingsController {
+public class MemberRegionController {
 
-    private final UserSettingsCommandService userSettingsCommandService;
-    private final UserSettingsQueryService userSettingsQueryService;
+    private final MemberRegionCommandService memberRegionCommandService;
+    private final MemberRegionQueryService memberRegionQueryService;
 
     @Operation(
             summary = "우리 동네 추가 API",
@@ -45,11 +44,11 @@ public class UserSettingsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PostMapping("")
-    public ApiResponse<UserSettingsResponseDTO.AddMyRegionResponseDTO> addMyRegion(
+    public ApiResponse<MemberRegionResponseDTO.AddMyRegionResponseDTO> addMyRegion(
             @Parameter(hidden=true) @AuthUser Long userId,
-            @Valid @RequestBody UserSettingsRequestDTO.AddMyRegionRequestDTO request
+            @Valid @RequestBody MemberRegionRequestDTO.AddMyRegionRequestDTO request
     ) {
-        return ApiResponse.onSuccess(userSettingsCommandService.addMyRegion(userId, request));
+        return ApiResponse.onSuccess(memberRegionCommandService.addMyRegion(userId, request));
     }
 
     @Operation(
@@ -69,7 +68,7 @@ public class UserSettingsController {
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionId
     ) {
-        userSettingsCommandService.deleteMyRegion(userId, regionId);
+        memberRegionCommandService.deleteMyRegion(userId, regionId);
         return ApiResponse.onSuccess(null);
     }
 
@@ -79,16 +78,16 @@ public class UserSettingsController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 우리 동네 지역 조회 성공", content = @Content(
-                    schema = @Schema(implementation = UserSettingsResponseDTO.MyRegionListResponseDTO.class)
+                    schema = @Schema(implementation = MemberRegionResponseDTO.MyRegionListResponseDTO.class)
             )),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @GetMapping("")
-    public ApiResponse<UserSettingsResponseDTO.MyRegionListResponseDTO> getMyRegions(
+    public ApiResponse<MemberRegionResponseDTO.MyRegionListResponseDTO> getMyRegions(
             @Parameter(hidden=true) @AuthUser Long userId
     ) {
-        return ApiResponse.onSuccess(userSettingsQueryService.getMyRegions(userId));
+        return ApiResponse.onSuccess(memberRegionQueryService.getMyRegions(userId));
     }
 
     @Operation(
@@ -103,11 +102,11 @@ public class UserSettingsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PatchMapping("/{regionId}")
-    public ApiResponse<UserSettingsResponseDTO.UpdateMainRegionResponseDTO> updateMainRegion(
+    public ApiResponse<MemberRegionResponseDTO.UpdateMainRegionResponseDTO> updateMainRegion(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionId
     ) {
-        return ApiResponse.onSuccess(userSettingsCommandService.updateMainRegion(userId, regionId));
+        return ApiResponse.onSuccess(memberRegionCommandService.updateMainRegion(userId, regionId));
     }
 
     @Operation(
@@ -123,12 +122,12 @@ public class UserSettingsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @PatchMapping("/{regionId}/auth")
-    public ApiResponse<UserSettingsResponseDTO.VerifyMyRegionResponseDTO> verifyMyRegion(
+    public ApiResponse<MemberRegionResponseDTO.VerifyMyRegionResponseDTO> verifyMyRegion(
             @Parameter(hidden=true) @AuthUser Long userId,
             @PathVariable Long regionId,
-            @Valid @RequestBody UserSettingsRequestDTO.VerifyMyRegionRequestDTO request
+            @Valid @RequestBody MemberRegionRequestDTO.VerifyMyRegionRequestDTO request
     ) {
-        return ApiResponse.onSuccess(userSettingsCommandService.verifyMyRegion(userId, regionId, request));
+        return ApiResponse.onSuccess(memberRegionCommandService.verifyMyRegion(userId, regionId, request));
     }
 
     @Operation(
@@ -141,12 +140,12 @@ public class UserSettingsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @GetMapping("/search")
-    public ApiResponse<UserSettingsResponseDTO.GetRegionsByKeywordResponseDTO> getRegionsByKeyword(
+    public ApiResponse<MemberRegionResponseDTO.GetRegionsByKeywordResponseDTO> getRegionsByKeyword(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "3") @Min(1) int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.onSuccess(userSettingsQueryService.getRegionsByKeyword(keyword, pageable));
+        return ApiResponse.onSuccess(memberRegionQueryService.getRegionsByKeyword(keyword, pageable));
     }
 }

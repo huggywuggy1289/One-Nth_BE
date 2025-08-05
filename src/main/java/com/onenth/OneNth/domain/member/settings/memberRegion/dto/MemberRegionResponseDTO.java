@@ -1,14 +1,13 @@
-package com.onenth.OneNth.domain.member.settings.dto;
+package com.onenth.OneNth.domain.member.settings.memberRegion.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.swing.text.Document;
 import java.util.List;
 
-public class UserSettingsResponseDTO {
+public class MemberRegionResponseDTO {
 
     @Getter
     @Builder
