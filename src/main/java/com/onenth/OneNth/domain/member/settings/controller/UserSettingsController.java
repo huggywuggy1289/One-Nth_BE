@@ -14,13 +14,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "사용자 설정 - 우리동네 관련 API", description = "우리동네 등록, 인증, 삭제, 목록 조회, 메인으로 등록  API")
 @RestController
 @RequestMapping("/api/user-settings/regions")
 @RequiredArgsConstructor
+@Validated
 public class UserSettingsController {
 
     private final UserSettingsCommandService userSettingsCommandService;
@@ -123,5 +129,24 @@ public class UserSettingsController {
             @Valid @RequestBody UserSettingsRequestDTO.VerifyMyRegionRequestDTO request
     ) {
         return ApiResponse.onSuccess(userSettingsCommandService.verifyMyRegion(userId, regionId, request));
+    }
+
+    @Operation(
+            summary = "지역 선택을 위한 지역 검색어를 띄워주는 API",
+            description = "검색어 기반으로 지역들을 띄워주는 API입니다. 응답으로 지역 id와 지역 이름을 갖는 객체 리스트를 반환합니다.(페이지네이션 포함)"
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @GetMapping("/search")
+    public ApiResponse<UserSettingsResponseDTO.GetRegionsByKeywordResponseDTO> getRegionsByKeyword(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "3") @Min(1) int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.onSuccess(userSettingsQueryService.getRegionsByKeyword(keyword, pageable));
     }
 }

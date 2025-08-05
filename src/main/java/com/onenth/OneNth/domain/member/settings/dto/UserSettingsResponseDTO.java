@@ -70,4 +70,28 @@ public class UserSettingsResponseDTO {
         }
 
     }
+
+    @Getter
+    @Builder
+    public static class GetRegionsByKeywordResponseDTO {
+        private List<SearchedRegionSummary> regions;
+        private Pagination pagination;
+    }
+
+    @Getter
+    @Builder
+    public static class SearchedRegionSummary {
+        private Integer regionId;
+        private String regionName;
+    }
+
+    @Getter
+    @Builder
+    public static class Pagination {
+        private int page;
+        private int size;
+        private int totalPages;
+        private long totalElements;
+        private boolean isLast;
+    }
 }
