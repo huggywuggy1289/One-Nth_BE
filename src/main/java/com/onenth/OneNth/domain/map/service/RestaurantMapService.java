@@ -37,10 +37,10 @@ public class RestaurantMapService implements MapService {
 
         Region region = mainMemberRegion.getRegion();
 
-        List<Post> restaurtantPosts = postRepository.findAllByRegionAndPostType(region, MarkerType.RESTAURANT);
+        List<Post> restaurantPosts = postRepository.findAllByRegionAndPostTypeWithLocation(region, MarkerType.RESTAURANT);
 
-        List<MapResponseDTO.MarkerSummary> summaries = restaurtantPosts.stream().map(
-                restaurtantPost -> MapConverter.toMarkerSummary(restaurtantPost, MarkerType.RESTAURANT)
+        List<MapResponseDTO.MarkerSummary> summaries = restaurantPosts.stream().map(
+                restaurantPost -> MapConverter.toMarkerSummary(restaurantPost, MarkerType.RESTAURANT)
         ).collect(Collectors.toList());
 
         return MapConverter.toGetMarkersResponseDTO(summaries);

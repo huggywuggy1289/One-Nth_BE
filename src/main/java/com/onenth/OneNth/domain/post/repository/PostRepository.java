@@ -45,5 +45,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     //마이페이지 - 내가 쓴 글 조회
     Page<Post> findByMemberId(Long memberId, Pageable pageable);
 
-    List<Post> findAllByRegionAndPostType(Region region, MarkerType markerType);
+    @Query("select p from Post p where p.region = :region and p.postType = :postType and p.latitude is not null and p.longitude is not null")
+    List<Post> findAllByRegionAndPostTypeWithLocation(@Param("region") Region region, @Param("postType") MarkerType markerType);
 }

@@ -39,7 +39,7 @@ public class DiscountMapService implements MapService {
 
         Region region = mainMemberRegion.getRegion();
 
-        List<Post> discountPosts = postRepository.findAllByRegionAndPostType(region, MarkerType.DISCOUNT);
+        List<Post> discountPosts = postRepository.findAllByRegionAndPostTypeWithLocation(region, MarkerType.DISCOUNT);
 
         List<MapResponseDTO.MarkerSummary> summaries = discountPosts.stream().map(
                 discountPost -> MapConverter.toMarkerSummary(discountPost, MarkerType.DISCOUNT)
