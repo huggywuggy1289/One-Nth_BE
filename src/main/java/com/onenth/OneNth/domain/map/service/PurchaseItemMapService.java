@@ -8,6 +8,7 @@ import com.onenth.OneNth.domain.member.entity.MemberRegion;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
+import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -37,7 +38,7 @@ public class PurchaseItemMapService implements MapService {
 
         Region region = mainMemberRegion.getRegion();
 
-        List<PurchaseItem> purchaseItems = purchaseItemRepository.findAllByRegion(region);
+        List<PurchaseItem> purchaseItems = purchaseItemRepository.findAllByRegionAndPurchaseMethod(region, PurchaseMethod.OFFLINE);
 
         List<MapResponseDTO.MarkerSummary> summaries = purchaseItems.stream().map(
                 purchaseItem -> MapConverter.toMarkerSummary(purchaseItem)

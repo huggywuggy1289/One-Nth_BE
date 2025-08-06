@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.product.repository.itemRepository.purchase;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
+import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.region.entity.Region;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,5 +24,5 @@ public interface PurchaseItemRepository  extends JpaRepository<PurchaseItem, Lon
     """)
     Optional<PurchaseItem> findWithRegionById(@Param("id") Long id);
 
-    List<PurchaseItem> findAllByRegion(Region region);
+    List<PurchaseItem> findAllByRegionAndPurchaseMethod(Region region, PurchaseMethod method);
 }

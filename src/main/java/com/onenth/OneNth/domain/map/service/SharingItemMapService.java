@@ -7,6 +7,7 @@ import com.onenth.OneNth.domain.member.entity.MemberRegion;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
+import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -36,7 +37,7 @@ public class SharingItemMapService implements MapService {
 
         Region region = mainMemberRegion.getRegion();
 
-        List<SharingItem> sharingItems = sharingItemRepository.findAllByRegion(region);
+        List<SharingItem> sharingItems = sharingItemRepository.findAllByRegionAndPurchaseMethod(region, PurchaseMethod.OFFLINE);
 
         List<MapResponseDTO.MarkerSummary> summaries = sharingItems.stream().map(
                 sharingItem -> MapConverter.toMarkerSummary(sharingItem)
