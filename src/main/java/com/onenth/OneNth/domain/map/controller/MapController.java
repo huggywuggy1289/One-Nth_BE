@@ -44,6 +44,7 @@ public class MapController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER_REGION005", description = "사용자의 메인 지역 설정이 필요합니다. 우리동네 설정 화면에서 메인 지역을 선택해주세요.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MAP001", description = "지원하지 않는 MarkerType입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
@@ -51,13 +52,14 @@ public class MapController {
     @GetMapping("/markers")
     public ApiResponse<MapResponseDTO.GetMarkersResponseDTO> getMarkers(
             @Parameter(hidden=true) @AuthUser Long userId,
-            @RequestParam String markerType
+            @RequestParam String markerType,
+            @RequestParam(required = false) Long regionId
     ) {
         MapResponseDTO.GetMarkersResponseDTO response = switch (markerType) {
-            case "purchase-item" -> purchaseItemMapService.getMarkers(userId);
-            case "sharing-item" -> sharingItemMapService.getMarkers(userId);
-            case "discount" -> discountMapService.getMarkers(userId);
-            case "restaurant" -> restaurantMapService.getMarkers(userId);
+            case "purchase-item" -> purchaseItemMapService.getMarkers(userId, regionId);
+            case "sharing-item" -> sharingItemMapService.getMarkers(userId, regionId);
+            case "discount" -> discountMapService.getMarkers(userId, regionId);
+            case "restaurant" -> restaurantMapService.getMarkers(userId, regionId);
             default -> throw new GeneralException(ErrorStatus.INVALID_MARKER_TYPE);
         };
         return ApiResponse.onSuccess(response);
