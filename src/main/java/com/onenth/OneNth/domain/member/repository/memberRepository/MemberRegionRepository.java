@@ -18,4 +18,6 @@ public interface MemberRegionRepository extends JpaRepository<MemberRegion, Long
     Optional<MemberRegion> findByMemberAndRegion(Member member, Region region);
 
     List<MemberRegion> findAllByMember(Member member);
+
+    Optional<MemberRegion> findByMemberAndIsMain(Member member, boolean isMain);
 }

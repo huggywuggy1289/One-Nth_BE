@@ -34,6 +34,7 @@ public enum ErrorStatus implements BaseErrorCode {
     REGION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "MEMBER_REGION001", "등록 가능한 지역은 최대 3개입니다."),
     REGION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER_REGION002", "이미 등록한 지역입니다."),
     MEMBER_REGION_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER_REGION003", "해당 사용자가 등록하지 않은 지역입니다."),
+    CANNOT_DELETE_MAIN_REGION(HttpStatus.BAD_REQUEST, "MEMBER_REGION004", "메인으로 등록된 지역은 삭제할 수 없습니다."),
 
     // 지역 키워드 알림 관련
     REGION_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT001", "등록 가능한 지역 알림은 최대 3개입니다."),
@@ -62,6 +63,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 사용자 차단 관련
     BLOCK_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK001", "차단 대상 사용자가 존재하지 않습니다."),
     BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK002", "차단한 사용자 목록에 존재하지 않습니다."),
+
+    // 외부 API 관련
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "EXTERNAL_API_001", "외부 API 통신 중 문제가 발생했습니다."),
     ;
 
     private final HttpStatus httpStatus;

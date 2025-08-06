@@ -39,6 +39,7 @@ public class MemberConverter {
         MemberRegion memberRegion = MemberRegion.builder()
                 .member(member)
                 .region(region)
+                .isMain(true)
                 .build();
 
         member.getMemberRegions().add(memberRegion);
