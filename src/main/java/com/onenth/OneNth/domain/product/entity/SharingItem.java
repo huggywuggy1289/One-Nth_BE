@@ -10,6 +10,7 @@ import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public class SharingItem extends BaseEntity {
             joinColumns = @JoinColumn(name = "sharing_item_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
+    @BatchSize(size=100)
     private List<Tag> tags = new ArrayList<>();
 
     // +

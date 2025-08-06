@@ -79,6 +79,29 @@ public class MemberResponseDTO {
         Boolean isSuccess;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AddScrapOrLikeResponseDTO {
+        Boolean isSuccess;
+    }
+
+//    @Builder
+//    @Getter
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class likedPostListDTO {
+//
+//    }
+//
+//    @Builder
+//    @Getter
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class likedPostPreviewDTO {
+//
+//    }
     @Getter
     @Builder
     @AllArgsConstructor
