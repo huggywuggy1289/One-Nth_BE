@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface PurchaseItemRepository  extends JpaRepository<PurchaseItem, Long>, PurchaseItemRepositoryCustom {
     List<PurchaseItem> findByMember(Member member);
 
-    // 상품명(지역 필터링)
+    // 상품단건조회
     @Query("""
     SELECT p
     FROM PurchaseItem p
