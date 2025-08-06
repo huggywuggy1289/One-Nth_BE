@@ -66,7 +66,7 @@ public enum ErrorStatus implements BaseErrorCode {
     BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK002", "차단한 사용자 목록에 존재하지 않습니다."),
 
     // 외부 API 관련
-    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "EXTERNAL_API_001", "외부 API 통신 중 문제가 발생했습니다."),
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "EXTERNAL_API001", "외부 API 통신 중 문제가 발생했습니다."),
 
     // 지도 관련
     INVALID_MARKER_TYPE(HttpStatus.BAD_REQUEST, "MAP001", "지원하지 않는 MarkerType입니다.")
