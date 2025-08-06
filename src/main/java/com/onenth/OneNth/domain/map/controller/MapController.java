@@ -38,8 +38,8 @@ public class MapController {
             summary = "지도에 마커 표시 API",
             description = "지도에 해당 지역에 해당하는 글 마커를 띄워주는 API입니다. " +
                     "같이사요/함께나눠요/할인정보게시판/맛집게시판에 따라 MarkerType(purchase-item, sharing-item, discount, restaurant)를 받으며, 각 값에 따라 해당하는 거래 글 / 게시글의 마커를 띄워줍니다." +
-                    "항상 사용자가 메인으로 설정한 지역의 글을 띄워줍니다." +
-                    "응답으로 글의 거래장소 혹은 정보의 주소(위도, 경도, 주소)와 글 제목, 글 id, markerType을 반환합니다."
+                    "regionId 파라미터를 선택적으로 받으며, regionId가 없는 경우엔 사용자가 메인으로 설정한 지역의 글을 띄워줍니다." +
+                    "응답으로 markerType(purchase-item, sharing-item, discount, restaurant), 글 id, 글 제목, 거래장소 혹은 정보의 주소(위도, 경도)를 반환합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
