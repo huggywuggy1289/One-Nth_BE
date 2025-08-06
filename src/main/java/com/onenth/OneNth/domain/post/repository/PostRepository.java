@@ -1,6 +1,9 @@
 package com.onenth.OneNth.domain.post.repository;
 
+import com.onenth.OneNth.domain.map.enums.MarkerType;
 import com.onenth.OneNth.domain.post.entity.Post;
+import com.onenth.OneNth.domain.region.entity.Region;
+import org.slf4j.Marker;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
@@ -8,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -40,4 +44,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //마이페이지 - 내가 쓴 글 조회
     Page<Post> findByMemberId(Long memberId, Pageable pageable);
+
+    List<Post> findAllByRegionAndPostType(Region region, MarkerType markerType);
 }

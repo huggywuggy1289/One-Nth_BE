@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.product.repository.itemRepository.sharing;
 
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
+import com.onenth.OneNth.domain.region.entity.Region;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,4 +35,5 @@ public interface SharingItemRepository extends JpaRepository<SharingItem, Long>,
     """)
     Optional<SharingItem> findWithRegionById(@Param("id") Long id);
 
+    List<SharingItem> findAllByRegion(Region region);
 }
