@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.product.dto;
 
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
+import com.onenth.OneNth.domain.product.entity.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,6 +34,7 @@ public class SellerProfileResponseDTO {
     public static class PurchaseItemSummaryDTO {
         private Long id;
         private String name;
+        private Status status;
         private int price;
         private ItemCategory itemCategory;
         private PurchaseMethod purchaseMethod;

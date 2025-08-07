@@ -60,7 +60,7 @@ public class PurchaseItemController {
     )
     @GetMapping
     public ResponseEntity<ApiResponse<List<PurchaseItemListDTO>>> searchItems(
-            @RequestParam String keyword,
+            @RequestParam(name = "keyword") String keyword,
             @AuthUser Long userId
     ) {
         List<PurchaseItemListDTO> result = purchaseItemService.searchItems(keyword, userId);
@@ -75,7 +75,7 @@ public class PurchaseItemController {
             description = "- 사용자가 설정한 3개 지역 내에서만 상품명을 기준으로 검색"
     )
     public ApiResponse<List<PurchaseItemListDTO>> searchByTitleWithUserRegion(
-            @RequestParam String keyword,
+            @RequestParam(name = "keyword") String keyword,
             @AuthUser Long userId
     ) {
         List<PurchaseItemListDTO> results = purchaseItemService.searchByTitleInUserRegions(keyword, userId);
