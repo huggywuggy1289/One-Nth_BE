@@ -13,6 +13,8 @@ public enum ErrorStatus implements BaseErrorCode {
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "USER_4002", "금지된 요청입니다."),
     _BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON403", "입력값이 유효하지 않습니다."),
+    //토큰 관련
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4003", "잘몬된 토큰입니다."),
 
     // 회원 관련
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER001", "존재하지 않는 사용자입니다."),

@@ -97,10 +97,12 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         );
 
         String accessToken = jwtTokenProvider.generateToken(authentication);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
         return MemberConverter.toLoginResultDTO(
                 member.getId(),
-                accessToken
+                accessToken,
+                refreshToken
         );
     }
 

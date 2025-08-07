@@ -14,7 +14,6 @@ import com.onenth.OneNth.domain.region.entity.Region;
 import org.springframework.data.domain.Page;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -76,10 +75,11 @@ public class MemberConverter {
     }
 
     //로그인 결과 dto로 변환
-    public static MemberResponseDTO.LoginResultDTO toLoginResultDTO(Long memberId, String accessToken) {
+    public static MemberResponseDTO.LoginResultDTO toLoginResultDTO(Long memberId, String accessToken, String refreshToken) {
        return MemberResponseDTO.LoginResultDTO.builder()
                .memberId(memberId)
                .accessToken(accessToken)
+               .refreshToken(refreshToken)
                .build();
     }
 

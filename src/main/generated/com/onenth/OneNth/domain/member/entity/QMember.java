@@ -65,6 +65,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final EnumPath<com.onenth.OneNth.domain.member.entity.enums.MemberStatus> status = createEnum("status", com.onenth.OneNth.domain.member.entity.enums.MemberStatus.class);
 
+    public final NumberPath<Long> totalSavedAmount = createNumber("totalSavedAmount", Long.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
