@@ -25,7 +25,8 @@ public class Deal extends BaseEntity {
     @JoinColumn(name = "sharing_item_id")
     private SharingItem sharingItem;
 
-    @OneToOne(mappedBy = "deal", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "deal_confirmation_id", nullable = false)
     private DealConfirmation dealConfirmation;
 
     @PrePersist

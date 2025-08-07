@@ -2,10 +2,12 @@ package com.onenth.OneNth.domain.deal.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.deal.entity.enums.TradeType;
+import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -18,24 +20,25 @@ public class DealConfirmation extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "deal_id", nullable = false)
-    private Deal deal;
-
     @Column(nullable = false)
-    private LocalDateTime tradeDate;
+    private LocalDate tradeDate;
 
     private Integer tradePrice;
+
+    private Integer originalPrice;
+
+    @Enumerated(EnumType.STRING)
+    private ItemType itemType;
+
+    private Long productId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TradeType tradeType;
 
-    @Column(length = 50)
-    private String trackingNumber;
-
-    @Column(nullable = false)
-    private boolean isAccepted;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private Member member;
 
     @OneToOne(mappedBy = "dealConfirmation", cascade = CascadeType.ALL, orphanRemoval = true)
     private DealCompletion dealCompletion;

@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SharingItem extends BaseEntity {
+public class SharingItem extends BaseEntity implements Item{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
