@@ -1,11 +1,13 @@
 package com.onenth.OneNth.domain.deal.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
+import com.onenth.OneNth.domain.deal.entity.enums.CancelReason;
+import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -18,9 +20,12 @@ public class CancelledDeal extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long dealId;
+    @Enumerated(EnumType.STRING)
+    private ItemType itemType;
 
-    @OneToMany(mappedBy = "cancelledDeal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DealCancellationReason> dealCancellationReasonList = new ArrayList<>();
+    private Long productId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CancelReason cancelReason;
 }

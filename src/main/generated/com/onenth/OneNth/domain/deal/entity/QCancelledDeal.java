@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -22,14 +21,16 @@ public class QCancelledDeal extends EntityPathBase<CancelledDeal> {
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
+    public final EnumPath<com.onenth.OneNth.domain.deal.entity.enums.CancelReason> cancelReason = createEnum("cancelReason", com.onenth.OneNth.domain.deal.entity.enums.CancelReason.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final ListPath<DealCancellationReason, QDealCancellationReason> dealCancellationReasonList = this.<DealCancellationReason, QDealCancellationReason>createList("dealCancellationReasonList", DealCancellationReason.class, QDealCancellationReason.class, PathInits.DIRECT2);
-
-    public final NumberPath<Long> dealId = createNumber("dealId", Long.class);
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.ItemType> itemType = createEnum("itemType", com.onenth.OneNth.domain.product.entity.enums.ItemType.class);
+
+    public final NumberPath<Long> productId = createNumber("productId", Long.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;

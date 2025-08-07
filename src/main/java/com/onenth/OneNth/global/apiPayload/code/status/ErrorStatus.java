@@ -68,6 +68,7 @@ public enum ErrorStatus implements BaseErrorCode {
     DEAL_CONFIRMATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION002", "id에 해당하는 거래확정 폼이 존재하지 않습니다"),
     DEAL_COMPLETION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION003", "해당 상품은 이미 거래완료 폼이 발행된 상태입니다."),
     DEAL_COMPLETION_ALREADY(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION004", "해당 상품은 이미 거래완료된 상태입니다."),
+    NOT_DEAL_COMPLETION(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION005", "거래 확정 상태인 상품이 아닙니다."),
     ;
 
     private final HttpStatus httpStatus;

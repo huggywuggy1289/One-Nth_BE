@@ -2,9 +2,11 @@ package com.onenth.OneNth.domain.deal.service;
 
 import com.onenth.OneNth.domain.deal.converter.DealConverter;
 import com.onenth.OneNth.domain.deal.dto.DealRequestDTO;
-import com.onenth.OneNth.domain.deal.entity.Deal;
+import com.onenth.OneNth.domain.deal.entity.CancelledDeal;
 import com.onenth.OneNth.domain.deal.entity.DealCompletion;
 import com.onenth.OneNth.domain.deal.entity.DealConfirmation;
+import com.onenth.OneNth.domain.deal.entity.enums.CancelReason;
+import com.onenth.OneNth.domain.deal.repository.CancelledDealRepository;
 import com.onenth.OneNth.domain.deal.repository.DealCompletionRepository;
 import com.onenth.OneNth.domain.deal.repository.DealConfirmationRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
@@ -33,6 +35,7 @@ public class DealCommandService {
     private final PurchaseItemRepository purchaseItemRepository;
     private final DealConfirmationRepository dealConfirmationRepository;
     private final DealCompletionRepository dealCompletionRepository;
+    private final CancelledDealRepository cancelledDealRepository;
 
     @Transactional
     public void createDealConfirmation(Long memberId, DealRequestDTO.DealConfirmationRequestDTO request) {
@@ -70,6 +73,26 @@ public class DealCommandService {
         dealCompletionRepository.save(result);
 
         item.setStatus(Status.COMPLETED);
+    }
+
+    @Transactional
+    public void cancelDeal(DealRequestDTO.DealCancelRequestDTO request) {
+
+        DealConfirmation dealConfirmation = dealConfirmationRepository.findById(request.getDealConfirmationId())
+                .orElseThrow(() -> new DealHandler(ErrorStatus.DEAL_CONFIRMATION_NOT_FOUND));
+
+        Item item = getProduct(dealConfirmation.getItemType(), dealConfirmation.getProductId());
+
+        if(item.getStatus()!=Status.IN_PROGRESS){
+            throw new DealHandler(ErrorStatus.NOT_DEAL_COMPLETION);
+        }
+
+        CancelReason cancelReason = request.getCancelReason();
+        CancelledDeal cancelledDeal = DealConverter.toCancelledDeal(cancelReason, dealConfirmation);
+        cancelledDealRepository.save(cancelledDeal);
+
+        dealConfirmationRepository.delete(dealConfirmation);
+        item.setStatus(Status.DEFAULT);
     }
 
     private Item getProduct(ItemType itemType, Long productId) {

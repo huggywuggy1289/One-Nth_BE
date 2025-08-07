@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.deal.dto;
 
+import com.onenth.OneNth.domain.deal.entity.enums.CancelReason;
 import com.onenth.OneNth.domain.deal.entity.enums.TradeType;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import lombok.AllArgsConstructor;
@@ -34,5 +35,14 @@ public class DealRequestDTO {
         private Integer tradePrice;
         private Integer tradeCount;
         private TradeType tradeType;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DealCancelRequestDTO {
+        private Long dealConfirmationId;
+        private CancelReason cancelReason;
     }
 }
