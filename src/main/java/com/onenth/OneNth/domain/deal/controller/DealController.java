@@ -28,9 +28,10 @@ public class DealController {
     @PostMapping("/confirmation")
     public ApiResponse<String> createDealConfirmationForm(
             @AuthUser Long memberId,
+            @RequestParam("roomName") String roomName,
             @RequestBody DealRequestDTO.DealConfirmationRequestDTO request
             ) {
-        dealCommandService.createDealConfirmation(memberId, request);
+        dealCommandService.createDealConfirmation(memberId, request, roomName);
         return ApiResponse.onSuccess("거래확정폼 발행이 완료되었습니다.");
     }
 
@@ -45,9 +46,10 @@ public class DealController {
     @PostMapping("/completion")
     public ApiResponse<String> createDealCompletionForm(
             @AuthUser Long memberId,
+            @RequestParam("roomName") String roomName,
             @RequestBody DealRequestDTO.DealCompletionRequestDTO request
     ) {
-        dealCommandService.createDealCompletion(memberId, request);
+        dealCommandService.createDealCompletion(memberId, request, roomName);
         return ApiResponse.onSuccess("거래완료폼 발행이 완료되었습니다.");
     }
 
@@ -62,6 +64,7 @@ public class DealController {
     )
     @DeleteMapping("/cancellation")
     public ApiResponse<String> cancelDeal(
+            @RequestParam String roomName,
             @RequestBody DealRequestDTO.DealCancelRequestDTO request
             ) {
         dealCommandService.cancelDeal(request);

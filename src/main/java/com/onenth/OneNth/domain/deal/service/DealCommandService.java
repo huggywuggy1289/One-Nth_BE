@@ -1,5 +1,8 @@
 package com.onenth.OneNth.domain.deal.service;
 
+import com.onenth.OneNth.domain.chat.dto.ChatMessageDTO;
+import com.onenth.OneNth.domain.chat.entity.ChatRoom;
+import com.onenth.OneNth.domain.chat.repository.ChatRoomRepository;
 import com.onenth.OneNth.domain.deal.converter.DealConverter;
 import com.onenth.OneNth.domain.deal.dto.DealRequestDTO;
 import com.onenth.OneNth.domain.deal.entity.CancelledDeal;
@@ -17,10 +20,12 @@ import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.ChatHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.DealHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.SharingItemHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DealCommandService {
 
     private final MemberRepository memberRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     private final SharingItemRepository sharingItemRepository;
 
@@ -37,8 +43,11 @@ public class DealCommandService {
     private final DealCompletionRepository dealCompletionRepository;
     private final CancelledDealRepository cancelledDealRepository;
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     @Transactional
-    public void createDealConfirmation(Long memberId, DealRequestDTO.DealConfirmationRequestDTO request) {
+    public void createDealConfirmation(
+            Long memberId, DealRequestDTO.DealConfirmationRequestDTO request, String roomName) {
         Member member = findMemberById(memberId);
         Item item = getProduct(request.getItemType(), request.getItemId());
 
@@ -51,10 +60,20 @@ public class DealCommandService {
         dealConfirmationRepository.save(result);
 
         item.setStatus(Status.IN_PROGRESS);
+
+        ChatMessageDTO.DealConfirmationResponseDTO messageDTO =
+                ChatMessageDTO.DealConfirmationResponseDTO.builder()
+                        .dealConfirmationFormId(result.getId())
+                        .sendMemberId(member.getId())
+                        .itemName(item.getProductName())
+                        .build();
+
+        messagingTemplate.convertAndSend(
+                "/sub/chat-rooms/" + roomName,messageDTO);
     }
 
     @Transactional
-    public void createDealCompletion(Long memberId, DealRequestDTO.DealCompletionRequestDTO request) {
+    public void createDealCompletion(Long memberId, DealRequestDTO.DealCompletionRequestDTO request, String roomName) {
         Member member = findMemberById(memberId);
 
         DealConfirmation dealConfirmation = dealConfirmationRepository.findById(request.getDealConfirmationId())
@@ -73,6 +92,19 @@ public class DealCommandService {
         dealCompletionRepository.save(result);
 
         item.setStatus(Status.COMPLETED);
+
+        ChatRoom chatRoom = chatRoomRepository.findByName(roomName)
+                .orElseThrow(() -> new ChatHandler(ErrorStatus.CHAT_ROOM_NOT_FOUND));
+
+        ChatMessageDTO.DealCompletionResponseDTO messageDTO =
+                ChatMessageDTO.DealCompletionResponseDTO.builder()
+                        .dealCompletionFormId(result.getId())
+                        .sendMemberId(member.getId())
+                        .itemName(item.getProductName())
+                        .build();
+
+        messagingTemplate.convertAndSend(
+                "/sub/chat-rooms/" + roomName,messageDTO);
     }
 
     @Transactional

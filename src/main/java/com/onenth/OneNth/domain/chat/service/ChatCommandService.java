@@ -8,5 +8,5 @@ public interface ChatCommandService {
 
     ChatResponseDTO.ChatRoomResponseDTO getChatRoomName(Long userId, Long targetUserId, ChatRoomType chatRoomType);
     void leaveChatRoom(Long memberId, Long chatRoomId);
-    void createMessage(String roomName, ChatMessageDTO chatMessageDTO);
+    void createMessage(String roomName, ChatMessageDTO.MessageDTO chatMessageDTO);
 }

@@ -80,7 +80,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
 
     @Override
     @Transactional
-    public void createMessage(String roomName, ChatMessageDTO chatMessageDTO) {
+    public void createMessage(String roomName, ChatMessageDTO.MessageDTO chatMessageDTO) {
         Member member = memberRepository.findById(chatMessageDTO.getSendMemberId())
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 

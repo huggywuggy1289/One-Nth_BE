@@ -90,4 +90,8 @@ public class PurchaseItem extends BaseEntity implements Item {
     public void setLongitude(Double longitude){
         this.longitude = longitude;
     }
+
+    public String getProductName(){
+        return this.name;
+    }
 }

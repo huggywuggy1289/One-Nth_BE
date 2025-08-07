@@ -14,7 +14,9 @@ public class ChatWebSocketController {
     private final ChatCommandService chatCommandService;
 
     @MessageMapping("/chat-rooms/{roomName}")
-    public ChatMessageDTO chat(@DestinationVariable("roomName") String roomName, ChatMessageDTO chatMessageDTO) {
+    public ChatMessageDTO.MessageDTO chat(
+            @DestinationVariable("roomName") String roomName,
+            ChatMessageDTO.MessageDTO chatMessageDTO) {
         chatCommandService.createMessage(roomName, chatMessageDTO);
         return(chatMessageDTO);
     }
