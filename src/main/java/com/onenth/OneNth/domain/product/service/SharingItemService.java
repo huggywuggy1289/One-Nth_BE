@@ -40,6 +40,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO.toStatusLabel;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -333,6 +335,8 @@ public class SharingItemService {
                 .writerNickname(member.getNickname())
                 .latitude(item.getLatitude())
                 .longitude(item.getLongitude())
+                .status(item.getStatus().name())
+                .statusLabel(toStatusLabel(item.getStatus()))
                 .build();
     }
     // 스크랩 설정
