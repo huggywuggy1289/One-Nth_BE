@@ -1,7 +1,11 @@
 package com.onenth.OneNth.domain.product.dto;
 
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
+import com.onenth.OneNth.domain.product.entity.enums.Status;
+import com.onenth.OneNth.domain.product.entity.ItemImage;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,5 +43,8 @@ public class PurchaseItemResponseDTO {
 
         private Double latitude;
         private Double longitude;
+
+        private String status;
+        private String statusLabel;
     }
 }
