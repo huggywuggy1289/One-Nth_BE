@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -21,11 +20,11 @@ public class DealCompletion extends BaseEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction_confirmation_id", nullable = false)
+    @JoinColumn(name = "deal_confirmation_id", nullable = false)
     private DealConfirmation dealConfirmation;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memebr_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Column(nullable = false)
