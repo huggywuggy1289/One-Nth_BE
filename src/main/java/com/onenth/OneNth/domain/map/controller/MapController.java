@@ -31,10 +31,12 @@ public class MapController {
 
     @Operation(
             summary = "같이사요/함께나눠요 지도에 마커 표시 API",
-            description = "지도에 해당 지역에 해당하는 글 마커를 띄워주는 API입니다. " +
-                    "같이사요/함께나눠요에 따라 MarkerType(purchase-item, sharing-item)를 받으며, 각 값에 따라 해당하는 거래 글의 마커를 띄워줍니다." +
-                    "regionId 파라미터를 선택적으로 받으며, regionId가 없는 경우엔 사용자가 메인으로 설정한 지역의 글을 띄워줍니다." +
-                    "응답으로 markerType, 글 id, 상품 이름, 거래장소를 반환합니다." +
+            description = "지도에 해당 지역에 거래 글 마커를 띄워주는 API입니다. \n" +
+                    "거래글의 위도/경도를 기준으로 소수점 4자리까지 반올림하여, 같은 위치에 등록된 글들을 하나의 마커로 그룹핑하여 응답합니다.\n" +
+                    "마커 클릭 시 표시할 수 있도록, 해당 마커 위치에 포함된 글들의 요약 정보 목록을 함께 반환합니다.\n" +
+                    "같이사요/함께나눠요에 따라 MarkerType(purchase-item, sharing-item)를 받으며, 각 값에 따라 해당하는 거래 글의 마커를 띄워줍니다.\n" +
+                    "regionId 파라미터를 선택적으로 받으며, regionId가 없는 경우엔 사용자가 메인으로 설정한 지역의 글을 띄워줍니다.\n" +
+                    "응답으로 마커의 위도/경도, 포함된 거래글들의 markerType, 글 id, 상품 이름, 거래장소를 반환합니다.\n" +
                     "*MarkerType: 같이사요(purchase-item), 함께나눠요(sharing-item), 할인게시판(discount), 맛집게시판(restaurant)"
     )
     @ApiResponses({
@@ -61,10 +63,12 @@ public class MapController {
 
     @Operation(
             summary = "할인정보게시판/맛집게시판의 지도에 마커 표시 API",
-            description = "지도에 해당 지역에 해당하는 글 마커를 띄워주는 API입니다. " +
-                    "할인정보/맛집에 따라 MarkerType(discount, restaurant)를 받으며, 각 값에 따라 해당하는 게시글의 마커를 띄워줍니다." +
-                    "regionId 파라미터를 선택적으로 받으며, regionId가 없는 경우엔 사용자가 메인으로 설정한 지역의 글을 띄워줍니다." +
-                    "응답으로 markerType, 글 id, 글 제목, 게시글에 등록된 장소의 주소(위도, 경도)를 반환합니다." +
+            description = "지도에 해당 지역에 게시글 마커를 띄워주는 API입니다. \n" +
+                    "게시글의 위도/경도를 기준으로 소수점 4자리까지 반올림하여, 같은 위치에 등록된 글들을 하나의 마커로 그룹핑하여 응답합니다.\n" +
+                    "마커 클릭 시 표시할 수 있도록, 해당 마커 위치에 포함된 글들의 요약 정보 목록을 함께 반환합니다.\n" +
+                    "할인정보/맛집게시판에 따라 MarkerType(discount, restaurant)를 받으며, 각 값에 따라 해당하는 게시글의 마커를 띄워줍니다.\n" +
+                    "regionId 파라미터를 선택적으로 받으며, regionId가 없는 경우엔 사용자가 메인으로 설정한 지역의 글을 띄워줍니다.\n" +
+                    "응답으로 마커의 위도/경도, 포함된 게시글들의 markerType, 글 id, 제목, 등록한 장소 정보를 반환합니다.\n" +
                     "*MarkerType: 같이사요(purchase-item), 함께나눠요(sharing-item), 할인게시판(discount), 맛집게시판(restaurant)"
     )
     @ApiResponses({

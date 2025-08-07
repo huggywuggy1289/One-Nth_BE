@@ -12,9 +12,17 @@ import java.util.stream.Collectors;
 
 public class MapConverter {
 
-    public static MapResponseDTO.GetMarkersResponseDTO toGetMarkersResponseDTO(List<MapResponseDTO.MarkerSummary> summaries) {
+    public static MapResponseDTO.GetMarkersResponseDTO toGetMarkersResponseDTO(List<MapResponseDTO.GroupedMarkerSummary> summaries) {
         return MapResponseDTO.GetMarkersResponseDTO.builder()
-                .markers(summaries)
+                .groupedMarkers(summaries)
+                .build();
+    }
+
+    public static MapResponseDTO.GroupedMarkerSummary toGroupedMarkerSummary(String[] latLng, List<MapResponseDTO.MarkerSummary> markers) {
+        return MapResponseDTO.GroupedMarkerSummary.builder()
+                .latitude(Double.parseDouble(latLng[0]))
+                .longitude(Double.parseDouble(latLng[1]))
+                .markers(markers)
                 .build();
     }
 

@@ -15,7 +15,15 @@ public class MapResponseDTO {
     @Getter
     @Builder
     public static class GetMarkersResponseDTO {
-        private List<MarkerSummary> markers;
+        private List<GroupedMarkerSummary> groupedMarkers;
+    }
+
+    @Getter
+    @Builder
+    public static class GroupedMarkerSummary {
+        private Double latitude;
+        private Double longitude;
+        private List<MapResponseDTO.MarkerSummary> markers;
     }
 
     @Getter

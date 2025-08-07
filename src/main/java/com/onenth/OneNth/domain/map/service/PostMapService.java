@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,11 +33,26 @@ public class PostMapService {
 
         List<Post> posts = postRepository.findAllByRegionAndMarkerTypeWithLocation(region, markerType.getPostType());
 
-        List<MapResponseDTO.MarkerSummary> summaries = posts.stream().map(
-                post -> MapConverter.toMarkerSummary(post, markerType)
-        ).collect(Collectors.toList());
+        Map<String, List<Post>> grouped = posts.stream()
+                .collect(Collectors.groupingBy(post -> getLocationKey(post.getLatitude(), post.getLongitude())));
 
-        return MapConverter.toGetMarkersResponseDTO(summaries);
+        List<MapResponseDTO.GroupedMarkerSummary> groupedMarkerSummaries = grouped.entrySet().stream()
+                .map(entry -> {
+                    List<Post> groupedPosts = entry.getValue();
+
+                    String[] latLng = entry.getKey().split("-");
+
+                    List<MapResponseDTO.MarkerSummary> markers = groupedPosts.stream().map(post ->
+                            MapConverter.toMarkerSummary(post, markerType)).toList();
+
+                    return MapResponseDTO.GroupedMarkerSummary.builder()
+                            .latitude(Double.parseDouble(latLng[0]))
+                            .longitude(Double.parseDouble(latLng[1]))
+                            .markers(markers)
+                            .build();
+                }).toList();
+
+        return MapConverter.toGetMarkersResponseDTO(groupedMarkerSummaries);
     }
 
     public MapResponseDTO.GetPostMarkerDetailsResponseDTO getMarkerDetails(Long userId, List<Long> postIds) {
@@ -58,5 +74,9 @@ public class PostMapService {
 
         return MapConverter.toGetPostMarkerDetailsResponseDTO(postMarkerDetails);
 
+    }
+
+    private String getLocationKey(Double latitude, Double longitude) {
+        return String.format("%.4f-%.4f", latitude, longitude);
     }
 }

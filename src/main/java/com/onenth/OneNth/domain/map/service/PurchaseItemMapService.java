@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,11 +33,24 @@ public class PurchaseItemMapService {
 
         List<PurchaseItem> purchaseItems = purchaseItemRepository.findAllByRegionAndPurchaseMethod(region, PurchaseMethod.OFFLINE);
 
-        List<MapResponseDTO.MarkerSummary> summaries = purchaseItems.stream().map(
-                purchaseItem -> MapConverter.toMarkerSummary(purchaseItem)
-        ).collect(Collectors.toList());
+        Map<String, List<PurchaseItem>> grouped = purchaseItems.stream()
+                .collect(Collectors.groupingBy(item -> getLocationKey(item.getLatitude(), item.getLongitude())));
 
-        return MapConverter.toGetMarkersResponseDTO(summaries);
+        List<MapResponseDTO.GroupedMarkerSummary> groupedMarkerSummaries = grouped.entrySet().stream()
+                .map(entry -> {
+                    List<PurchaseItem> groupedPurchaseItems = entry.getValue();
+
+                    String[] latLng = entry.getKey().split("-");
+
+                    List<MapResponseDTO.MarkerSummary> markers = groupedPurchaseItems.stream().map(purchaseItem ->
+                            MapConverter.toMarkerSummary(purchaseItem)).toList();
+
+                    return MapConverter.toGroupedMarkerSummary(latLng, markers);
+                }).toList();
+
+
+        return MapConverter.toGetMarkersResponseDTO(groupedMarkerSummaries);
+
     }
 
     public MapResponseDTO.GetItemMarkerDetailsResponseDTO getMarkerDetails(Long userId, List<Long> itemIds) {
@@ -58,5 +72,9 @@ public class PurchaseItemMapService {
 
         return MapConverter.toGetItemMarkerDetailsResponseDTO(itemMarkerDetails);
 
+    }
+
+    private String getLocationKey(Double latitude, Double longitude) {
+        return String.format("%.4f-%.4f", latitude, longitude);
     }
 }
