@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.region.entity.Region;
+import com.onenth.OneNth.domain.product.entity.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,13 +21,16 @@ public interface SharingItemRepository extends JpaRepository<SharingItem, Long>,
     @Query("""
     SELECT s
     FROM SharingItem s
+    JOIN FETCH s.region
     WHERE LOWER(s.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
       AND s.region.id IN :regionIds
+      AND s.status IN :statuses
     """)
-    List<SharingItem> searchByTitleAndRegion(@Param("keyword") String keyword, @Param("regionIds") List<Integer> regionIds);
-
-    // 상품명(전체 조회)
-    List<SharingItem> findByTitleContainingIgnoreCase(String keyword);
+    List<SharingItem> searchByTitleAndRegion(
+            @Param("keyword") String keyword,
+            @Param("regionIds") List<Integer> regionIds,
+            @Param("statuses") List<Status> statuses
+    );
 
     @Query("""
     SELECT s

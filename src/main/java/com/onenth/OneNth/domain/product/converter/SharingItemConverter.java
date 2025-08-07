@@ -33,7 +33,6 @@ public class SharingItemConverter {
                 .expirationDate(expirationDate)
                 .isAvailable(isAvailable)
                 .purchaseMethod(purchaseMethod)
-                .regionId(regionId)
                 .tags(tags)
                 .build();
     }

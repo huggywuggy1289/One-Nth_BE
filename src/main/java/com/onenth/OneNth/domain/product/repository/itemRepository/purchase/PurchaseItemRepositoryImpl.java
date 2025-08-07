@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.product.repository.itemRepository.purchase;
 
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
+import com.onenth.OneNth.domain.product.entity.QItemImage;
 import com.onenth.OneNth.domain.product.entity.QPurchaseItem;
 import com.onenth.OneNth.domain.product.entity.QTag;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
@@ -28,14 +29,19 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
     public List<PurchaseItem> findByRegionsAndTag(List<Integer> regionIds, String tag) {
         QPurchaseItem item = QPurchaseItem.purchaseItem;
         QTag qTag = QTag.tag;
+        QItemImage image = QItemImage.itemImage;
+        QRegion region = QRegion.region;
 
         return queryFactory
                 .selectFrom(item)
+                .distinct()
+                .join(item.region, region).fetchJoin()
+                .leftJoin(item.itemImages, image).fetchJoin()
                 .join(item.tags, qTag)
                 .where(
-                        item.region.id.in(regionIds)
-                                .and(qTag.name.eq(tag))
-                                .and(item.status.in(Status.DEFAULT, Status.IN_PROGRESS))
+                        item.region.id.in(regionIds),
+                        qTag.name.eq(tag),
+                        item.status.in(Status.DEFAULT, Status.IN_PROGRESS)
                 )
                 .fetch();
     }
@@ -43,12 +49,18 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
     @Override
     public List<PurchaseItem> findByRegionsAndCategory(List<Integer> regionIds, String category) {
         QPurchaseItem item = QPurchaseItem.purchaseItem;
-        return queryFactory.selectFrom(item)
-                .where(
-                        item.region.id.in(regionIds)
-                                .and(item.itemCategory.eq(ItemCategory.valueOf(category.toUpperCase())))
-                                .and(item.status.in(Status.DEFAULT, Status.IN_PROGRESS))
+        QItemImage image = QItemImage.itemImage;
+        QRegion region = QRegion.region;
 
+        return queryFactory
+                .selectFrom(item)
+                .distinct()
+                .join(item.region, region).fetchJoin()
+                .leftJoin(item.itemImages, image).fetchJoin()
+                .where(
+                        item.region.id.in(regionIds),
+                        item.itemCategory.eq(ItemCategory.valueOf(category.toUpperCase())),
+                        item.status.in(Status.DEFAULT, Status.IN_PROGRESS)
                 )
                 .fetch();
     }
@@ -57,15 +69,20 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
     public List<PurchaseItem> findByRegionsName(String regionName) {
         QPurchaseItem item = QPurchaseItem.purchaseItem;
         QRegion region = QRegion.region;
+        QItemImage image = QItemImage.itemImage;
+        QTag tag = QTag.tag;
 
         String cleanKeyword = regionName.trim();
 
         return queryFactory
                 .selectFrom(item)
-                .join(item.region, region)
+                .distinct()
+                .join(item.region, region).fetchJoin()
+                .leftJoin(item.itemImages, image).fetchJoin()
+                .join(item.tags, tag)
                 .where(
-                        region.regionName.like("%" + cleanKeyword + "%")
-                                .and(item.status.in(Status.DEFAULT, Status.IN_PROGRESS))
+                        region.regionName.like("%" + cleanKeyword + "%"),
+                        item.status.in(Status.DEFAULT, Status.IN_PROGRESS)
                 )
                 .fetch();
     }
@@ -74,6 +91,8 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
     public List<PurchaseItem> searchByTitleAndRegion(String keyword, List<Integer> regionIds) {
         log.info("QueryDSL searchByTitleAndRegion 실행");
         QPurchaseItem item = QPurchaseItem.purchaseItem;
+        QItemImage image = QItemImage.itemImage;
+        QTag tag = QTag.tag;
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(item.name.containsIgnoreCase(keyword));
@@ -82,13 +101,16 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
         if (regionIds != null && !regionIds.isEmpty()) {
             builder.and(item.region.id.in(regionIds));
         }
+
         log.info("regionIds = {}", regionIds);
         log.info("필터링된 쿼리 조건: name LIKE '%{}%', region.id in {}", keyword, regionIds);
 
-
         return queryFactory
                 .selectFrom(item)
+                .distinct()
                 .join(item.region).fetchJoin()
+                .leftJoin(item.itemImages, image).fetchJoin()
+                .join(item.tags, tag)
                 .where(builder)
                 .fetch();
     }

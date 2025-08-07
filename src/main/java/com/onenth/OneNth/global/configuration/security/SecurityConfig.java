@@ -39,6 +39,7 @@ public class SecurityConfig {
                                         "/api/email-auth/password/request-code",
                                         "/api/email-auth/password/verify-code",
                                         "/api/members/password/reset",
+                                        "/api/members/reissue",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**").permitAll()

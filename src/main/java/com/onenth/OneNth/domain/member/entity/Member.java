@@ -57,6 +57,9 @@ public class Member extends BaseEntity {
 
     private String profileImageUrl;
 
+    @Column(name = "total_saved_amount")
+    private Long totalSavedAmount = 0L;
+
     public void updateProfileImage(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
