@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.product.dto;
 
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
+import com.onenth.OneNth.domain.product.entity.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +22,9 @@ public class PurchaseItemListDTO {
     private Double latitude;
     private Double longitude;
 
+    private String status;
+    private String statusLabel;
+
     public static PurchaseItemListDTO fromEntity(PurchaseItem entity) {
         return fromEntity(entity, false); // 기본값 false로 위임
     }
@@ -40,6 +44,15 @@ public class PurchaseItemListDTO {
                 .latitude(entity.getLatitude())
                 .longitude(entity.getLongitude())
                 .bookmarked(isBookmarked)
+                .status(entity.getStatus().name())
+                .statusLabel(toStatusLabel(entity.getStatus()))
                 .build();
+    }
+    public static String toStatusLabel(Status s) {
+        return switch (s) {
+            case DEFAULT -> "판매중";
+            case IN_PROGRESS -> "거래확정";
+            case COMPLETED -> "거래완료";
+        };
     }
 }

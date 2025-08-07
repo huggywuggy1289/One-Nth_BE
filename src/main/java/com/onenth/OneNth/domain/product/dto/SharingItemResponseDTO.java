@@ -20,7 +20,7 @@ public class SharingItemResponseDTO {
         private Long sharingItem;
     }
 
-    //단일 상세 조회용
+    //단일 상품
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -41,6 +41,9 @@ public class SharingItemResponseDTO {
 
         private Double latitude;
         private Double longitude;
+
+        private String status;
+        private String statusLabel;
     }
 }
 
