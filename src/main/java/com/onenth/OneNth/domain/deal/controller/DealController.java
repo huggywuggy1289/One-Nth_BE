@@ -28,11 +28,28 @@ public class DealController {
     """
     )
     @PostMapping("/confirmation")
-    public ApiResponse<String> issueTradeConfirmationForm(
+    public ApiResponse<String> createDealConfirmationForm(
             @AuthUser Long memberId,
             @RequestBody DealRequestDTO.DealConfirmationRequestDTO request
             ) {
         dealCommandService.createDealConfirmation(memberId, request);
         return ApiResponse.onSuccess("거래확정폼 발행이 완료되었습니다.");
+    }
+
+    @Operation(
+            summary = "거래 완료 폼 발행 API",
+            description = """
+    거래 완료 폼을 발행하는 API입니다. 채팅 거래 프로세스에서 이용됩니다.
+    - 특정 상품에 대해 거래를 완료하려 할 때 거래완료 폼 데이터를 저장합니다.
+    - 해당 상품의 상태롤 거래완료(COMPLETED)로 전환합니다.
+    """
+    )
+    @PostMapping("/completion")
+    public ApiResponse<String> createDealCompletionForm(
+            @AuthUser Long memberId,
+            @RequestBody DealRequestDTO.DealCompletionRequestDTO request
+    ) {
+        dealCommandService.createDealCompletion(memberId, request);
+        return ApiResponse.onSuccess("거래완료폼 발행이 완료되었습니다.");
     }
 }

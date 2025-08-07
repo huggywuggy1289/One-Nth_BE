@@ -2,7 +2,10 @@ package com.onenth.OneNth.domain.deal.service;
 
 import com.onenth.OneNth.domain.deal.converter.DealConverter;
 import com.onenth.OneNth.domain.deal.dto.DealRequestDTO;
+import com.onenth.OneNth.domain.deal.entity.Deal;
+import com.onenth.OneNth.domain.deal.entity.DealCompletion;
 import com.onenth.OneNth.domain.deal.entity.DealConfirmation;
+import com.onenth.OneNth.domain.deal.repository.DealCompletionRepository;
 import com.onenth.OneNth.domain.deal.repository.DealConfirmationRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
@@ -29,6 +32,7 @@ public class DealCommandService {
 
     private final PurchaseItemRepository purchaseItemRepository;
     private final DealConfirmationRepository dealConfirmationRepository;
+    private final DealCompletionRepository dealCompletionRepository;
 
     @Transactional
     public void createDealConfirmation(Long memberId, DealRequestDTO.DealConfirmationRequestDTO request) {
@@ -44,6 +48,28 @@ public class DealCommandService {
         dealConfirmationRepository.save(result);
 
         item.setStatus(Status.IN_PROGRESS);
+    }
+
+    @Transactional
+    public void createDealCompletion(Long memberId, DealRequestDTO.DealCompletionRequestDTO request) {
+        Member member = findMemberById(memberId);
+
+        DealConfirmation dealConfirmation = dealConfirmationRepository.findById(request.getDealConfirmationId())
+                .orElseThrow(() -> new DealHandler(ErrorStatus.DEAL_CONFIRMATION_NOT_FOUND));
+
+        Item item = getProduct(dealConfirmation.getItemType(), dealConfirmation.getProductId());
+
+        if(item.getStatus()==Status.COMPLETED){
+            throw new DealHandler(ErrorStatus.DEAL_COMPLETION_ALREADY);
+        }
+        boolean exists = dealCompletionRepository.existsByDealConfirmation(dealConfirmation);
+        if (exists) {
+            throw new DealHandler(ErrorStatus.DEAL_COMPLETION_ALREADY_EXISTS);
+        }
+        DealCompletion result = DealConverter.toDealCompletion(request, member, dealConfirmation);
+        dealCompletionRepository.save(result);
+
+        item.setStatus(Status.COMPLETED);
     }
 
     private Item getProduct(ItemType itemType, Long productId) {

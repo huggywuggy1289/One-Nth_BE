@@ -64,7 +64,10 @@ public enum ErrorStatus implements BaseErrorCode {
     BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK002", "차단한 사용자 목록에 존재하지 않습니다."),
 
     // 거래 관련
-    DEAL_CONFIRMATION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION001", "해당 상품은 이미 거래확정 폼이 발행된 상태입니다.")
+    DEAL_CONFIRMATION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION001", "해당 상품은 이미 거래확정 폼이 발행된 상태입니다."),
+    DEAL_CONFIRMATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION002", "id에 해당하는 거래확정 폼이 존재하지 않습니다"),
+    DEAL_COMPLETION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION003", "해당 상품은 이미 거래완료 폼이 발행된 상태입니다."),
+    DEAL_COMPLETION_ALREADY(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION004", "해당 상품은 이미 거래완료된 상태입니다."),
     ;
 
     private final HttpStatus httpStatus;

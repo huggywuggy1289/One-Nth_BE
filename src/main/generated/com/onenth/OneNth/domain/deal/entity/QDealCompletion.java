@@ -31,11 +31,11 @@ public class QDealCompletion extends EntityPathBase<DealCompletion> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final BooleanPath isAccepted = createBoolean("isAccepted");
+    public final com.onenth.OneNth.domain.member.entity.QMember member;
 
-    public final StringPath trackingNumber = createString("trackingNumber");
+    public final NumberPath<Integer> tradeCount = createNumber("tradeCount", Integer.class);
 
-    public final DateTimePath<java.time.LocalDateTime> tradeDate = createDateTime("tradeDate", java.time.LocalDateTime.class);
+    public final DatePath<java.time.LocalDate> tradeDate = createDate("tradeDate", java.time.LocalDate.class);
 
     public final NumberPath<Integer> tradePrice = createNumber("tradePrice", Integer.class);
 
@@ -63,6 +63,7 @@ public class QDealCompletion extends EntityPathBase<DealCompletion> {
     public QDealCompletion(Class<? extends DealCompletion> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.dealConfirmation = inits.isInitialized("dealConfirmation") ? new QDealConfirmation(forProperty("dealConfirmation"), inits.get("dealConfirmation")) : null;
+        this.member = inits.isInitialized("member") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("member")) : null;
     }
 
 }

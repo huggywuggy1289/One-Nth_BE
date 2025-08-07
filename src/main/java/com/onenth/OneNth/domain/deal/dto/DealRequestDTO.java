@@ -23,4 +23,16 @@ public class DealRequestDTO {
         private Integer purchasePrice;
         private Integer originalPrice;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DealCompletionRequestDTO {
+        private Long dealConfirmationId;
+        private LocalDate dealDate;
+        private Integer tradePrice;
+        private Integer tradeCount;
+        private TradeType tradeType;
+    }
 }
