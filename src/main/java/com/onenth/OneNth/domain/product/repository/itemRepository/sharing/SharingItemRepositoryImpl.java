@@ -1,9 +1,6 @@
 package com.onenth.OneNth.domain.product.repository.itemRepository.sharing;
 
-import com.onenth.OneNth.domain.product.entity.QPurchaseItem;
-import com.onenth.OneNth.domain.product.entity.QSharingItem;
-import com.onenth.OneNth.domain.product.entity.QTag;
-import com.onenth.OneNth.domain.product.entity.SharingItem;
+import com.onenth.OneNth.domain.product.entity.*;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.region.entity.QRegion;
@@ -22,14 +19,19 @@ public class SharingItemRepositoryImpl implements SharingItemRepositoryCustom {
     public List<SharingItem> findByRegionAndTag(List<Integer> regionIds, String tag) {
         QSharingItem item = QSharingItem.sharingItem;
         QTag qTag = QTag.tag;
+        QItemImage image = QItemImage.itemImage;
+        QRegion region = QRegion.region;
 
         return queryFactory
                 .selectFrom(item)
+                .distinct()
+                .join(item.region, region).fetchJoin()
+                .leftJoin(item.itemImages, image).fetchJoin()
                 .join(item.tags, qTag)
                 .where(
-                        item.region.id.in(regionIds)
-                                .and(qTag.name.eq(tag))
-                                .and(item.status.in(Status.DEFAULT, Status.IN_PROGRESS))
+                        item.region.id.in(regionIds),
+                        qTag.name.eq(tag),
+                        item.status.in(Status.DEFAULT, Status.IN_PROGRESS)
                 )
                 .fetch();
     }
@@ -37,11 +39,18 @@ public class SharingItemRepositoryImpl implements SharingItemRepositoryCustom {
     @Override
     public List<SharingItem> findByRegionAndCategory(List<Integer> regionIds, String category) {
         QSharingItem item = QSharingItem.sharingItem;
-        return queryFactory.selectFrom(item)
+        QItemImage image = QItemImage.itemImage;
+        QRegion region = QRegion.region;
+
+        return queryFactory
+                .selectFrom(item)
+                .distinct()
+                .join(item.region, region).fetchJoin()
+                .leftJoin(item.itemImages, image).fetchJoin()
                 .where(
-                        item.region.id.in(regionIds)
-                                .and(item.itemCategory.eq(ItemCategory.valueOf(category.toUpperCase())))
-                                .and(item.status.in(Status.DEFAULT, Status.IN_PROGRESS))
+                        item.region.id.in(regionIds),
+                        item.itemCategory.eq(ItemCategory.valueOf(category.toUpperCase())),
+                        item.status.in(Status.DEFAULT, Status.IN_PROGRESS)
                 )
                 .fetch();
     }

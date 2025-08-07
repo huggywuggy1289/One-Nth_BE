@@ -44,9 +44,6 @@ public class SharingItemRequestDTO {
     @JsonProperty("purchaseMethod")
     private PurchaseMethod purchaseMethod;
 
-    @NotNull
-    private Long regionId;
-
     @Size(min = 1, max = 3)
     private List<@NotBlank String> imageUrls;
 

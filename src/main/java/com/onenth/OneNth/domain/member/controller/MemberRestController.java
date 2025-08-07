@@ -6,7 +6,10 @@ import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVer
 import com.onenth.OneNth.domain.member.service.memberService.MemberCommandService;
 import com.onenth.OneNth.domain.member.service.memberService.MemberQueryService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
+import com.onenth.OneNth.global.configuration.security.jwt.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -18,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "회원 계정 관련 API",
@@ -30,6 +34,7 @@ public class MemberRestController {
     private final MemberCommandService memberCommandService;
     private final EmailVerificationService emailVerificationService;
     private final MemberQueryService memberQueryService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 일반 회원가입 API 구현
@@ -212,5 +217,39 @@ public class MemberRestController {
     ) {
         return ApiResponse.onSuccess(memberQueryService.getMyPosts(memberId, page, size));
     }
+
+    /**
+     * 토큰 재발급
+     */
+    @Operation(
+            summary = "토큰 재발급 API",
+            description = "리프레시 토큰으로 액세스 토큰을 재발급하는 API입니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @PostMapping("/reissue")
+    public ApiResponse<MemberResponseDTO.TokenReissueResultDTO> reissue(
+            @RequestBody MemberRequestDTO.TokenReissueDTO request){
+
+        String refreshToken = request.getRefreshToken();
+
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new MemberHandler(ErrorStatus.INVALID_TOKEN);
+        }
+
+        Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
+
+        String newAccessToken = jwtTokenProvider.generateToken(authentication);
+
+        MemberResponseDTO.TokenReissueResultDTO response = MemberResponseDTO.TokenReissueResultDTO.builder()
+                .accessToken(newAccessToken)
+                .build();
+
+        return ApiResponse.onSuccess(response);
+    }
+
+
 
 }

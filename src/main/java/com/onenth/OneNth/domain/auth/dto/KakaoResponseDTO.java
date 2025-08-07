@@ -13,6 +13,7 @@ public class KakaoResponseDTO {
     @NoArgsConstructor
     public static class KakaoLoginResponseDTO {
         private String access_token;
+        private String refresh_token;
         private String email;
         private String name;
         private String serialId;

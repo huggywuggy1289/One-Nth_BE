@@ -48,7 +48,6 @@ public class KakaoAuthService {
 
         Optional<Member> member = memberRepository.findBySocialIdAndLoginType(userInfo.getId(), LoginType.KAKAO);
 
-
         //member 에 객체가 들어있는지 확인
         if (member.isPresent()) {
 
@@ -61,13 +60,18 @@ public class KakaoAuthService {
                     null,
                     Collections.emptyList()
             );
+
+            //authentication 으로 access, refresh 토큰 발급
             String token = jwtTokenProvider.generateToken(authentication);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
             return KakaoResponseDTO.KakaoLoginResponseDTO.builder()
                     .access_token(token)
+                    .refresh_token(refreshToken)
                     .isNew(false)
                     .build();
         }
+
         //기존 가입 정보가 없는 경우 추가 정보 요청 분기로 넘어감
         else {
             return KakaoResponseDTO.KakaoLoginResponseDTO.builder()
@@ -109,10 +113,13 @@ public class KakaoAuthService {
                 Collections.emptyList()
         );
 
+        //authentication 으로 access, refresh 토큰 발급
         String token = jwtTokenProvider.generateToken(authentication);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
         return KakaoResponseDTO.KakaoLoginResponseDTO.builder()
                 .access_token(token)
+                .refresh_token(refreshToken)
                 .isNew(false)
                 .build();
     }

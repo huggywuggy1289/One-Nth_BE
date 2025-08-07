@@ -5,17 +5,23 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRegionRepository;
+import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
+import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
 import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
+import com.onenth.OneNth.domain.product.entity.scrap.SharingItemScrap;
 import com.onenth.OneNth.domain.product.repository.itemRepository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
+import com.onenth.OneNth.domain.product.repository.scrapRepository.SharingItemScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
@@ -30,6 +36,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -42,6 +50,9 @@ public class SharingItemService {
     private final TagRepository tagRepository;
     private final RegionRepository regionRepository;
     private final GeoCodingService geoCodingService;
+    //+
+    private final SharingItemScrapRepository scrapRepository;
+    private final MemberRepository memberRepository;
 
     private final AmazonS3 amazonS3;
 
@@ -49,9 +60,8 @@ public class SharingItemService {
     private String bucketName;
 
     @Transactional
-    public Long registerItem(SharingItemRequestDTO dto, List<MultipartFile> imageFiles, Long userId){
+    public Long registerItem(SharingItemRequestDTO dto, List<MultipartFile> imageFiles, Long userId) {
 
-        // 소비기한 유효성 검사
         if (dto.getItemCategory() == ItemCategory.FOOD) {
             if (dto.getExpirationDate() == null) {
                 throw new IllegalArgumentException("식품 카테고리는 소비기한을 입력해야 합니다.");
@@ -62,14 +72,36 @@ public class SharingItemService {
             }
         }
 
-        // 회원연동
         Member member = Member.builder().id(userId).build();
-        // 이어서 회원가입시 등록된 대표지역도 주입
-        Region region = memberRegionRepository.findByMemberId(userId)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
-                .getRegion();
+
+        GeoCodingResult geo = null;
+        Region region;
+
+        if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
+            if (dto.getSharingLocation() == null || dto.getSharingLocation().isBlank()) {
+                throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
+            }
+
+            geo = geoCodingService.getCoordinatesFromAddress(dto.getSharingLocation());
+            if (geo == null) {
+                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+            }
+
+            region = regionRepository.findByRegionNameContaining(dto.getSharingLocation())
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다."));
+        } else {
+            if (dto.getSharingLocation() != null && !dto.getSharingLocation().isBlank()) {
+                throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
+            }
+
+            region = memberRegionRepository.findByMemberId(userId)
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
+                    .getRegion();
+        }
 
         List<Tag> tagEntities = dto.getTags().stream()
                 .peek(tag -> {
@@ -81,19 +113,15 @@ public class SharingItemService {
                         .orElseGet(() -> tagRepository.save(Tag.builder().name(tag).build())))
                 .toList();
 
-        if (tagEntities.stream().count() > 5){
+        if (tagEntities.size() > 5) {
             throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
         }
 
-        // 이미지 유효성 검사
         if (imageFiles == null || imageFiles.isEmpty()) {
             throw new IllegalArgumentException("상품 이미지는 최소 1장 이상 첨부해야 합니다.");
         }
 
-        // 유효한 파일만 개수 체크
-        long validFileCount = Optional.ofNullable(imageFiles)
-                .orElse(Collections.emptyList())
-                .stream()
+        long validFileCount = imageFiles.stream()
                 .filter(f -> f != null && !f.isEmpty())
                 .count();
 
@@ -103,24 +131,6 @@ public class SharingItemService {
 
         if (validFileCount > 3) {
             throw new IllegalArgumentException("이미지는 최대 3장까지 업로드할 수 있습니다.");
-        }
-
-        GeoCodingResult geo = null;
-
-        if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
-            if (dto.getSharingLocation() == null || dto.getSharingLocation().isBlank()) {
-                throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
-            }
-
-            geo = geoCodingService.getCoordinatesFromAddress(dto.getSharingLocation());
-            if (geo == null) {
-                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
-            }
-        } else {
-            // 온라인일 경우엔 주소 없어야 함
-            if (dto.getSharingLocation() != null && !dto.getSharingLocation().isBlank()) {
-                throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
-            }
         }
 
         SharingItem sharingItem = SharingItem.builder()
@@ -137,15 +147,15 @@ public class SharingItemService {
                 .tags(new ArrayList<>())
                 .sharingLocation(dto.getSharingLocation())
                 .build();
-        sharingItem.getTags().addAll(tagEntities); // +
+        sharingItem.getTags().addAll(tagEntities);
 
-        // ONLINE이면 대표지역 위도경도 설정
         if (dto.getPurchaseMethod() == PurchaseMethod.ONLINE) {
             if (region.getLatitude() == null || region.getLongitude() == null) {
                 GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(region.getRegionName());
                 if (regionGeo == null) {
                     throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
                 }
+
                 region.setLatitude(regionGeo.getLatitude());
                 region.setLongitude(regionGeo.getLongitude());
                 regionRepository.save(region);
@@ -153,18 +163,13 @@ public class SharingItemService {
 
             sharingItem.setLatitude(region.getLatitude());
             sharingItem.setLongitude(region.getLongitude());
-        } else {
-            if (geo == null) {
-                throw new IllegalArgumentException("OFFLINE 주소에서 위도/경도를 가져올 수 없습니다.");
-            }
 
+        } else {
             sharingItem.setLatitude(geo.getLatitude());
             sharingItem.setLongitude(geo.getLongitude());
         }
 
         sharingItemRepository.save(sharingItem);
-
-        // 이미지 업로드 처리
 
         imageFiles.stream()
                 .filter(f -> f != null && !f.isEmpty())
@@ -178,25 +183,21 @@ public class SharingItemService {
                         metadata.setContentType(file.getContentType());
 
                         amazonS3.putObject(bucketName, s3Key, file.getInputStream(), metadata);
-
                         String s3Url = amazonS3.getUrl(bucketName, s3Key).toString();
 
-                        // 디버깅
                         boolean exists = amazonS3.doesObjectExist(bucketName, s3Key);
                         if (!exists) {
                             throw new RuntimeException("S3에 파일이 존재하지 않습니다: " + s3Key);
-                        } else {
-                            System.out.println(s3Key + " : 존재합니다");
                         }
 
-                        // DB저장
                         ItemImage image = ItemImage.builder()
                                 .sharingItem(sharingItem)
-                                .url(s3Url) // S3 URL을 저장
+                                .url(s3Url)
                                 .itemType(ItemType.SHARE)
                                 .build();
 
                         itemImageRepository.save(image);
+
                     } catch (IOException e) {
                         throw new RuntimeException("S3 파일 업로드 실패: " + e.getMessage());
                     }
@@ -227,14 +228,21 @@ public class SharingItemService {
             items = sharingItemRepository.findByRegionName(keyword);
         }
 
-        items.forEach(i ->
-                log.info("📦 [item: {}] ↔ [region: {}]", i.getTitle(),
-                        i.getRegion() != null ? i.getRegion().getRegionName() : "null")
-        );
+        List<SharingItemScrap> scraps = scrapRepository.findByUserId(userId);
 
-        return items.stream()
-                .map(SharingItemListDTO::fromEntity)
-                .toList();
+        // 디버깅
+        System.out.println("스크랩 수: " + scraps.size());
+        for (SharingItemScrap scrap : scraps) {
+            System.out.println("스크랩된 아이템 ID: " + scrap.getSharingItem().getId());
+        }
+
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(s -> s.getSharingItem().getId())
+                .collect(Collectors.toSet());
+
+        log.info("유저 {}의 북마크 목록: {}", userId, bookmarkedIds);
+
+        return SharingItemConverter.toSharingItemListDTOs(items, bookmarkedIds);
     }
 
     // 상품명 검색++++
@@ -251,13 +259,23 @@ public class SharingItemService {
             throw new IllegalStateException("사용자의 지역 정보가 존재하지 않습니다.");
         }
 
-        // 2. 지역 필터 + 키워드 기반 상품명 LIKE 검색
-        List<SharingItem> items = sharingItemRepository.searchByTitleAndRegion(keyword, regionIds);
+        List<Status> statuses = List.of(Status.DEFAULT, Status.IN_PROGRESS);
+
+        List<SharingItem> items = sharingItemRepository.searchByTitleAndRegion(
+                keyword,
+                regionIds,
+                statuses
+        );
+
+        List<SharingItemScrap> scraps = scrapRepository.findByUserId(userId);
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(s -> s.getSharingItem().getId())
+                .collect(Collectors.toSet());
 
         // 3. 거래 완료 제외 후 DTO 변환
         return items.stream()
                 .filter(i -> i.getStatus() != Status.COMPLETED)
-                .map(SharingItemListDTO::fromEntity)
+                .map(item -> SharingItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
                 .toList();
     }
 
@@ -317,6 +335,42 @@ public class SharingItemService {
                 .longitude(item.getLongitude())
                 .build();
     }
+    // 스크랩 설정
+    @Transactional
+    public void addScrap(Long sharingItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
 
+        SharingItem item = sharingItemRepository.findById(sharingItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
 
+        if (scrapRepository.existsByMemberAndSharingItem(member, item)) {
+            throw new IllegalStateException("이미 스크랩한 상품입니다.");
+        }
+
+        SharingItemScrap scrap = SharingItemScrap.builder()
+                .member(member)
+                .sharingItem(item)
+                .build();
+
+        log.info("스크랩 저장 완료: userId={}, sharingItemId={}", userId, sharingItemId);
+
+        scrapRepository.save(scrap);
+    }
+
+    // 북마크 삭제
+    @Transactional
+    public void removeScrap(Long purchaseItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
+
+        SharingItem item = sharingItemRepository.findById(purchaseItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        SharingItemScrap scrap = scrapRepository.findByMemberIdAndSharingItemId(userId, purchaseItemId)
+                .orElseThrow(() -> new IllegalStateException("스크랩 정보가 존재하지 않습니다."));
+
+        scrapRepository.delete(scrap);
+        log.info("스크랩 삭제 완료: userId={}, itemId={}", userId, purchaseItemId);
+    }
 }

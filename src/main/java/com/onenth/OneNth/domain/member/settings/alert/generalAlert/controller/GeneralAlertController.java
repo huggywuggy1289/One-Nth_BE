@@ -4,8 +4,6 @@ import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAl
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAlertResponseDTO;
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.service.GeneralAlertCommandService;
 import com.onenth.OneNth.domain.member.settings.alert.generalAlert.service.GeneralAlertQueryService;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsRequestDTO;
-import com.onenth.OneNth.domain.member.settings.dto.UserSettingsResponseDTO;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
@@ -19,7 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "사용자 설정 중 일반 알림 설정 관련 API", description = "키워드 알림 외 알림 설정 API")
+@Tag(name = "사용자 설정 - 일반 알림 설정 관련 API", description = "키워드 알림 외 알림 설정 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user-settings")
