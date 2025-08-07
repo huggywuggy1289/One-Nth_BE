@@ -5,6 +5,6 @@ import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 
 public interface ReviewQueryService {
     ReviewResponseDTO.getReviewListDTO getMemberReviews(Long memberId);
-    ReviewResponseDTO.getReviewDTO getReviewDetails(Long reviewId, Long userId, ItemType itemType);
+    ReviewResponseDTO.getMyReviewDTO getReviewDetails(Long reviewId, Long userId, ItemType itemType);
     ReviewResponseDTO.getReviewListDTO getUserReceivedReviews(Long userId);
 }
