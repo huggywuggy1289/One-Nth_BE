@@ -63,7 +63,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
     }
 
     @Override
-    public ReviewResponseDTO.getReviewDTO getReviewDetails(Long reviewId, Long userId, ItemType itemType) {
+    public ReviewResponseDTO.getMyReviewDTO getReviewDetails(Long reviewId, Long userId, ItemType itemType) {
 
         Review review = switch (itemType) {
             case SHARE -> sharingReviewRepository.findById(reviewId)
@@ -74,11 +74,12 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
 
         Long itemId = review.getItemId();
 
-        List<String> imageList = review.getReviewImages().stream()
-                .map(ReviewImage::getImageUrl)
+        List<ReviewResponseDTO.getImageDetail> imageDetailList
+                = review.getReviewImages().stream()
+                .map(ReviewConverter::toGetImageDetail)
                 .collect(Collectors.toList());
 
-        return ReviewConverter.toGetReviewDTO(review, imageList, itemType, userId, itemId);
+        return ReviewConverter.toGetMyReviewDTO(review, imageDetailList, itemType, userId, itemId);
     }
 
     @Override

@@ -8,13 +8,14 @@ import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.review.Review;
+import com.onenth.OneNth.domain.product.entity.review.ReviewImage;
 import com.onenth.OneNth.domain.product.entity.review.SharingReview;
 
 import java.util.List;
 
 public class ReviewConverter {
 
-    public static SharingReview toSharingReview(ReviewRequestDTO.createReview request,Member member,SharingItem sharingItem) {
+    public static SharingReview toSharingReview(ReviewRequestDTO.createReview request, Member member, SharingItem sharingItem) {
         return SharingReview.builder()
                 .rate(request.getRate())
                 .content(request.getContent())
@@ -49,10 +50,33 @@ public class ReviewConverter {
 
     public static ReviewResponseDTO.getReviewListDTO toGetReviewListDTO(
             List<ReviewResponseDTO.getReviewDTO> getReviewDTOList
-            ,Long memberId) {
+            , Long memberId) {
         return ReviewResponseDTO.getReviewListDTO.builder()
                 .memberId(memberId)
                 .reviewList(getReviewDTOList)
+                .build();
+    }
+
+    public static ReviewResponseDTO.getImageDetail toGetImageDetail(ReviewImage reviewImage) {
+        return ReviewResponseDTO.getImageDetail.builder()
+                .reviewImageId(reviewImage.getId())
+                .imageUrl(reviewImage.getImageUrl())
+                .build();
+    }
+
+    public static ReviewResponseDTO.getMyReviewDTO toGetMyReviewDTO(
+            Review review, List<ReviewResponseDTO.getImageDetail> image, ItemType itemType, Long targetUserId, Long itemId
+    ){
+        return ReviewResponseDTO.getMyReviewDTO.builder()
+                .reviewId(review.getId())
+                .itemType(itemType)
+                .itemId(itemId)
+                .reviewerId(review.getMember().getId())
+                .reviewTargetId(targetUserId)
+                .content(review.getContent())
+                .createdAt(review.getCreatedAt())
+                .rate(review.getRate())
+                .reviewImageList(image)
                 .build();
     }
 }
