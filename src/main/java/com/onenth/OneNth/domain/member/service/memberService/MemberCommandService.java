@@ -2,10 +2,6 @@ package com.onenth.OneNth.domain.member.service.memberService;
 
 import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
-import com.onenth.OneNth.domain.member.entity.Member;
-import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 
 public interface MemberCommandService {
@@ -19,8 +15,14 @@ public interface MemberCommandService {
     //비밀번호 재설정 로직 구현
     MemberResponseDTO.PasswordResetResultDTO resetPassword(MemberRequestDTO.ResetPasswordRequestDTO request);
 
+    //스크랩한 글 등록
+    MemberResponseDTO.AddScrapOrLikeResponseDTO addScrap(Long memberId, Long postId);
+
     //스크랩한 글 취소
     MemberResponseDTO.CancelScrapOrLikeResponseDTO cancelScrap(Long memberId, Long postId);
+
+    //공감한 글 등록
+    MemberResponseDTO.AddScrapOrLikeResponseDTO addLike(Long memberId, Long postId);
 
     //공감한 글 취소
     MemberResponseDTO.CancelScrapOrLikeResponseDTO cancelLike(Long memberId, Long postId);

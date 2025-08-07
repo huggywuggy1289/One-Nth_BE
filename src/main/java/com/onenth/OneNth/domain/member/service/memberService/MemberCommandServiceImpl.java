@@ -3,7 +3,6 @@ package com.onenth.OneNth.domain.member.service.memberService;
 import com.onenth.OneNth.domain.member.converter.MemberConverter;
 import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
-import com.onenth.OneNth.domain.member.entity.EmailVerificationCode;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
 import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
@@ -12,7 +11,9 @@ import com.onenth.OneNth.domain.member.repository.memberRepository.MemberReposit
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailService;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVerificationService;
 import com.onenth.OneNth.domain.post.entity.Like;
+import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
+import com.onenth.OneNth.domain.post.repository.PostRepository;
 import com.onenth.OneNth.domain.post.repository.likeRepository.LikeRepository;
 import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
@@ -28,8 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-import static com.onenth.OneNth.domain.post.entity.QScrap.scrap;
-
 @Service
 @RequiredArgsConstructor
 public class MemberCommandServiceImpl implements MemberCommandService {
@@ -40,6 +39,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final EmailVerificationService emailVerificationService;
     private final EmailService emailService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PostRepository postRepository;
     private final ScrapRepository scrapRepository;
     private final LikeRepository likeRepository;
     private final MemberAlertSettingRepository memberAlertSettingRepository;
@@ -97,10 +97,12 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         );
 
         String accessToken = jwtTokenProvider.generateToken(authentication);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
         return MemberConverter.toLoginResultDTO(
                 member.getId(),
-                accessToken
+                accessToken,
+                refreshToken
         );
     }
 
@@ -121,6 +123,35 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         return MemberResponseDTO.PasswordResetResultDTO.builder().isSuccess(true).build();
     }
 
+
+    @Override
+    public MemberResponseDTO.AddScrapOrLikeResponseDTO addScrap(Long memberId, Long postId) {
+        // 게시글 존재 여부 확인
+        postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글입니다."));
+
+        // 중복 스크랩 여부 확인
+        boolean exists = scrapRepository.existsByPostIdAndMemberId(postId, memberId);
+        if (exists) {
+            throw new RuntimeException("이미 스크랩한 글입니다.");
+        }
+
+        // 회원 여부 확인
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        Scrap scrap = Scrap.builder()
+                .member(member)
+                .post(Post.builder().id(postId).build())
+                .build();
+
+        scrapRepository.save(scrap);
+
+        return MemberResponseDTO.AddScrapOrLikeResponseDTO.builder()
+                .isSuccess(true)
+                .build();
+    }
+
     @Override
     public MemberResponseDTO.CancelScrapOrLikeResponseDTO cancelScrap(Long memberId, Long postId) {
         Scrap scrap = scrapRepository.findByMemberIdAndPostId(memberId, postId)
@@ -129,6 +160,34 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         scrapRepository.delete(scrap);
 
         return MemberResponseDTO.CancelScrapOrLikeResponseDTO.builder()
+                .isSuccess(true)
+                .build();
+    }
+
+    @Override
+    public MemberResponseDTO.AddScrapOrLikeResponseDTO addLike(Long memberId, Long postId) {
+        // 게시글 존재 여부 확인
+        postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글입니다."));
+
+        // 중복 공감 여부 확인
+        boolean exists = likeRepository.findByMemberIdAndPostId(memberId, postId).isPresent();
+        if (exists) {
+            throw new RuntimeException("이미 공감한 글입니다.");
+        }
+
+        // 회원 여부 확인
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        Like like = Like.builder()
+                .member(member)
+                .post(Post.builder().id(postId).build())
+                .build();
+
+        likeRepository.save(like);
+
+        return MemberResponseDTO.AddScrapOrLikeResponseDTO.builder()
                 .isSuccess(true)
                 .build();
     }

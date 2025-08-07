@@ -17,9 +17,11 @@ import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
 import com.onenth.OneNth.domain.product.repository.itemRepository.ItemImageRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
+import com.onenth.OneNth.domain.product.repository.scrapRepository.PurchaseItemScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -36,7 +38,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -45,11 +49,12 @@ public class PurchaseItemService {
 
     private final PurchaseItemRepository purchaseItemRepository;
     private final ItemImageRepository itemImageRepository;
-    private final MemberRegionRepository memberRegionRepository; // 검색 필터링시
-    private  final TagRepository tagRepository; // +
+    private final MemberRegionRepository memberRegionRepository;
+    private  final TagRepository tagRepository;
     private final RegionRepository regionRepository;
     private final GeoCodingService geoCodingService;
     private final MemberRepository memberRepository;
+    private final PurchaseItemScrapRepository scrapRepository;
 
     //s3 연동
     private final AmazonS3 amazonS3;
@@ -74,11 +79,18 @@ public class PurchaseItemService {
 
         // 회원 및 지역 조회
         Member member = Member.builder().id(userId).build();
-        Region region = memberRegionRepository.findByMemberId(userId)
+
+        // 등록한 주소명 문자열 기반으로 region 찾아 매핑
+        GeoCodingResult geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
+        if (geo == null) {
+            throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+        }
+
+        Region region = regionRepository.findByRegionNameContaining(dto.getPurchaseLocation())
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
-                .getRegion();
+                .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다."));
+
 
         // 태그 유효성 검사 및 저장
         List<Tag> tagEntities = dto.getTags().stream()
@@ -96,8 +108,6 @@ public class PurchaseItemService {
         }
 
         // 장소입력 유효성
-        GeoCodingResult geo = null;
-
         if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
             if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
                 throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
@@ -238,17 +248,29 @@ public class PurchaseItemService {
         }
         System.out.println("keyword: [" + keyword + "]");
 
-        return PurchaseItemConverter.toPurchaseItemListDTOs(items);
+        List<PurchaseItemScrap> scraps = scrapRepository.findByUserId(userId);
+
+        // 디버깅
+        System.out.println("스크랩 수: " + scraps.size());
+        for (PurchaseItemScrap scrap : scraps) {
+            System.out.println("스크랩된 아이템 ID: " + scrap.getPurchaseItem().getId());
+        }
+
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(scrap -> scrap.getPurchaseItem().getId())
+                .collect(Collectors.toSet());
+
+        log.info("유저 {}의 북마크 목록: {}", userId, bookmarkedIds);
+
+        return PurchaseItemConverter.toPurchaseItemListDTOs(items, bookmarkedIds);
     }
 
     // 상품명 검색++++
     @Transactional(readOnly = true)
     public List<PurchaseItemListDTO> searchByTitleInUserRegions(String keyword, Long userId) {
 
-        // 검색 요청 정보
         log.info("검색 요청 - keyword: {}, userId: {}", keyword, userId);
 
-        // 사용자 설정 지역 ID 추출
         List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
                 .stream()
                 .map(r -> r.getRegion().getId())
@@ -256,19 +278,16 @@ public class PurchaseItemService {
 
         log.info("사용자 설정 지역 ID 목록: {}", regionIds);
 
-        // 상품 검색
         List<PurchaseItem> items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
 
-        // 검색 결과 확인
-        for (PurchaseItem item : items) {
-            log.info("검색 결과 - id: {}, name: {}, regionId: {}, status: {}",
-                    item.getId(), item.getName(), item.getRegion().getId(), item.getStatus());
-        }
+        List<PurchaseItemScrap> scraps = scrapRepository.findByUserId(userId);
+        Set<Long> bookmarkedIds = scraps.stream()
+                .map(s -> s.getPurchaseItem().getId())
+                .collect(Collectors.toSet());
 
-        // 거래 완료 제외 후 변환
         return items.stream()
                 .filter(i -> i.getStatus() != Status.COMPLETED)
-                .map(PurchaseItemListDTO::fromEntity)
+                .map(item -> PurchaseItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
                 .toList();
     }
 
@@ -335,9 +354,48 @@ public class PurchaseItemService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        if(!item.getMember().equals(member)) {
+        if (!item.getMember().equals(member)) {
             throw new MemberHandler(ErrorStatus._FORBIDDEN);
         }
         item.setStatus(status);
+    }
+
+    // 북마크 추가
+    @Transactional
+    public void addScrap(Long purchaseItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
+
+        PurchaseItem item = purchaseItemRepository.findById(purchaseItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        if (scrapRepository.existsByMemberAndPurchaseItem(member, item)) {
+            throw new IllegalStateException("이미 스크랩한 상품입니다.");
+        }
+
+        PurchaseItemScrap scrap = PurchaseItemScrap.builder()
+                .member(member)
+                .purchaseItem(item)
+                .build();
+
+        log.info("스크랩 저장 완료: userId={}, itemId={}", userId, purchaseItemId);
+
+        scrapRepository.save(scrap);
+    }
+
+    // 북마크 삭제
+    @Transactional
+    public void removeScrap(Long purchaseItemId, Long userId) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("회원을 찾을 수 없습니다."));
+
+        PurchaseItem item = purchaseItemRepository.findById(purchaseItemId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+
+        PurchaseItemScrap scrap = scrapRepository.findByMemberIdAndPurchaseItemId(userId, purchaseItemId)
+                .orElseThrow(() -> new IllegalStateException("스크랩 정보가 존재하지 않습니다."));
+
+        scrapRepository.delete(scrap);
+        log.info("스크랩 삭제 완료: userId={}, itemId={}", userId, purchaseItemId);
     }
 }

@@ -24,7 +24,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
-@Tag(name = "거래 후기(리뷰) 관련 API", description = "거래 후기 작성, 수정, 삭제, 조회 관련 API 지원")
 public class ReviewController {
 
     private final ReviewCommandService reviewCommandService;
@@ -193,12 +192,12 @@ public class ReviewController {
     """
     )
     @GetMapping(value = "/{reviewId}")
-    public ApiResponse<ReviewResponseDTO.getReviewDTO> getReviewDetails(
+    public ApiResponse<ReviewResponseDTO.getMyReviewDTO> getReviewDetails(
             @AuthUser Long memberId,
             @PathVariable("reviewId") Long reviewId,
             @Parameter(description = "거래 유형 (PURCHASE: 같이 사요 후기, SHARE: 함께 나눠요 후기)")
             @RequestParam("itemType") ItemType itemType) {
-        ReviewResponseDTO.getReviewDTO result = reviewQueryService.getReviewDetails(reviewId,memberId,itemType);
+        ReviewResponseDTO.getMyReviewDTO result = reviewQueryService.getReviewDetails(reviewId,memberId,itemType);
         return ApiResponse.onSuccess(result);
     }
 

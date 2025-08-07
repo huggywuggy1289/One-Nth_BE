@@ -1,5 +1,7 @@
 package com.onenth.OneNth.global.configuration.security.jwt;
 
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
 import com.onenth.OneNth.global.configuration.properties.JwtProperties;
 import com.onenth.OneNth.global.configuration.security.Constants;
 import io.jsonwebtoken.Claims;
@@ -39,6 +41,18 @@ public class JwtTokenProvider {
                 .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration().getAccess()))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    //리프레시 토큰 발급
+    public String generateRefreshToken(Authentication authentication) {
+        String userId = authentication.getName();
+
+        return Jwts.builder()
+                .setSubject(userId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration().getRefresh()))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -92,7 +106,7 @@ public class JwtTokenProvider {
     public Authentication extractAuthentication(HttpServletRequest request){
         String accessToken = resolveToken(request);
         if(accessToken == null || !validateToken(accessToken)) {
-            throw new RuntimeException("Invalid access token");
+            throw new MemberHandler(ErrorStatus.INVALID_TOKEN);
         }
         return getAuthentication(accessToken);
     }

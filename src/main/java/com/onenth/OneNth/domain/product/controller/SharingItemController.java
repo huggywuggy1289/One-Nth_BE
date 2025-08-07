@@ -116,4 +116,27 @@ public class SharingItemController {
         sharingItemService.changeItemStatus(purchaseItemId, memberId, status);
         return ApiResponse.onSuccess("상품 상태 전환이 완료되었습니다.");
     }
+
+    @Operation(
+            summary = "함께나눠요 스크랩 등록",
+            description = "특정 함께나눠요 상품을 스크랩합니다. 이미 스크랩한 경우 예외 발생"
+    )
+    @PostMapping("/{sharingItemId}/scrap")
+    public ApiResponse<Void> addSharingItemScrap(
+            @PathVariable("sharingItemId") Long sharingItemId,
+            @AuthUser Long userId
+    ) {
+        sharingItemService.addScrap(sharingItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
+
+    @DeleteMapping("/{sharingItemId}/scrap")
+    @Operation(summary = "함께나눠요 상품 스크랩 삭제")
+    public ApiResponse<Void> removeSharingItemScrap(
+            @PathVariable("sharingItemId") Long sharingItemId,
+            @AuthUser Long userId
+    ) {
+        sharingItemService.removeScrap(sharingItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
 }

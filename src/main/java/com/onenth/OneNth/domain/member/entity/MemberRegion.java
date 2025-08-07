@@ -17,6 +17,14 @@ public class MemberRegion extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isMain = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isVerified = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id", nullable = false)
     private Region region;
@@ -24,6 +32,10 @@ public class MemberRegion extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    public void updateIsMain(boolean isMain) {
+        this.isMain = isMain;
+    }
 
     public static MemberRegion of(Member member, Region region) {
         return MemberRegion.builder()
