@@ -85,13 +85,16 @@ public class MapController {
             @RequestParam MarkerType markerType,
             @RequestParam(required = false) Long regionId
     ) {
-        MapResponseDTO.GetMarkersResponseDTO response = postMapService.getMarkers(userId, regionId, markerType);
-        return ApiResponse.onSuccess(response);
+        if (markerType == MarkerType.DISCOUNT || markerType == MarkerType.RESTAURANT) {
+            return ApiResponse.onSuccess(postMapService.getMarkers(userId, regionId, markerType));
+        } else {
+            throw new GeneralException(ErrorStatus.INVALID_MARKER_TYPE);
+        }
     }
 
     @Operation(
-            summary = "같이사요/함께나눠요에서 마커 클릭 시 화면에 미리보기를 표시하는 API",
-            description = "지도에 표시된 마커들 중 하나를 클릭했을 때 해당 마커의 거래 글 미리보기 리스트를 보여주는 API입니다." +
+            summary = "같이사요/함께나눠요에서 마커 클릭 시 화면에 미리보기를 표시하는 API\n",
+            description = "지도에 표시된 마커들 중 하나를 클릭했을 때 해당 마커의 거래 글 미리보기 리스트를 보여주는 API입니다.\n" +
                     "응답으로 해당 거래글의 현재 상태(status: DEFAULT/IN_PROGRESS/COMPLETED), 거래 글의 카테고리, 구매 방식(ONLINE/OFFLINE), 스크랩 여부, 이미지 url들, 거래 상품 이름, 거래 상품 가격, 해당 거래글의 위도 및 경도를 반환합니다."
     )
     @ApiResponses({
@@ -99,46 +102,46 @@ public class MapController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PURCHASE_ITEM_4001", description = "존재하지 않는 품목입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SHARING_ITEM_4001", description = "존재하지 않는 품목입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MAP001", description = "지원하지 않는 MarkerType입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     @GetMapping("/markers/items/details")
     public ApiResponse<MapResponseDTO.GetItemMarkerDetailsResponseDTO> getItemMarkerDetails(
             @Parameter(hidden=true) @AuthUser Long userId,
-            @RequestParam String markerType,
+            @RequestParam MarkerType markerType,
             @RequestParam List<Long> itemIds
     ) {
         MapResponseDTO.GetItemMarkerDetailsResponseDTO response = switch (markerType) {
-            case "purchase-item" -> purchaseItemMapService.getMarkerDetails(userId, itemIds);
-            case "sharing-item" -> sharingItemMapService.getMarkerDetails(userId, itemIds);
+            case PURCHASEITEM -> purchaseItemMapService.getMarkerDetails(userId, itemIds);
+            case SHARINGITEM -> sharingItemMapService.getMarkerDetails(userId, itemIds);
             default -> throw new GeneralException(ErrorStatus.INVALID_MARKER_TYPE);
         };
         return ApiResponse.onSuccess(response);
     }
 
-//    @Operation(
-//            summary = "할인정보 게시판/우리동네 맛집 게시판에서 마커 클릭 시 화면에 미리보기를 표시하는 API",
-//            description = "지도에 표시된 마커들 중 하나를 클릭했을 때 해당 마커의 게시글 미리보기 리스트를 보여주는 API입니다." +
-//                    "응답으로 해당 거래글의 현재 상태(status: DEFAULT/IN_PROGRESS/COMPLETED), 거래 글의 카테고리, 구매 방식(ONLINE/OFFLINE), 스크랩 여부, 이미지 url들, 거래 상품 이름, 거래 상품 가격, 해당 거래글의 위도 및 경도를 반환합니다."
-//    )
-//    @ApiResponses({
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
-////            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
-////            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PURCHASE_ITEM_4001", description = "존재하지 않는 품목입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
-////            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SHARING_ITEM_4001", description = "존재하지 않는 품목입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
-//    })
-//    @GetMapping("/markers/posts/details")
-//    public ApiResponse<MapResponseDTO.GetPostMarkerDetailsResponseDTO> getPostMarkerDetails(
-//            @Parameter(hidden=true) @AuthUser Long userId,
-//            @RequestParam String markerType,
-//            @RequestParam List<Long> postIds
-//
-//    ) {
-//        MapResponseDTO.GetPostMarkerDetailsResponseDTO response = switch (markerType) {
-//            case "discount" -> discountMapService.getMarkerDetails(userId, postIds);
-//            case "restaurant" -> restaurantMapService.getMarkerDetails(userId, postIds);
-//            default -> throw new GeneralException(ErrorStatus.INVALID_MARKER_TYPE);
-//        };
-//        return ApiResponse.onSuccess(response);
-//    }
+    @Operation(
+            summary = "할인정보 게시판/우리동네 맛집 게시판에서 마커 클릭 시 화면에 미리보기를 표시하는 API\n",
+            description = "지도에 표시된 마커들 중 하나를 클릭했을 때 해당 마커의 게시글 미리보기 리스트를 보여주는 API입니다.\n" +
+                    "응답으로 해당 게시글의 장소 이름, 스크랩 여부, 글 제목, 장소 주소, 게시글 생성 시간, 장소 정보(위/경도)를 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_001", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MAP001", description = "지원하지 않는 MarkerType입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @GetMapping("/markers/posts/details")
+    public ApiResponse<MapResponseDTO.GetPostMarkerDetailsResponseDTO> getPostMarkerDetails(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @RequestParam MarkerType markerType,
+            @RequestParam List<Long> postIds
+
+    ) {
+        if (markerType == MarkerType.DISCOUNT || markerType == MarkerType.RESTAURANT) {
+            return ApiResponse.onSuccess(postMapService.getMarkerDetails(userId, postIds));
+        } else {
+            throw new GeneralException(ErrorStatus.INVALID_MARKER_TYPE);
+        }
+    }
 }
