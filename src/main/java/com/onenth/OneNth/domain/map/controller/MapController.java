@@ -1,13 +1,10 @@
 package com.onenth.OneNth.domain.map.controller;
 
-import com.onenth.OneNth.domain.map.dto.MapRequestDTO;
 import com.onenth.OneNth.domain.map.dto.MapResponseDTO;
 import com.onenth.OneNth.domain.map.service.DiscountMapService;
 import com.onenth.OneNth.domain.map.service.PurchaseItemMapService;
 import com.onenth.OneNth.domain.map.service.RestaurantMapService;
 import com.onenth.OneNth.domain.map.service.SharingItemMapService;
-import com.onenth.OneNth.domain.member.settings.memberRegion.dto.MemberRegionRequestDTO;
-import com.onenth.OneNth.domain.member.settings.memberRegion.dto.MemberRegionResponseDTO;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.apiPayload.code.ErrorReasonDTO;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -19,9 +16,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "지도 마커 표시 관련 API", description = "같이사요, 함께나눠요, 할인정보게시판, 맛집게시판 지도 마커 표시 및 특정 마커 상세 표시 API")
 @RestController
@@ -64,4 +62,31 @@ public class MapController {
         };
         return ApiResponse.onSuccess(response);
     }
+
+    @Operation(
+            summary = "마커 클릭 시 화면에 미리보기를 표시하는 API",
+            description = ""
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PURCHASE_ITEM_4001", description = "존재하지 않는 품목입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SHARING_ITEM_4001", description = "존재하지 않는 품목입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @GetMapping("/markers/items/details")
+    public ApiResponse<MapResponseDTO.GetItemMarkerDetailsResponseDTO> getItemMarkerDetails(
+            @Parameter(hidden=true) @AuthUser Long userId,
+            @RequestParam String markerType,
+            @RequestParam List<Long> itemIds
+    ) {
+        MapResponseDTO.GetItemMarkerDetailsResponseDTO response = switch (markerType) {
+            case "purchase-item" -> purchaseItemMapService.getMarkerDetails(userId, itemIds);
+            case "sharing-item" -> sharingItemMapService.getMarkerDetails(userId, itemIds);
+            default -> throw new GeneralException(ErrorStatus.INVALID_MARKER_TYPE);
+        };
+        return ApiResponse.onSuccess(response);
+    }
+
+    //@GetMapping("/markers/posts/details")
 }

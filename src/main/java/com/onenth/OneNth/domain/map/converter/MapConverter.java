@@ -3,10 +3,12 @@ package com.onenth.OneNth.domain.map.converter;
 import com.onenth.OneNth.domain.map.dto.MapResponseDTO;
 import com.onenth.OneNth.domain.map.enums.MarkerType;
 import com.onenth.OneNth.domain.post.entity.Post;
+import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MapConverter {
 
@@ -43,6 +45,46 @@ public class MapConverter {
                 .title(post.getTitle())
                 .latitude(post.getLatitude())
                 .longitude(post.getLongitude())
+                .build();
+    }
+
+    public static MapResponseDTO.GetItemMarkerDetailsResponseDTO toGetItemMarkerDetailsResponseDTO(List<MapResponseDTO.ItemMarkerDetail> itemMarkerDetails) {
+        return MapResponseDTO.GetItemMarkerDetailsResponseDTO.builder()
+                .itemMarkerDetails(itemMarkerDetails)
+                .build();
+    }
+
+    public static MapResponseDTO.ItemMarkerDetail toItemMarkerDetail(PurchaseItem item, boolean isVerified) {
+        List<String> imageUrls = item.getItemImages().stream()
+                .map(ItemImage::getUrl).collect(Collectors.toList());
+
+        return MapResponseDTO.ItemMarkerDetail.builder()
+                .status(item.getStatus())
+                .itemCategory(item.getItemCategory())
+                .purchaseMethod(item.getPurchaseMethod())
+                .isScraped(isVerified)
+                .imageUrls(imageUrls)
+                .title(item.getName())
+                .price(item.getPrice())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
+                .build();
+    }
+
+    public static MapResponseDTO.ItemMarkerDetail toItemMarkerDetail(SharingItem item, boolean isVerified) {
+        List<String> imageUrls = item.getItemImages().stream()
+                .map(ItemImage::getUrl).collect(Collectors.toList());
+
+        return MapResponseDTO.ItemMarkerDetail.builder()
+                .status(item.getStatus())
+                .itemCategory(item.getItemCategory())
+                .purchaseMethod(item.getPurchaseMethod())
+                .isScraped(isVerified)
+                .imageUrls(imageUrls)
+                .title(item.getTitle())
+                .price(item.getPrice())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
                 .build();
     }
 }
