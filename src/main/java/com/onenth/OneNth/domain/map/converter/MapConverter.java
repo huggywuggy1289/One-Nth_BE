@@ -87,4 +87,22 @@ public class MapConverter {
                 .longitude(item.getLongitude())
                 .build();
     }
+
+    public static MapResponseDTO.GetPostMarkerDetailsResponseDTO toGetPostMarkerDetailsResponseDTO(List<MapResponseDTO.PostMarkerDetail> postMarkerDetails) {
+        return MapResponseDTO.GetPostMarkerDetailsResponseDTO.builder()
+                .postMarkerDetails(postMarkerDetails)
+                .build();
+    }
+
+    public static MapResponseDTO.PostMarkerDetail toPostMarkerDetail(Post post, boolean isVerified) {
+        return MapResponseDTO.PostMarkerDetail.builder()
+                .placeName(post.getPlaceName())
+                .isScraped(isVerified)
+                .title(post.getTitle())
+                .address(post.getAddress())
+                .createdAt(post.getCreatedAt())
+                .latitude(post.getLatitude())
+                .longitude(post.getLongitude())
+                .build();
+    }
 }

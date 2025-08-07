@@ -7,7 +7,7 @@ import com.onenth.OneNth.domain.product.entity.enums.Status;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class MapResponseDTO {
@@ -31,7 +31,7 @@ public class MapResponseDTO {
     @Getter
     @Builder
     public static class GetItemMarkerDetailsResponseDTO {
-        List<ItemMarkerDetail> itemMarkerDetails;
+        private List<ItemMarkerDetail> itemMarkerDetails;
     }
 
     @Getter
@@ -44,6 +44,24 @@ public class MapResponseDTO {
         private List<String> imageUrls;
         private String title;
         private Integer price;
+        private Double latitude;
+        private Double longitude;
+    }
+
+    @Getter
+    @Builder
+    public static class GetPostMarkerDetailsResponseDTO {
+        private List<PostMarkerDetail> postMarkerDetails;
+    }
+
+    @Getter
+    @Builder
+    public static class PostMarkerDetail {
+        private String placeName;
+        private boolean isScraped;
+        private String title;
+        private String address;
+        private LocalDateTime createdAt;
         private Double latitude;
         private Double longitude;
     }

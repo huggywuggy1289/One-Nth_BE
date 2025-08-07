@@ -19,14 +19,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class SharingItemMapService implements MapService {
+public class SharingItemMapService {
 
     private final SharingItemRepository sharingItemRepository;
     private final RegionResolver regionResolver;
     private final MemberRepository memberRepository;
     private final SharingItemScrapRepository sharingItemScrapRepository;
 
-    @Override
     public MapResponseDTO.GetMarkersResponseDTO getMarkers(Long userId, Long regionId) {
 
         Region region = regionResolver.resolveRegion(userId, regionId);

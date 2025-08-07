@@ -1,9 +1,7 @@
 package com.onenth.OneNth.domain.post.repository;
 
-import com.onenth.OneNth.domain.map.enums.MarkerType;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.region.entity.Region;
-import org.slf4j.Marker;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
@@ -46,5 +44,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findByMemberId(Long memberId, Pageable pageable);
 
     @Query("select p from Post p where p.region = :region and p.postType = :postType and p.latitude is not null and p.longitude is not null")
-    List<Post> findAllByRegionAndPostTypeWithLocation(@Param("region") Region region, @Param("postType") MarkerType markerType);
+    List<Post> findAllByRegionAndMarkerTypeWithLocation(@Param("region") Region region, @Param("postType") PostType postType);
 }

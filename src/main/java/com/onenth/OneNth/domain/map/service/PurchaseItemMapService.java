@@ -3,13 +3,9 @@ package com.onenth.OneNth.domain.map.service;
 import com.onenth.OneNth.domain.map.converter.MapConverter;
 import com.onenth.OneNth.domain.map.dto.MapResponseDTO;
 import com.onenth.OneNth.domain.member.entity.Member;
-import com.onenth.OneNth.domain.member.entity.MemberRegion;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
-import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
-import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
-import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.scrapRepository.PurchaseItemScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
@@ -23,14 +19,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PurchaseItemMapService implements MapService {
+public class PurchaseItemMapService {
 
     private final PurchaseItemRepository purchaseItemRepository;
     private final RegionResolver regionResolver;
     private final MemberRepository memberRepository;
     private final PurchaseItemScrapRepository purchaseItemScrapRepository;
 
-    @Override
     public MapResponseDTO.GetMarkersResponseDTO getMarkers(Long userId, Long regionId) {
 
         Region region = regionResolver.resolveRegion(userId, regionId);
