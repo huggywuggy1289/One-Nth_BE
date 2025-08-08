@@ -1,5 +1,7 @@
 package com.onenth.OneNth.domain.post.repository.scrapRepository;
 
+import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +23,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     Optional<Scrap> findByMemberIdAndPostId(Long memberId, Long postId);
 
     boolean existsByPostIdAndMemberId(Long postId, Long memberId);
+
+    boolean existsByMemberAndPost(Member member, Post post);
 }
