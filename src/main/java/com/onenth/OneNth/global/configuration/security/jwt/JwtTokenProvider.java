@@ -11,6 +11,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -92,6 +93,15 @@ public class JwtTokenProvider {
         return null;
     }
 
+    // StompHeaderAccessor에서 JWT 토큰 추출
+    public static String resolveTokenFromAccessor(StompHeaderAccessor accessor) {
+        String bearerToken = accessor.getFirstNativeHeader(Constants.AUTH_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(Constants.TOKEN_PREFIX)) {
+            return bearerToken.substring(Constants.TOKEN_PREFIX.length());
+        }
+        return null;
+    }
+
     // Spring Security 의 Authentication 객체로 변환
     public Authentication extractAuthentication(HttpServletRequest request){
         String accessToken = resolveToken(request);
@@ -100,7 +110,4 @@ public class JwtTokenProvider {
         }
         return getAuthentication(accessToken);
     }
-
-
-
 }

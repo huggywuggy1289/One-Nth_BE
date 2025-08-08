@@ -4,10 +4,12 @@ import com.onenth.OneNth.domain.product.converter.PurchaseItemConverter;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.PurchaseItemResponseDTO;
+import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.service.PurchaseItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -51,14 +53,14 @@ public class PurchaseItemController {
 
     // 상품 검색
     @Operation(
-            summary = "같이사요 상품 검색",
+            summary = "같이사요 상품 검색 API",
             description = """
             키워드로 상품을 검색합니다.
             """
     )
     @GetMapping
     public ResponseEntity<ApiResponse<List<PurchaseItemListDTO>>> searchItems(
-            @RequestParam String keyword,
+            @RequestParam(name = "keyword") String keyword,
             @AuthUser Long userId
     ) {
         List<PurchaseItemListDTO> result = purchaseItemService.searchItems(keyword, userId);
@@ -69,21 +71,20 @@ public class PurchaseItemController {
     // 상품검색(상품명)
     @GetMapping("/title")
     @Operation(
-            summary = "상품명 기반 지역 설정 검색",
+            summary = "상품명 기반 지역 설정 검색 API",
             description = "- 사용자가 설정한 3개 지역 내에서만 상품명을 기준으로 검색"
     )
     public ApiResponse<List<PurchaseItemListDTO>> searchByTitleWithUserRegion(
-            @RequestParam String keyword,
+            @RequestParam(name = "keyword") String keyword,
             @AuthUser Long userId
     ) {
         List<PurchaseItemListDTO> results = purchaseItemService.searchByTitleInUserRegions(keyword, userId);
         return ApiResponse.onSuccess(results);
     }
 
-
     // 단일 상품 검색
     @Operation(
-            summary = "같이사요 단일 상품조회",
+            summary = "같이사요 단일 상품조회 API",
             description = """
             상품의 상세조회를 합니다.
             
@@ -92,9 +93,7 @@ public class PurchaseItemController {
             - `지역명` : 설정과 무관하게 특정 지역명으로 검색
             """
     )
-  
     @GetMapping("/{groupPurchaseId}")
-
     public ApiResponse<PurchaseItemResponseDTO.GetPurchaseItemResponseDTO> getGroupPurchaseDetail(
             @PathVariable Long groupPurchaseId,
             @AuthUser Long userId
@@ -116,6 +115,7 @@ public class PurchaseItemController {
         purchaseItemService.addScrap(purchaseItemId, userId);
         return ApiResponse.onSuccess(null);
     }
+
     @DeleteMapping("/{purchaseItemId}/scrap")
     @Operation(summary = "같이사요 상품 스크랩 삭제")
     public ApiResponse<Void> removeScrap(
@@ -125,5 +125,22 @@ public class PurchaseItemController {
         purchaseItemService.removeScrap(purchaseItemId, userId);
         return ApiResponse.onSuccess(null);
     }
-}
 
+    @Operation(
+            summary = "같이 사요 상품 상태 전환 API",
+            description = """
+    특정 같이 사요 상품의 상태를 전환합니다. (판매 중 <-> 판매 완료)
+    - URL 경로에 포함된 `groupPurchaseId` 위치에 상태를 전환하고자 하는 같이 사요 상품의 Id를 넣어 요청합니다.
+    - 쿼리 파라미터 'status'에 후기에 전환하고자 하는 상태를 명시합니다. (DEFAULT: 판매중, COMPLETED: 판매완료)
+    """
+    )
+    @PatchMapping(value = "/{groupPurchaseId}/status")
+    public ApiResponse<String> changeItemStatus(
+            @AuthUser Long memberId,
+            @PathVariable("groupPurchaseId") Long purchaseItemId,
+            @Parameter(description = "상품 상태 (DEFAULT: 판매중, COMPLETED: 판매완료)")
+            @RequestParam("status") Status status) {
+        purchaseItemService.changeItemStatus(purchaseItemId,memberId,status);
+        return ApiResponse.onSuccess("상품 상태 전환이 완료되었습니다.");
+    }
+}

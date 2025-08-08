@@ -24,6 +24,9 @@ import com.onenth.OneNth.domain.product.repository.itemRepository.TagRepository;
 import com.onenth.OneNth.domain.product.repository.scrapRepository.PurchaseItemScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
+import com.onenth.OneNth.global.apiPayload.exception.handler.PurchasingItemHandler;
 import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
 import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +53,6 @@ public class PurchaseItemService {
     private  final TagRepository tagRepository;
     private final RegionRepository regionRepository;
     private final GeoCodingService geoCodingService;
-    // +
     private final MemberRepository memberRepository;
     private final PurchaseItemScrapRepository scrapRepository;
 
@@ -302,8 +304,6 @@ public class PurchaseItemService {
         return !regionRepository.findByRegionNameContaining(keyword).isEmpty();
     }
 
-
-
     // 단일 상품 리스트 조회
     @Transactional(readOnly = true)
     public PurchaseItemResponseDTO.GetPurchaseItemResponseDTO getItemDetail(Long groupPurchaseId, Long userId) {
@@ -343,6 +343,21 @@ public class PurchaseItemService {
                 .latitude(item.getLatitude())
                 .longitude(item.getLongitude())
                 .build();
+    }
+
+    @Transactional
+    public void changeItemStatus(Long groupPurchaseId, Long memberId, Status status) {
+
+        PurchaseItem item = purchaseItemRepository.findById(groupPurchaseId)
+                .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.PURCHASE_ITEM_NOT_FOUND));
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        if (!item.getMember().equals(member)) {
+            throw new MemberHandler(ErrorStatus._FORBIDDEN);
+        }
+        item.setStatus(status);
     }
 
     // 북마크 추가

@@ -41,6 +41,8 @@ public class SecurityConfig {
                                         "/api/members/password/reset",
                                         "/api/members/reissue",
                                         "/swagger-ui.html",
+                                        "/ws-chat/**",
+                                        "/ws-chat",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()

@@ -11,17 +11,17 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PurchaseItem extends BaseEntity {
+public class PurchaseItem extends BaseEntity implements Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,4 +78,20 @@ public class PurchaseItem extends BaseEntity {
 
     @Column
     private Double longitude;
+
+    public void setStatus(Status status){
+        this.status = status;
+    }
+
+    public void setLatitude(Double latitude){
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(Double longitude){
+        this.longitude = longitude;
+    }
+
+    public String getProductName(){
+        return this.name;
+    }
 }

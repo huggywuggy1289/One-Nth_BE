@@ -24,6 +24,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
+@Tag(name = "거래후기(리뷰) 관련 API", description = "거래후기 등록, 삭제, 수정등 API 지원")
 public class ReviewController {
 
     private final ReviewCommandService reviewCommandService;

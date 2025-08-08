@@ -66,6 +66,12 @@ public enum ErrorStatus implements BaseErrorCode {
     BLOCK_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK001", "차단 대상 사용자가 존재하지 않습니다."),
     BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOCK002", "차단한 사용자 목록에 존재하지 않습니다."),
 
+    // 거래 관련
+    DEAL_CONFIRMATION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION001", "해당 상품은 이미 거래확정 폼이 발행된 상태입니다."),
+    DEAL_CONFIRMATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION002", "id에 해당하는 거래확정 폼이 존재하지 않습니다"),
+    DEAL_COMPLETION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION003", "해당 상품은 이미 거래완료 폼이 발행된 상태입니다."),
+    DEAL_COMPLETION_ALREADY(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION004", "해당 상품은 이미 거래완료된 상태입니다."),
+    NOT_DEAL_COMPLETION(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION005", "거래 확정 상태인 상품이 아닙니다."),
     // 외부 API 관련
     EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "EXTERNAL_API_001", "외부 API 통신 중 문제가 발생했습니다."),
     ;

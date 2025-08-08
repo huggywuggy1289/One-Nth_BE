@@ -18,11 +18,10 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SharingItem extends BaseEntity {
+public class SharingItem extends BaseEntity implements Item{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,4 +85,20 @@ public class SharingItem extends BaseEntity {
 
     @Column
     private Double longitude;
+
+    public void setStatus(Status status){
+        this.status = status;
+    }
+
+    public void setLatitude(Double latitude){
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(Double longitude){
+        this.longitude = longitude;
+    }
+
+    public String getProductName(){
+        return this.title;
+    }
 }

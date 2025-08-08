@@ -4,22 +4,20 @@ import com.onenth.OneNth.domain.product.converter.SharingItemConverter;
 import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
-import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
-import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
+import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.service.SharingItemService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -51,14 +49,14 @@ public class SharingItemController {
 
     // 상품 검색
     @Operation(
-            summary = "함께나눠요 상품 검색",
+            summary = "함께나눠요 상품 검색 API",
             description = """
-            키워드로 상품을 검색합니다.
-            
-            - `#태그명` : 설정한 3개 지역 내 태그로 검색
-            - `카테고리명` : 설정한 3개 지역 내 카테고리로 검색
-            - `지역명` : 설정과 무관하게 특정 지역명으로 검색
-            """
+                    키워드로 상품을 검색합니다.
+                    
+                    - `#태그명` : 설정한 3개 지역 내 태그로 검색
+                    - `카테고리명` : 설정한 3개 지역 내 카테고리로 검색
+                    - `지역명` : 설정과 무관하게 특정 지역명으로 검색
+                    """
     )
     @GetMapping
     public ResponseEntity<ApiResponse<List<SharingItemListDTO>>> searchSharingItems(
@@ -72,10 +70,10 @@ public class SharingItemController {
 
     // 상품검색(상품명)
     @Operation(
-            summary = "상품명 기반 지역 선택 검색",
+            summary = "상품명 기반 지역 선택 검색 API",
             description = """
-    - 설정한 3개 지역 내 상품명으로 검색
-    """
+                    - 설정한 3개 지역 내 상품명으로 검색
+                    """
     )
 
     @GetMapping("/title")
@@ -89,7 +87,7 @@ public class SharingItemController {
     }
 
     @Operation(
-            summary = "함께 나눠요 단일 상품 조회",
+            summary = "함께 나눠요 단일 상품 조회 API",
             description = "ID를 기준으로 함께 나눠요 상품의 상세 정보를 조회합니다."
     )
     @GetMapping("/{sharingItemId}")
@@ -99,6 +97,24 @@ public class SharingItemController {
     ) {
         SharingItemResponseDTO.GetResponse detail = sharingItemService.getItemDetail(sharingItemId, userId);
         return ApiResponse.onSuccess(detail);
+    }
+
+    @Operation(
+            summary = "함께 나눠요 상품 상태 전환 API",
+            description = """
+                    특정 함께 나눠요 상품의 상태를 전환합니다. (판매 중 <-> 판매 완료)
+                    - URL 경로에 포함된 `groupPurchaseId` 위치에 상태를 전환하고자 하는 함께 나눠요 상품의 Id를 넣어 요청합니다.
+                    - 쿼리 파라미터 'status'에 후기에 전환하고자 하는 상태를 명시합니다. (DEFAULT: 판매중, COMPLETED: 판매완료)
+                    """
+    )
+    @PatchMapping(value = "/{sharingItemId}/status")
+    public ApiResponse<String> changeItemStatus(
+            @AuthUser Long memberId,
+            @PathVariable("sharingItemId") Long purchaseItemId,
+            @Parameter(description = "상품 상태 (DEFAULT: 판매중, COMPLETED: 판매완료)")
+            @RequestParam("status") Status status) {
+        sharingItemService.changeItemStatus(purchaseItemId, memberId, status);
+        return ApiResponse.onSuccess("상품 상태 전환이 완료되었습니다.");
     }
 
     @Operation(
