@@ -11,8 +11,8 @@ public class KakaoRequestDTO {
     @Getter
     @Setter
     public static class KakaoLoginRequestDTO {
-        @NotBlank(message = "인가코드는 필수입니다.")
-        private String code; // 카카오 인가 코드
+        @NotBlank(message = "access token은 필수입니다.")
+        private String accessToken;  // 카카오 accessToken으로 변경
     }
 
     @Getter

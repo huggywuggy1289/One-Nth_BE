@@ -30,10 +30,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class KakaoAuthService {
 
-    @Value("${kakao.redirect_uri}")
-    private String redirectUri;
-    @Value("${kakao.client_id}")
-    private String clientId;
+//    @Value("${kakao.redirect_uri}")
+//    private String redirectUri;
+//    @Value("${kakao.client_id}")
+//    private String clientId;
 
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -43,7 +43,7 @@ public class KakaoAuthService {
 
     // 카카오 로그인 요청 처리 서비스
     public KakaoResponseDTO.KakaoLoginResponseDTO processKakaoLogin (KakaoRequestDTO.KakaoLoginRequestDTO request) {
-        String accessToken = getKakaoAccessToken(request.getCode());
+        String accessToken = request.getAccessToken();
         KakaoUserInfo userInfo = getUserInfo(accessToken);
 
         Optional<Member> member = memberRepository.findBySocialIdAndLoginType(userInfo.getId(), LoginType.KAKAO);
@@ -124,28 +124,6 @@ public class KakaoAuthService {
                 .build();
     }
 
-    //프론트에서 받은 인가 코드로 access token 요청하는 메서드
-    private String getKakaoAccessToken(String authorizationCode) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "authorization_code");
-        params.add("client_id", clientId);
-        params.add("redirect_uri", redirectUri);
-        params.add("code", authorizationCode);
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-        ResponseEntity<Map> response = restTemplate.postForEntity(
-                "https://kauth.kakao.com/oauth/token",
-                request,
-                Map.class
-        );
-
-        return (String) response.getBody().get("access_token");
-    }
-
     // 카카오에서 발급받은 access 토큰을 이용해서 사용자 정보 요청하는 메서드
     private KakaoUserInfo getUserInfo(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
@@ -170,4 +148,28 @@ public class KakaoAuthService {
                 String.valueOf(body.get("id"))
         );
     }
+
+
+//    //프론트에서 받은 인가 코드로 access token 요청하는 메서드
+//    private String getKakaoAccessToken(String authorizationCode) {
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//
+//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+//        params.add("grant_type", "authorization_code");
+//        params.add("client_id", clientId);
+//        params.add("redirect_uri", redirectUri);
+//        params.add("code", authorizationCode);
+//
+//        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+//        ResponseEntity<Map> response = restTemplate.postForEntity(
+//                "https://kauth.kakao.com/oauth/token",
+//                request,
+//                Map.class
+//        );
+//
+//        return (String) response.getBody().get("access_token");
+//    }
+
 }
