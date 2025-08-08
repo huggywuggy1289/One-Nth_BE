@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.product.dto;
 
 import com.onenth.OneNth.domain.product.entity.SharingItem;
+import com.onenth.OneNth.domain.product.entity.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +22,9 @@ public class SharingItemListDTO {
     private Double latitude;
     private Double longitude;
 
+    private String status;
+    private String statusLabel;
+
     public static SharingItemListDTO fromEntity(SharingItem entity, boolean isBookmarked) {
         return SharingItemListDTO.builder()
                 .id(entity.getId())
@@ -35,6 +39,16 @@ public class SharingItemListDTO {
                 .latitude(entity.getLatitude())
                 .longitude(entity.getLongitude())
                 .bookmarked(isBookmarked)
+                .status(entity.getStatus().name())
+                .statusLabel(toStatusLabel(entity.getStatus()))
                 .build();
+    }
+
+    public static String toStatusLabel(Status s) {
+        return switch (s) {
+            case DEFAULT -> "판매중";
+            case IN_PROGRESS -> "거래확정";
+            case COMPLETED -> "거래완료";
+        };
     }
 }
