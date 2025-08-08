@@ -37,8 +37,12 @@ public class DealConfirmation extends BaseEntity {
     private TradeType tradeType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private Member member;
+    @JoinColumn(name = "seller_id", nullable = false)
+    private Member seller;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id", nullable = false)
+    private Member buyer;
 
     @OneToOne(mappedBy = "dealConfirmation", cascade = CascadeType.ALL, orphanRemoval = true)
     private DealCompletion dealCompletion;

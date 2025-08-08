@@ -11,7 +11,7 @@ public class DealConverter {
 
     public static DealConfirmation toDealConfirmation(
             DealRequestDTO.DealConfirmationRequestDTO request,
-            Member member) {
+            Member seller, Member buyer) {
         return DealConfirmation.builder()
                 .tradeDate(request.getDealDate())
                 .tradePrice(request.getPurchasePrice())
@@ -19,17 +19,19 @@ public class DealConverter {
                 .tradeType(request.getTradeType())
                 .itemType(request.getItemType())
                 .productId(request.getItemId())
-                .member(member)
+                .seller(seller)
+                .buyer(buyer)
                 .build();
     }
 
     public static DealCompletion toDealCompletion(
             DealRequestDTO.DealCompletionRequestDTO request,
-            Member member, DealConfirmation dealConfirmation
+            Member seller, Member buyer, DealConfirmation dealConfirmation
     ){
         return DealCompletion.builder()
                 .dealConfirmation(dealConfirmation)
-                .member(member)
+                .seller(seller)
+                .buyer(buyer)
                 .tradeDate(request.getDealDate())
                 .tradePrice(request.getTradePrice())
                 .tradeCount(request.getTradeCount())

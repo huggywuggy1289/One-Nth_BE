@@ -23,9 +23,13 @@ public class DealCompletion extends BaseEntity {
     @JoinColumn(name = "deal_confirmation_id", nullable = false)
     private DealConfirmation dealConfirmation;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", nullable = false)
+    private Member seller;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id", nullable = false)
+    private Member buyer;
 
     @Column(nullable = false)
     private LocalDate tradeDate;
