@@ -14,7 +14,6 @@ public interface SharingItemRepository extends JpaRepository<SharingItem, Long>,
     Optional<SharingItem> findById(Long id);
     List<SharingItem> findByMember(Member member);
 
-
     // 상품명(지역 필터링)
     @Query("""
     SELECT s

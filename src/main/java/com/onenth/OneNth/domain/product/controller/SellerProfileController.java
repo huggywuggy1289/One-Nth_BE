@@ -56,6 +56,22 @@ public class SellerProfileController {
         SellerProfileResponseDTO dto = sellerProfileService.getSharingSellerProfile(userId);
         return ApiResponse.onSuccess(dto);
     }
+
+    @Operation(
+            summary = "판매자 프로필 거래 내역 및 총 별점 조회",
+            description = """
+            - 판매자의 프로필에서 해당 판매자의 거래 내역(거래 수) 및 총 별점을 반환합니다.
+            - userId 에 조회하고자 하는 유저의 Id를 넣어주세요
+            """
+    )
+    @GetMapping("/trade-history/{userId}")
+    public ApiResponse<SellerProfileResponseDTO.TradeHistoryResponseDTO> getTradeHistory(
+            @Parameter(description = "조회할 판매자의 ID", required = true)
+            @PathVariable("userId") Long userId
+    ) {
+        SellerProfileResponseDTO.TradeHistoryResponseDTO result = sellerProfileService.countUserReceivedReviews(userId);
+        return ApiResponse.onSuccess(result);
+    }
 }
 
 

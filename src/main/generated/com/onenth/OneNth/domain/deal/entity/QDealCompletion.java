@@ -24,6 +24,8 @@ public class QDealCompletion extends EntityPathBase<DealCompletion> {
 
     public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
 
+    public final com.onenth.OneNth.domain.member.entity.QMember buyer;
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -31,7 +33,7 @@ public class QDealCompletion extends EntityPathBase<DealCompletion> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final com.onenth.OneNth.domain.member.entity.QMember member;
+    public final com.onenth.OneNth.domain.member.entity.QMember seller;
 
     public final NumberPath<Integer> tradeCount = createNumber("tradeCount", Integer.class);
 
@@ -62,8 +64,9 @@ public class QDealCompletion extends EntityPathBase<DealCompletion> {
 
     public QDealCompletion(Class<? extends DealCompletion> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.buyer = inits.isInitialized("buyer") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("buyer")) : null;
         this.dealConfirmation = inits.isInitialized("dealConfirmation") ? new QDealConfirmation(forProperty("dealConfirmation"), inits.get("dealConfirmation")) : null;
-        this.member = inits.isInitialized("member") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("member")) : null;
+        this.seller = inits.isInitialized("seller") ? new com.onenth.OneNth.domain.member.entity.QMember(forProperty("seller")) : null;
     }
 
 }
