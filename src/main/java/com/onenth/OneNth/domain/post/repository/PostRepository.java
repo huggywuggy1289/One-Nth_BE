@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.post.repository;
 
+import com.onenth.OneNth.domain.map.dto.MapResponseDTO;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.region.entity.Region;
 import org.springframework.data.domain.Page;
@@ -45,4 +46,23 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("select p from Post p where p.region = :region and p.postType = :postType and p.latitude is not null and p.longitude is not null")
     List<Post> findAllByRegionAndMarkerTypeWithLocation(@Param("region") Region region, @Param("postType") PostType postType);
+
+    @Query(value = """
+    select new com.onenth.OneNth.domain.map.dto.MapResponseDTO$PostMarkerDetail(
+        p.placeName as placeName,
+        case when s.id is not null then true else false end as isScraped,
+        p.title as title,
+        p.address as address,
+        p.createdAt as createdAt,
+        p.latitude as latitude,
+        p.longitude as longitude)
+    from Post p
+    left join Scrap s on s.post = p and s.member.id = :memberId
+    where p.id in :ids
+    """)
+    List<MapResponseDTO.PostMarkerDetail> findMarkerDetailsWithScrap(
+            @Param("ids") List<Long> ids,
+            @Param("memberId") Long memberId
+    );
+
 }
