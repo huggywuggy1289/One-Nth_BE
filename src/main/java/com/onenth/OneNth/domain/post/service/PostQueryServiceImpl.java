@@ -41,14 +41,32 @@ public class PostQueryServiceImpl implements PostQueryService {
         // LIFE_TIP은 지역 없이, 나머지는 조건에 따라 regionName 처리
         Page<Post> posts;
 
+        boolean isTagSearch = keyword != null && keyword.startsWith("#");
+        String searchKeyword = isTagSearch ? keyword.substring(1) : keyword;
+
         if (postType == PostType.LIFE_TIP) {
-            posts = postRepository.findByPostTypeAndKeyword(postType, keyword, pageable);
-        } else {
-            if (regionName != null && !regionName.isBlank()) {
-                posts = postRepository.findByPostTypeAndRegionNameAndKeyword(
-                        postType, regionName, keyword, pageable);
+            if(isTagSearch) {
+                posts = postRepository.findByPostTypeAndTagName(postType, searchKeyword, pageable);
             } else {
                 posts = postRepository.findByPostTypeAndKeyword(postType, keyword, pageable);
+            }
+        } else {
+            if (regionName != null && !regionName.isBlank()) {
+                if (isTagSearch) {
+                    // 태그 + 지역명 검색
+                    posts = postRepository.findByPostTypeAndRegionNameAndTagName(postType, regionName, searchKeyword, pageable);
+                } else {
+                    // 제목/내용 + 지역명 검색
+                    posts = postRepository.findByPostTypeAndRegionNameAndKeyword(postType, regionName, searchKeyword, pageable);
+                }
+            } else {
+                if (isTagSearch) {
+                    // 태그 검색 (지역 무관)
+                    posts = postRepository.findByPostTypeAndTagName(postType, searchKeyword, pageable);
+                } else {
+                    // 제목/내용 검색 (지역 무관)
+                    posts = postRepository.findByPostTypeAndKeyword(postType, searchKeyword, pageable);
+                }
             }
         }
 

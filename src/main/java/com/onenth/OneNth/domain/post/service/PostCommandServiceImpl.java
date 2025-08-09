@@ -6,9 +6,13 @@ import com.onenth.OneNth.domain.post.converter.PostConverter;
 import com.onenth.OneNth.domain.post.dto.PostSaveRequestDTO;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.PostImage;
+import com.onenth.OneNth.domain.post.entity.PostTag;
+import com.onenth.OneNth.domain.post.entity.Tag;
 import com.onenth.OneNth.domain.post.entity.enums.PostType;
 import com.onenth.OneNth.domain.post.repository.imageRepository.ImageRepository;
 import com.onenth.OneNth.domain.post.repository.PostRepository;
+import com.onenth.OneNth.domain.post.repository.tagRepository.PostTagRepositoryCustom;
+import com.onenth.OneNth.domain.post.repository.tagRepository.PostTagRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -32,12 +36,14 @@ public class PostCommandServiceImpl implements PostCommandService {
     private final MemberRepository memberRepository;
     private final RegionRepository regionRepository;
     private final ImageRepository imageRepository;
+    private final PostTagRepository postTagRepository;
+    private final PostTagRepositoryCustom postTagRepositoryCustom;
     private final AmazonS3Manager amazonS3Manager;
     private final GeoCodingService geoCodingService;
 
     @Override
     @Transactional
-    public Long save(PostSaveRequestDTO requestDto, PostType postType, Long memberId, List<MultipartFile> images){
+    public Long save(PostSaveRequestDTO requestDto, PostType postType, Long memberId, List<MultipartFile> images) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
@@ -51,21 +57,37 @@ public class PostCommandServiceImpl implements PostCommandService {
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지역입니다."));
         }
 
-        Post post = PostConverter.toEntity(requestDto, postType, member, region);
-        Post savedPost = postRepository.save(post);
+        Post savedPost = postRepository.save(PostConverter.toEntity(requestDto, postType, member, region));
 
-        if(images != null && !images.isEmpty()){
+        // 이미지 저장
+        if (images != null && !images.isEmpty()) {
             for (MultipartFile image : images) {
                 String imageUrl = amazonS3Manager.uploadFile("post/" + UUID.randomUUID(), image);
-                PostImage postImage = PostImage.builder()
+                imageRepository.save(PostImage.builder()
                         .post(savedPost)
                         .imageUrl(imageUrl)
-                        .build();
-                imageRepository.save(postImage);
+                        .build());
             }
         }
 
-        return postRepository.save(post).getId();
+        // 태그 저장
+        if (requestDto.getTags() != null && !requestDto.getTags().isEmpty()) {
+            for (String tagName : requestDto.getTags()) {
+                Tag tag = postTagRepository.findByName(tagName)
+                        .orElseGet(() -> postTagRepository.save(Tag.builder()
+                                .name(tagName)
+                                .build()));
+
+                PostTag postTag = PostTag.builder()
+                        .post(savedPost)
+                        .tag(tag)
+                        .build();
+
+                savedPost.getPostTag().add(postTag);
+            }
+        }
+
+        return savedPost.getId();
     }
 
     // 조회수 증가 메서드
@@ -132,6 +154,25 @@ public class PostCommandServiceImpl implements PostCommandService {
             for (MultipartFile image : images) {
                 String imageUrl = amazonS3Manager.uploadFile("post/" + UUID.randomUUID(), image);
                 imageRepository.save(PostImage.builder().post(post).imageUrl(imageUrl).build());
+            }
+        }
+
+        postTagRepositoryCustom.deleteAllByPost(post);
+
+        if (requestDto.getTags() != null && !requestDto.getTags().isEmpty()) {
+            for (String tagName : requestDto.getTags()) {
+                Tag tag = postTagRepository.findByName(tagName)
+                        .orElseGet(() -> postTagRepository.save(Tag.builder()
+                                .name(tagName)
+                                .build()));
+
+                PostTag postTag = PostTag.builder()
+                        .post(post)
+                        .tag(tag)
+                        .build();
+
+                postTagRepositoryCustom.save(postTag);
+                post.getPostTag().add(postTag);
             }
         }
 
