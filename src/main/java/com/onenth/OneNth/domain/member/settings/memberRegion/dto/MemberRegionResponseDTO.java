@@ -48,29 +48,6 @@ public class MemberRegionResponseDTO {
     }
 
     @Getter
-    @NoArgsConstructor
-    public static class KakaoRegionResponseDTO {
-        private List<Document> documents;
-
-        @Getter
-        @NoArgsConstructor
-        public static class Document {
-            @JsonProperty("region_type")
-            private String regionType;
-
-            @JsonProperty("region_1depth_name")
-            private String region1DepthName;
-
-            @JsonProperty("region_2depth_name")
-            private String region2DepthName;
-
-            @JsonProperty("region_3depth_name")
-            private String region3DepthName;
-        }
-
-    }
-
-    @Getter
     @Builder
     public static class GetRegionsByKeywordResponseDTO {
         private List<SearchedRegionSummary> regions;

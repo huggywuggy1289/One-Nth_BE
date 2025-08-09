@@ -8,6 +8,7 @@ import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
+import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ public class RegionResolver {
     private final MemberRepository memberRepository;
     private final RegionRepository regionRepository;
     private final MemberRegionRepository memberRegionRepository;
+    private final GeoCodingService geoCodingService;
 
     public Region resolveRegion(Long userId, Long regionId) {
 
@@ -33,5 +35,12 @@ public class RegionResolver {
 
             return mainMemberRegion.getRegion();
         }
+    }
+
+    public Region resolveRegion(double lat, double lng) {
+        String regionName = geoCodingService.getRegionNameByCoordinates(lat, lng);
+
+        return regionRepository.findByRegionName(regionName)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.REGION_NOT_FOUND));
     }
 }

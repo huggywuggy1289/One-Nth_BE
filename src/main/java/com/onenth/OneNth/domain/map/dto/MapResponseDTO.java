@@ -73,4 +73,11 @@ public class MapResponseDTO {
         private Double latitude;
         private Double longitude;
     }
+
+    @Getter
+    @Builder
+    public static class GetRegionByCoordinatesResponseDTO {
+        private Integer regionId;
+        private String regionName;
+    }
 }

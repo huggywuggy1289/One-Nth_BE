@@ -28,6 +28,7 @@ public class MapController {
     private final PurchaseItemMapService purchaseItemMapService;
     private final SharingItemMapService sharingItemMapService;
     private final PostMapService postMapService;
+    private final MapRegionService mapRegionService;
 
     @Operation(
             summary = "같이사요/함께나눠요 지도에 마커 표시 API",
@@ -40,7 +41,7 @@ public class MapController {
                     "*MarkerType: 같이사요(purchase-item), 함께나눠요(sharing-item), 할인게시판(discount), 맛집게시판(restaurant)"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER_REGION005", description = "사용자의 메인 지역 설정이 필요합니다. 우리동네 설정 화면에서 메인 지역을 선택해주세요.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
@@ -72,7 +73,7 @@ public class MapController {
                     "*MarkerType: 같이사요(purchase-item), 함께나눠요(sharing-item), 할인게시판(discount), 맛집게시판(restaurant)"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER_REGION005", description = "사용자의 메인 지역 설정이 필요합니다. 우리동네 설정 화면에서 메인 지역을 선택해주세요.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
@@ -98,7 +99,7 @@ public class MapController {
                     "응답으로 해당 거래글의 현재 상태(status: DEFAULT/IN_PROGRESS/COMPLETED), 거래 글의 카테고리, 구매 방식(ONLINE/OFFLINE), 스크랩 여부, 이미지 url들, 거래 상품 이름, 거래 상품 가격, 해당 거래글의 위도 및 경도를 반환합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PURCHASE_ITEM_4001", description = "존재하지 않는 품목입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SHARING_ITEM_4001", description = "존재하지 않는 품목입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
@@ -125,7 +126,7 @@ public class MapController {
                     "응답으로 해당 게시글의 장소 이름, 스크랩 여부, 글 제목, 장소 주소, 게시글 생성 시간, 장소 정보(위/경도)를 반환합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER001", description = "존재하지 않는 사용자입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_001", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MAP001", description = "지원하지 않는 MarkerType입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
@@ -143,5 +144,23 @@ public class MapController {
         } else {
             throw new GeneralException(ErrorStatus.INVALID_MARKER_TYPE);
         }
+    }
+
+    @Operation(
+            summary = "좌표 기반으로 regionId와 regionName을 보내주는 API\n",
+            description = "위도/경도 좌표를 요청으로 받아 해당 위도/경도의 서버 내부에 저장된 regionId와 regionName을 응답으로 보내주는 API입니다.\n" +
+                    "응답으로 regionId와 regionName을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @GetMapping("/regions")
+    public ApiResponse<MapResponseDTO.GetRegionByCoordinatesResponseDTO> getRegionByCoordinates(
+            @RequestParam double lat,
+            @RequestParam double lng
+    ) {
+        return ApiResponse.onSuccess(mapRegionService.getRegionByCoordinates(lat, lng));
     }
 }
