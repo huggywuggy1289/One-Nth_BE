@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 public class PostSaveRequestDTO {
@@ -31,10 +33,13 @@ public class PostSaveRequestDTO {
     @Schema(hidden = true)
     private Double longitude;
 
+    private List<String> tags;
+
     @Builder
     public PostSaveRequestDTO(String title, String content,
                               Double latitude, Double longitude, String link,
-                              String regionName, Integer regionId) {
+                              String regionName, Integer regionId,
+                              List<String> tags) {
         this.title = title;
         this.content = content;
         this.latitude = latitude;
@@ -42,5 +47,6 @@ public class PostSaveRequestDTO {
         this.link = link;
         this.regionName = regionName;
         this.regionId = regionId;
+        this.tags = tags;
     }
 }

@@ -38,6 +38,28 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE p.id = :postId")
     Optional<Post> findByIdWithMemberAndRegion(@Param("postId") Long postId);
 
+    @Query("SELECT DISTINCT p FROM Post p " +
+            "JOIN p.postTag pt " +
+            "JOIN pt.tag t " +
+            "WHERE p.postType = :postType " +
+            "AND LOWER(t.name) LIKE LOWER(CONCAT('%', :tagName, '%'))")
+    Page<Post> findByPostTypeAndTagName(
+            @Param("postType") PostType postType,
+            @Param("tagName") String tagName,
+            Pageable pageable);
+
+    @Query("SELECT DISTINCT p FROM Post p " +
+            "JOIN p.postTag pt " +
+            "JOIN pt.tag t " +
+            "WHERE p.postType = :postType " +
+            "AND p.regionName LIKE %:regionName% " +
+            "AND LOWER(t.name) LIKE LOWER(CONCAT('%', :tagName, '%'))")
+    Page<Post> findByPostTypeAndRegionNameAndTagName(
+            @Param("postType") PostType postType,
+            @Param("regionName") String regionName,
+            @Param("tagName") String tagName,
+            Pageable pageable);
+
     //마이페이지 - 내가 쓴 글 조회
     Page<Post> findByMemberId(Long memberId, Pageable pageable);
 }
