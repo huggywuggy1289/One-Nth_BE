@@ -45,7 +45,6 @@ public class GeneralAlertQueryServiceImpl implements GeneralAlertQueryService {
         List<ProductKeywordAlert> productKeywordAlerts = productKeywordAlertRepository.findAllByMember(member);
         List<RegionKeywordAlert> regionKeywordAlerts = regionKeywordAlertRepository.findAllByMember(member);
 
-        GeneralAlertResponseDTO.GeneralAlertSummary scrapAlertSummary = GeneralAlertConverter.toGeneralAlertSummary(AlertType.SCRAP, memberAlertSetting);
         GeneralAlertResponseDTO.GeneralAlertSummary reviewAlertSummary = GeneralAlertConverter.toGeneralAlertSummary(AlertType.REVIEW, memberAlertSetting);
 
         List<Object> mergedAlerts = KeywordAlertSortUtil.mergeAndSortAlerts(productKeywordAlerts, regionKeywordAlerts);
@@ -54,6 +53,6 @@ public class GeneralAlertQueryServiceImpl implements GeneralAlertQueryService {
                 .map(keywordAlert -> GeneralAlertConverter.toKeywordAlertSummary(keywordAlert))
                 .collect(Collectors.toList());
 
-        return GeneralAlertConverter.toGetAllAlertSettingsResponseDTO(scrapAlertSummary, reviewAlertSummary, keywordAlertSummaryList);
+        return GeneralAlertConverter.toGetAllAlertSettingsResponseDTO(reviewAlertSummary, keywordAlertSummaryList);
     }
 }
