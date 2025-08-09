@@ -1,8 +1,11 @@
 package com.onenth.OneNth.domain.post.repository.scrapRepository;
 
+import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,14 +14,12 @@ import java.util.Optional;
 
 public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
-    @Query("SELECT s FROM Scrap s " +
-            "JOIN FETCH s.post p " +
-            "JOIN FETCH p.region r " +
-            "WHERE s.member.id = :memberId " +
-            "ORDER BY s.createdAt DESC ")
+    @EntityGraph(attributePaths = {"post", "post.region"})
     Page<Scrap> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     Optional<Scrap> findByMemberIdAndPostId(Long memberId, Long postId);
 
     boolean existsByPostIdAndMemberId(Long postId, Long memberId);
+
+    boolean existsByMemberAndPost(Member member, Post post);
 }

@@ -42,6 +42,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO.toStatusLabel;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -342,6 +344,8 @@ public class PurchaseItemService {
                 .price(item.getPrice())
                 .latitude(item.getLatitude())
                 .longitude(item.getLongitude())
+                .status(item.getStatus().name())
+                .statusLabel(toStatusLabel(item.getStatus()))
                 .build();
     }
 
