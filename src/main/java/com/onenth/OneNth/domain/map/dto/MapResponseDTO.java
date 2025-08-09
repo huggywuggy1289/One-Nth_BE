@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.map.enums.MarkerType;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -64,13 +65,21 @@ public class MapResponseDTO {
 
     @Getter
     @Builder
+    @AllArgsConstructor
     public static class PostMarkerDetail {
         private String placeName;
-        private boolean isScraped;
+        private Boolean isScraped;
         private String title;
         private String address;
         private LocalDateTime createdAt;
         private Double latitude;
         private Double longitude;
+    }
+
+    @Getter
+    @Builder
+    public static class GetRegionByCoordinatesResponseDTO {
+        private Integer regionId;
+        private String regionName;
     }
 }

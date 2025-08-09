@@ -102,15 +102,4 @@ public class MapConverter {
                 .build();
     }
 
-    public static MapResponseDTO.PostMarkerDetail toPostMarkerDetail(Post post, boolean isVerified) {
-        return MapResponseDTO.PostMarkerDetail.builder()
-                .placeName(post.getPlaceName())
-                .isScraped(isVerified)
-                .title(post.getTitle())
-                .address(post.getAddress())
-                .createdAt(post.getCreatedAt())
-                .latitude(post.getLatitude())
-                .longitude(post.getLongitude())
-                .build();
-    }
 }

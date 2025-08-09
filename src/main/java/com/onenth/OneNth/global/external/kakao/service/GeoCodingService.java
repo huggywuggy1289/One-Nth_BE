@@ -2,9 +2,17 @@ package com.onenth.OneNth.global.external.kakao.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import com.onenth.OneNth.global.external.kakao.dto.GeoCodingResult;
+import com.onenth.OneNth.global.external.kakao.dto.GetRegionNameByCoordinatesResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,6 +26,8 @@ public class GeoCodingService {
 
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -68,5 +78,43 @@ public class GeoCodingService {
         }
 
         return null;
+    }
+
+    public String getRegionNameByCoordinates(double lat, double lng) {
+
+        try {
+            String url = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json"
+                    + "?x=" + lng + "&y=" + lat;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "KakaoAK " + kakaoApiKey);
+
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<GetRegionNameByCoordinatesResponseDTO> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    GetRegionNameByCoordinatesResponseDTO.class
+            );
+
+            GetRegionNameByCoordinatesResponseDTO responseBody = response.getBody();
+
+            if (responseBody == null || responseBody.getDocuments() == null || responseBody.getDocuments().isEmpty()) {
+                throw new GeneralException(ErrorStatus.EXTERNAL_API_ERROR);
+            }
+
+            GetRegionNameByCoordinatesResponseDTO.Document doc = responseBody
+                    .getDocuments()
+                    .get(0);
+
+            return String.join(" ",
+                    doc.getRegion1DepthName(),
+                    doc.getRegion2DepthName(),
+                    doc.getRegion3DepthName());
+        }
+        catch (Exception e) {
+            throw new GeneralException(ErrorStatus.EXTERNAL_API_ERROR);
+        }
     }
 }
