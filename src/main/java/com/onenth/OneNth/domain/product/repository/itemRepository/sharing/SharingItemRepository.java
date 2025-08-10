@@ -5,6 +5,7 @@ import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -40,4 +41,7 @@ public interface SharingItemRepository extends JpaRepository<SharingItem, Long>,
     Optional<SharingItem> findWithRegionById(@Param("id") Long id);
 
     List<SharingItem> findAllByRegionAndPurchaseMethod(Region region, PurchaseMethod method);
+
+    @EntityGraph(attributePaths = {"itemImages"})
+    List<SharingItem> findByMemberAndStatus(Member member, Status status);
 }

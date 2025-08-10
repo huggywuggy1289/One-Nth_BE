@@ -1,13 +1,17 @@
 package com.onenth.OneNth.domain.deal.controller;
 
 import com.onenth.OneNth.domain.deal.dto.DealRequestDTO;
+import com.onenth.OneNth.domain.deal.dto.DealResponseDTO;
 import com.onenth.OneNth.domain.deal.service.DealCommandService;
+import com.onenth.OneNth.domain.deal.service.DealQueryService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "거래 관련 API", description = " API")
 @RestController
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class DealController {
 
     private final DealCommandService dealCommandService;
+    private final DealQueryService dealQueryService;
 
     @Operation(
             summary = "거래 확정 폼 발행 API",
@@ -88,4 +93,20 @@ public class DealController {
         // 서비스, 응답 DTO
         return ApiResponse.onSuccess("거래취소가 완료되었습니다.");
     }*/
+
+    @Operation(
+            summary = "거래가 가능한 상품(판매자) 조회 API",
+            description = """
+    거래가 가능한 상품 목록을 조회합니다.
+    - 거래확정 폼 작성 시, 내 상품 중 상대방과 거래 시작이 가능한 상품 정보를 얻기 위한 의도로 만들어졌습니다.(드롭박스)
+    - 현재 사용자가 거래확정 폼 작성이 가능한 상품들의 목록들을 조회합니다.
+    """
+    )
+    @GetMapping("/available-products")
+    public ApiResponse<List<DealResponseDTO.getAvailableProductDTO>> getAvailableProducts(
+            @AuthUser Long memberId
+    ) {
+            List<DealResponseDTO.getAvailableProductDTO> result = dealQueryService.getAvailableProducts(memberId);
+            return ApiResponse.onSuccess(result);
+    }
 }
