@@ -17,8 +17,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 
 import java.util.List;
 
-
-@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom {
@@ -70,7 +68,6 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
         QPurchaseItem item = QPurchaseItem.purchaseItem;
         QRegion region = QRegion.region;
         QItemImage image = QItemImage.itemImage;
-        QTag tag = QTag.tag;
 
         String cleanKeyword = regionName.trim();
 
@@ -79,7 +76,6 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
                 .distinct()
                 .join(item.region, region).fetchJoin()
                 .leftJoin(item.itemImages, image).fetchJoin()
-                .join(item.tags, tag)
                 .where(
                         region.regionName.like("%" + cleanKeyword + "%"),
                         item.status.in(Status.DEFAULT, Status.IN_PROGRESS)
@@ -89,7 +85,6 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
 
     @Override
     public List<PurchaseItem> searchByTitleAndRegion(String keyword, List<Integer> regionIds) {
-        log.info("QueryDSL searchByTitleAndRegion 실행");
         QPurchaseItem item = QPurchaseItem.purchaseItem;
         QItemImage image = QItemImage.itemImage;
         QTag tag = QTag.tag;
@@ -101,9 +96,6 @@ public class PurchaseItemRepositoryImpl implements PurchaseItemRepositoryCustom 
         if (regionIds != null && !regionIds.isEmpty()) {
             builder.and(item.region.id.in(regionIds));
         }
-
-        log.info("regionIds = {}", regionIds);
-        log.info("필터링된 쿼리 조건: name LIKE '%{}%', region.id in {}", keyword, regionIds);
 
         return queryFactory
                 .selectFrom(item)
