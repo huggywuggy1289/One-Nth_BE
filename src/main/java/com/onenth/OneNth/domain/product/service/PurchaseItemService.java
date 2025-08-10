@@ -42,6 +42,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO.toStatusLabel;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -80,17 +82,38 @@ public class PurchaseItemService {
         // 회원 및 지역 조회
         Member member = Member.builder().id(userId).build();
 
-        // 등록한 주소명 문자열 기반으로 region 찾아 매핑
-        GeoCodingResult geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
-        if (geo == null) {
-            throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+        GeoCodingResult geo = null;
+        Region region;
+
+        // 장소입력 유효성
+        if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
+            if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
+                throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
+            }
+            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
+            if (geo == null) throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+
+            region = regionRepository.findByRegionNameContaining(dto.getPurchaseLocation())
+                    .stream().findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다."));
+        } else { // ONLINE
+            if (dto.getPurchaseLocation() != null && !dto.getPurchaseLocation().isBlank()) {
+                throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
+            }
+            Region mainRegion = memberRegionRepository.findByMemberId(userId)
+                    .stream().findFirst()
+                    .orElseThrow(() -> new IllegalStateException("대표 지역이 없습니다."))
+                    .getRegion();
+
+            if (mainRegion.getLatitude() == null || mainRegion.getLongitude() == null) {
+                GeoCodingResult g = geoCodingService.getCoordinatesFromAddress(mainRegion.getRegionName());
+                if (g == null) throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
+                mainRegion.setLatitude(g.getLatitude());
+                mainRegion.setLongitude(g.getLongitude());
+                regionRepository.save(mainRegion);
+            }
+            region = mainRegion;          // ★ ONLINE region 확정
         }
-
-        Region region = regionRepository.findByRegionNameContaining(dto.getPurchaseLocation())
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다."));
-
 
         // 태그 유효성 검사 및 저장
         List<Tag> tagEntities = dto.getTags().stream()
@@ -107,29 +130,12 @@ public class PurchaseItemService {
             throw new IllegalArgumentException("태그는 최대 5개까지 입력 가능합니다.");
         }
 
-        // 장소입력 유효성
-        if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
-            if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
-                throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
-            }
-
-            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
-            if (geo == null) {
-                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
-            }
-        } else {
-            // 온라인일 경우엔 주소 없어야 함
-            if (dto.getPurchaseLocation() != null && !dto.getPurchaseLocation().isBlank()) {
-                throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
-            }
-        }
-
         // PurchaseItem 생성
         PurchaseItem purchaseItem = PurchaseItem.builder()
                 .name(dto.getName())
                 .purchaseMethod(dto.getPurchaseMethod())
                 .itemCategory(dto.getItemCategory())
-                .purchaseLocation(dto.getPurchaseUrl())
+                .purchaseLocation(dto.getPurchaseLocation())
                 .expirationDate(dto.getExpirationDate())
                 .price(dto.getPrice())
                 .status(Status.DEFAULT)
@@ -342,6 +348,8 @@ public class PurchaseItemService {
                 .price(item.getPrice())
                 .latitude(item.getLatitude())
                 .longitude(item.getLongitude())
+                .status(item.getStatus().name())
+                .statusLabel(toStatusLabel(item.getStatus()))
                 .build();
     }
 

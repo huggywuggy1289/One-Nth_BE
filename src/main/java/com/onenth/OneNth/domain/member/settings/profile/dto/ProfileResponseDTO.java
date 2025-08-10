@@ -1,7 +1,10 @@
 package com.onenth.OneNth.domain.member.settings.profile.dto;
 
+import com.onenth.OneNth.domain.region.entity.Region;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 public class ProfileResponseDTO {
 
@@ -22,6 +25,7 @@ public class ProfileResponseDTO {
     public static class GetMyProfileResponseDTO {
         private String profileImageUrl;
         private String nickname;
+        private List<String> verifiedRegionNames;
     }
 
 

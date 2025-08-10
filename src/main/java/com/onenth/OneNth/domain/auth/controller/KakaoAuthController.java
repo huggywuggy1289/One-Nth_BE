@@ -25,7 +25,7 @@ public class KakaoAuthController {
      */
     @Operation(
             summary = "카카오 인가 코드를 받는 API",
-            description = "카카오 로그인을 위해 인가코드를 프론트에서 받습니다. 인가코드로 사용자 정보를 받아서 로그인완료/회원가입 요청으로 분기됩니다."
+            description = "카카오 로그인을 위해 액세스 토큰을 프론트에서 받습니다. 액세스 토큰을 이용해서 사용자 정보를 받아서 로그인완료/회원가입 요청으로 분기됩니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),

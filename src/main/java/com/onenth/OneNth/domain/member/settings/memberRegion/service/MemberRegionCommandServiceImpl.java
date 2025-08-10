@@ -11,13 +11,10 @@ import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
+import com.onenth.OneNth.global.external.kakao.service.GeoCodingService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,14 +25,10 @@ import java.util.Optional;
 @Transactional
 public class MemberRegionCommandServiceImpl implements MemberRegionCommandService {
 
-    @Value("${kakao.api.key}")
-    private String kakaoApiKey;
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
     private final MemberRepository memberRepository;
     private final MemberRegionRepository memberRegionRepository;
     private final RegionRepository regionRepository;
+    private final GeoCodingService geoCodingService;
 
     @Override
     public MemberRegionResponseDTO.AddMyRegionResponseDTO addMyRegion(Long userId, MemberRegionRequestDTO.AddMyRegionRequestDTO request) {
@@ -112,35 +105,7 @@ public class MemberRegionCommandServiceImpl implements MemberRegionCommandServic
         MemberRegion memberRegion = memberRegionRepository.findByMemberAndRegion(member, region)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_REGION_NOT_FOUND));
 
-        String url = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json"
-                + "?x=" + request.getLongitude() + "&y=" + request.getLatitude();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + kakaoApiKey);
-
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-        ResponseEntity<MemberRegionResponseDTO.KakaoRegionResponseDTO> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                MemberRegionResponseDTO.KakaoRegionResponseDTO.class
-        );
-
-        MemberRegionResponseDTO.KakaoRegionResponseDTO responseBody = response.getBody();
-
-        if (responseBody == null || responseBody.getDocuments() == null || responseBody.getDocuments().isEmpty()) {
-            throw new GeneralException(ErrorStatus.EXTERNAL_API_ERROR);
-        }
-
-        MemberRegionResponseDTO.KakaoRegionResponseDTO.Document doc = responseBody
-                .getDocuments()
-                .get(0);
-
-        String detectedRegionName = String.join(" ",
-                doc.getRegion1DepthName(),
-                doc.getRegion2DepthName(),
-                doc.getRegion3DepthName());
+        String detectedRegionName = geoCodingService.getRegionNameByCoordinates(request.getLatitude(), request.getLongitude());
 
         return MemberRegionResponseDTO.VerifyMyRegionResponseDTO.builder()
                 .isVerified(detectedRegionName.equals(region.getRegionName()))

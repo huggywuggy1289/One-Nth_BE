@@ -37,6 +37,7 @@ public enum ErrorStatus implements BaseErrorCode {
     REGION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER_REGION002", "이미 등록한 지역입니다."),
     MEMBER_REGION_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER_REGION003", "해당 사용자가 등록하지 않은 지역입니다."),
     CANNOT_DELETE_MAIN_REGION(HttpStatus.BAD_REQUEST, "MEMBER_REGION004", "메인으로 등록된 지역은 삭제할 수 없습니다."),
+    MAIN_REGION_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER_REGION005", "사용자의 메인 지역 설정이 필요합니다. 우리동네 설정 화면에서 메인 지역을 선택해주세요."),
 
     // 지역 키워드 알림 관련
     REGION_KEYWORD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "KEYWORD_ALERT001", "등록 가능한 지역 알림은 최대 3개입니다."),
@@ -73,7 +74,10 @@ public enum ErrorStatus implements BaseErrorCode {
     DEAL_COMPLETION_ALREADY(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION004", "해당 상품은 이미 거래완료된 상태입니다."),
     NOT_DEAL_COMPLETION(HttpStatus.BAD_REQUEST, "DEAL_CONFIRMATION005", "거래 확정 상태인 상품이 아닙니다."),
     // 외부 API 관련
-    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "EXTERNAL_API_001", "외부 API 통신 중 문제가 발생했습니다."),
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "EXTERNAL_API001", "외부 API 통신 중 문제가 발생했습니다."),
+
+    // 지도 관련
+    INVALID_MARKER_TYPE(HttpStatus.BAD_REQUEST, "MAP001", "지원하지 않는 MarkerType입니다.")
     ;
 
     private final HttpStatus httpStatus;

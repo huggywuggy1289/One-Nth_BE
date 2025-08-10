@@ -70,6 +70,7 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Scrap> scrap = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> postTag = new ArrayList<>();
 

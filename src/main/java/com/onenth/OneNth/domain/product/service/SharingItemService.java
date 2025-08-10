@@ -41,6 +41,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO.toStatusLabel;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -77,6 +79,7 @@ public class SharingItemService {
         GeoCodingResult geo = null;
         Region region;
 
+        // 장소입력 유효성
         if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
             if (dto.getSharingLocation() == null || dto.getSharingLocation().isBlank()) {
                 throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
@@ -103,6 +106,7 @@ public class SharingItemService {
                     .getRegion();
         }
 
+        // 태그 유효성 검사 및 저장
         List<Tag> tagEntities = dto.getTags().stream()
                 .peek(tag -> {
                     if (!tag.startsWith("#")) {
@@ -149,6 +153,7 @@ public class SharingItemService {
                 .build();
         sharingItem.getTags().addAll(tagEntities);
 
+        // ONLINE이면 대표지역 위도경도 설정
         if (dto.getPurchaseMethod() == PurchaseMethod.ONLINE) {
             if (region.getLatitude() == null || region.getLongitude() == null) {
                 GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(region.getRegionName());
@@ -219,7 +224,7 @@ public class SharingItemService {
         if (keyword.startsWith("#")) {
             // 태그 검색 (설정 지역 내)
             String tag = keyword;
-            items = sharingItemRepository.findByRegionAndTag(regionIds, tag);
+            items = sharingItemRepository.findByRegionsAndTag(regionIds, tag);
         } else if (isCategory(keyword)) {
             // 카테고리 검색 (설정 지역 내)
             items = sharingItemRepository.findByRegionAndCategory(regionIds, keyword);
@@ -333,6 +338,8 @@ public class SharingItemService {
                 .writerNickname(member.getNickname())
                 .latitude(item.getLatitude())
                 .longitude(item.getLongitude())
+                .status(item.getStatus().name())
+                .statusLabel(toStatusLabel(item.getStatus()))
                 .build();
     }
     // 스크랩 설정

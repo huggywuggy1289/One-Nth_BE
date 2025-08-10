@@ -35,12 +35,10 @@ public class GeneralAlertConverter {
     }
 
     public static GeneralAlertResponseDTO.GetAllAlertSettingsResponseDTO toGetAllAlertSettingsResponseDTO(
-            GeneralAlertResponseDTO.GeneralAlertSummary scrapAlertSummary,
             GeneralAlertResponseDTO.GeneralAlertSummary reviewAlertSummary,
             List<GeneralAlertResponseDTO.KeywordAlertSummary> keywordAlertSummaryList
     ) {
         return GeneralAlertResponseDTO.GetAllAlertSettingsResponseDTO.builder()
-                .scrapAlertSummary(scrapAlertSummary)
                 .reviewAlertSummary(reviewAlertSummary)
                 .keywordAlertSummaryList(keywordAlertSummaryList)
                 .build();
