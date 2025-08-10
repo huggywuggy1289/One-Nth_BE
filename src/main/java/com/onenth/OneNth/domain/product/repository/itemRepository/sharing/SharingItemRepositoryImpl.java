@@ -59,12 +59,14 @@ public class SharingItemRepositoryImpl implements SharingItemRepositoryCustom {
     public List<SharingItem> findByRegionName(String regionName) {
         QSharingItem item = QSharingItem.sharingItem;
         QRegion region = QRegion.region;
+        QItemImage image = QItemImage.itemImage;
 
         String cleanKeyword = regionName.trim();
 
         return queryFactory
                 .selectFrom(item)
                 .join(item.region, region).fetchJoin()
+                .leftJoin(item.itemImages, image).fetchJoin()
                 .where(
                         region.regionName.like("%" + cleanKeyword + "%")
                                 .and(item.status.in(Status.DEFAULT, Status.IN_PROGRESS))
