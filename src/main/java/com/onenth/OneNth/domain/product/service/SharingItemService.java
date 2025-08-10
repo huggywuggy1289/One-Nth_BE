@@ -221,7 +221,7 @@ public class SharingItemService {
         if (keyword.startsWith("#")) {
             // 태그 검색 (설정 지역 내)
             String tag = keyword;
-            items = sharingItemRepository.findByRegionAndTag(regionIds, tag);
+            items = sharingItemRepository.findByRegionsAndTag(regionIds, tag);
         } else if (isCategory(keyword)) {
             // 카테고리 검색 (설정 지역 내)
             items = sharingItemRepository.findByRegionAndCategory(regionIds, keyword);

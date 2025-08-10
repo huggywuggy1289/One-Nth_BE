@@ -16,7 +16,7 @@ public class SharingItemRepositoryImpl implements SharingItemRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<SharingItem> findByRegionAndTag(List<Integer> regionIds, String tag) {
+    public List<SharingItem> findByRegionsAndTag(List<Integer> regionIds, String tag) {
         QSharingItem item = QSharingItem.sharingItem;
         QTag qTag = QTag.tag;
         QItemImage image = QItemImage.itemImage;
@@ -65,6 +65,7 @@ public class SharingItemRepositoryImpl implements SharingItemRepositoryCustom {
 
         return queryFactory
                 .selectFrom(item)
+                .distinct()
                 .join(item.region, region).fetchJoin()
                 .leftJoin(item.itemImages, image).fetchJoin()
                 .where(

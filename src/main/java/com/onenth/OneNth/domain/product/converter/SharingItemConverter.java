@@ -22,7 +22,6 @@ public class SharingItemConverter {
             LocalDate expirationDate,
             Boolean isAvailable,
             PurchaseMethod purchaseMethod,
-            Long regionId,
             List<String> tags
     ) {
         return SharingItemRequestDTO.builder()
