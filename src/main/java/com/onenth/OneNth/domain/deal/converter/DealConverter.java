@@ -60,4 +60,15 @@ public class DealConverter {
                 .itemImageUrl(itemImage != null ? itemImage.getUrl() : null)
                 .build();
     }
+
+    public static DealResponseDTO.GetDealConfirmationDTO toGetDealConfirmationDTO(
+            Item item, ItemImage itemImage, Long dealConfirmationId){
+        return DealResponseDTO.GetDealConfirmationDTO.builder()
+                .dealConfirmationId(dealConfirmationId)
+                .itemId(item.getId())
+                .itemType(item.getItemType())
+                .itemName(item.getProductName())
+                .itemImageUrl(itemImage != null ? itemImage.getUrl() : null)
+                .build();
+    }
 }

@@ -1,6 +1,7 @@
 package com.onenth.OneNth.domain.product.repository.itemRepository.sharing;
 
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.region.entity.Region;
@@ -44,4 +45,7 @@ public interface SharingItemRepository extends JpaRepository<SharingItem, Long>,
 
     @EntityGraph(attributePaths = {"itemImages"})
     List<SharingItem> findByMemberAndStatus(Member member, Status status);
+
+    @EntityGraph(attributePaths = {"itemImages"})
+    Optional<SharingItem> findWithItemImagesById(Long id);
 }

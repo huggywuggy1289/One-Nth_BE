@@ -29,4 +29,7 @@ public interface PurchaseItemRepository  extends JpaRepository<PurchaseItem, Lon
 
     @EntityGraph(attributePaths = {"itemImages"})
     List<PurchaseItem> findByMemberAndStatus(Member member, Status status);
+
+    @EntityGraph(attributePaths = {"itemImages"})
+    Optional<PurchaseItem> findWithItemImagesById(Long id);
 }

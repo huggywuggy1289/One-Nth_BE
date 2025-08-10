@@ -76,23 +76,24 @@ public class DealController {
         return ApiResponse.onSuccess("거래취소가 완료되었습니다.");
     }
 
-/*    @Operation(
+    @Operation(
             summary = "거래 확정 폼 조회 API",
             description = """
-    발행된 거래확정 폼들에 대한 상품 목록을 조회합니다.
+    상대 사용자와의 거래에서 발행된 거래확정 폼을 조회합니다.
     - 거래완료 폼 작성 시 필요한 거래확정 폼의 Id 및 상품 정보를 얻기 위한 의도로 만들어졌습니다.(드롭박스)
     - 현재 사용자가 거래완료 폼 작성이 가능한 거래확정 폼들의 리스트 및 상품정보를 조회합니다.
-    - roomName에 현재 채팅방 roomName을 넣어야합니다.
+    - roomName에 현재 거래가 진행 중인 채팅방 roomName을 넣어야합니다.
     """
     )
-    @DeleteMapping("{roomName}/confirmation")
-    public ApiResponse<String> cancelDeal(
+    @GetMapping("/confirmation/{roomName}")
+    public ApiResponse<List<DealResponseDTO.GetDealConfirmationDTO>> cancelDeal(
             @AuthUser Long memberId,
             @PathVariable("roomName") String roomName
     ) {
-        // 서비스, 응답 DTO
-        return ApiResponse.onSuccess("거래취소가 완료되었습니다.");
-    }*/
+        List<DealResponseDTO.GetDealConfirmationDTO> result
+                = dealQueryService.getDealConfirmations(memberId,roomName);
+        return ApiResponse.onSuccess(result);
+    }
 
     @Operation(
             summary = "거래가 가능한 상품(판매자) 조회 API",
