@@ -71,4 +71,12 @@ public class DealConverter {
                 .itemImageUrl(itemImage != null ? itemImage.getUrl() : null)
                 .build();
     }
+
+    public static DealResponseDTO.DealHistoryDetailDTO toDealHistoryDetailDTO(
+            Integer totalDealCount, Integer totalDealAmount){
+        return DealResponseDTO.DealHistoryDetailDTO.builder()
+                .totalDealCount(totalDealCount)
+                .totalDealAmount(totalDealAmount)
+                .build();
+    }
 }

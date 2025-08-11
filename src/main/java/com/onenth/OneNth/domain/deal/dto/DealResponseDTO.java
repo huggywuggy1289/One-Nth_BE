@@ -30,4 +30,26 @@ public class DealResponseDTO {
         private String itemName;
         private String itemImageUrl;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GetMyDealHistoryDTO{
+        private Integer totalReviewCount;
+        private Double totalReviewRating;
+        private Integer savedAmount;
+        private DealHistoryDetailDTO totalDealHistory;
+        private DealHistoryDetailDTO purchaseDealHistory;
+        private DealHistoryDetailDTO shareDealHistory;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DealHistoryDetailDTO{
+        private Integer totalDealCount;
+        private Integer totalDealAmount ;
+    }
 }

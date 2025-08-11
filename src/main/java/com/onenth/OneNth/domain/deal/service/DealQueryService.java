@@ -4,7 +4,9 @@ import com.onenth.OneNth.domain.chat.entity.ChatRoom;
 import com.onenth.OneNth.domain.chat.entity.ChatRoomMember;
 import com.onenth.OneNth.domain.chat.repository.ChatRoomRepository;
 import com.onenth.OneNth.domain.deal.dto.DealResponseDTO;
+import com.onenth.OneNth.domain.deal.entity.DealCompletion;
 import com.onenth.OneNth.domain.deal.entity.DealConfirmation;
+import com.onenth.OneNth.domain.deal.repository.DealCompletionRepository;
 import com.onenth.OneNth.domain.deal.repository.DealConfirmationRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
@@ -14,6 +16,8 @@ import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
+import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
+import com.onenth.OneNth.domain.product.entity.review.SharingReview;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
@@ -24,13 +28,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.onenth.OneNth.domain.deal.converter.DealConverter.toGetAvailableProductDTO;
-import static com.onenth.OneNth.domain.deal.converter.DealConverter.toGetDealConfirmationDTO;
+import static com.onenth.OneNth.domain.deal.converter.DealConverter.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +50,7 @@ public class DealQueryService {
     private final PurchaseItemRepository purchaseItemRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final DealConfirmationRepository dealConfirmationRepository;
+    private final DealCompletionRepository dealCompletionRepository;
 
     public List<DealResponseDTO.getAvailableProductDTO> getAvailableProducts(Long memberId) {
         Member member = findMemberById(memberId);
@@ -85,6 +93,94 @@ public class DealQueryService {
                     return toGetDealConfirmationDTO(item, mainImage, entry.getKey().getId());
                 })
                 .collect(Collectors.toList());
+    }
+
+    public DealResponseDTO.GetMyDealHistoryDTO getMyDealHistory(Long memberId) {
+        Member targetMember = findMemberById(memberId);
+
+        List<SharingItem> sharingItems = sharingItemRepository.findByMemberAndStatus(targetMember,Status.COMPLETED);
+        List<PurchaseItem> purchaseItems = purchaseItemRepository.findByMemberAndStatus(targetMember, Status.COMPLETED);
+
+        int totalReviewCount = calculateTotalReviewCount(sharingItems, purchaseItems);
+        BigDecimal totalRatingSum = calculateTotalRatingSum(sharingItems, purchaseItems);
+        double averageRating = calculateAverageRating(totalRatingSum, totalReviewCount);
+
+        List<DealCompletion> dealCompletions = dealCompletionRepository.findBySellerOrBuyer(targetMember, targetMember);
+        int totalDealsCount
+                = dealCompletions.size();
+        int totalDealsAmount = dealCompletions.stream()
+                .mapToInt(DealCompletion::getTradePrice)
+                .sum();
+
+        List<DealCompletion> purchaseDealCompletions = dealCompletions.stream()
+                .filter(dc -> dc.getDealConfirmation().getItemType() == ItemType.PURCHASE)
+                .toList();
+        int purchaseTotalDealCount = purchaseDealCompletions.size();
+        int purchaseTotalDealAmount = purchaseDealCompletions.stream()
+                .mapToInt(DealCompletion::getTradePrice)
+                .sum();
+
+        List<DealCompletion> shareDealCompletions = dealCompletions.stream()
+                .filter(dc -> dc.getDealConfirmation().getItemType() == ItemType.SHARE)
+                .toList();
+        int shareTotalDealCount = shareDealCompletions.size();
+        int shareTotalDealAmount = shareDealCompletions.stream()
+                .mapToInt(DealCompletion::getTradePrice)
+                .sum();
+
+        List<DealCompletion> buyerDealCompletions = dealCompletions.stream()
+                .filter(dc -> dc.getBuyer().equals(targetMember))
+                .toList();
+        List<DealCompletion> sellerDealCompletions = dealCompletions.stream()
+                .filter(dc -> dc.getSeller().equals(targetMember))
+                .toList();
+        int savedAmount = Stream.concat(
+                        sellerDealCompletions.stream(),
+                        buyerDealCompletions.stream()
+                )
+                .mapToInt(DealCompletion::getTradePrice)
+                .sum();
+
+        return DealResponseDTO.GetMyDealHistoryDTO.builder()
+                .totalReviewRating(averageRating)
+                .totalReviewCount(totalReviewCount)
+                .savedAmount(savedAmount)
+                .totalDealHistory(toDealHistoryDetailDTO(totalDealsCount, totalDealsAmount))
+                .purchaseDealHistory(toDealHistoryDetailDTO(purchaseTotalDealCount,purchaseTotalDealAmount))
+                .shareDealHistory(toDealHistoryDetailDTO(shareTotalDealCount,shareTotalDealAmount))
+                .build();
+    }
+
+    private int calculateTotalReviewCount(List<SharingItem> sharingItems, List<PurchaseItem> purchaseItems) {
+        return sharingItems.stream()
+                .mapToInt(item -> item.getSharingReviews().size())
+                .sum() +
+                purchaseItems.stream()
+                        .mapToInt(item -> item.getPurchaseReviews().size())
+                        .sum();
+    }
+
+    private BigDecimal calculateTotalRatingSum(List<SharingItem> sharingItems, List<PurchaseItem> purchaseItems) {
+        BigDecimal sharingSum = sharingItems.stream()
+                .flatMap(item -> item.getSharingReviews().stream())
+                .map(SharingReview::getRate)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal purchaseSum = purchaseItems.stream()
+                .flatMap(item -> item.getPurchaseReviews().stream())
+                .map(PurchaseReview::getRate)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return sharingSum.add(purchaseSum);
+    }
+
+    private double calculateAverageRating(BigDecimal totalRatingSum, int totalReviewCount) {
+        if (totalReviewCount == 0) return 0.0;
+
+        return totalRatingSum.divide(BigDecimal.valueOf(totalReviewCount), 1, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     private Member findMemberById(Long memberId) {

@@ -110,4 +110,21 @@ public class DealController {
             List<DealResponseDTO.getAvailableProductDTO> result = dealQueryService.getAvailableProducts(memberId);
             return ApiResponse.onSuccess(result);
     }
+
+    @Operation(
+            summary = "내 거래 내역 조회 API",
+            description = """
+    N원 아꼈어요 페이지의 내 거래 내역 정보를 조회합니다.
+    - N분의 1 거래 횟수, 리뷰 총점 및 평균
+    - 같이사요, 함께 나눠요 거래 수 및 금액을 조회합니다
+    """
+    )
+    @GetMapping("/my-history")
+    public ApiResponse<DealResponseDTO.GetMyDealHistoryDTO> getMyDealHistory(
+            @AuthUser Long memberId
+    ) {
+        DealResponseDTO.GetMyDealHistoryDTO result
+                = dealQueryService.getMyDealHistory(memberId);
+        return ApiResponse.onSuccess(result);
+    }
 }
