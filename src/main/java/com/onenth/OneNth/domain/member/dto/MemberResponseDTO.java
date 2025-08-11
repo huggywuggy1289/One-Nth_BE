@@ -14,6 +14,16 @@ public class MemberResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class MemberProfilePreviewDTO {
+        private Long memberId;
+        private String mame;
+        private String profileImageUrl;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SignupResultDTO {
         Long memberId;
         LocalDateTime createdAt;
