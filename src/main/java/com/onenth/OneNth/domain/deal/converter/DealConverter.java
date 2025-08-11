@@ -51,9 +51,9 @@ public class DealConverter {
                 .build();
     }
 
-    public static DealResponseDTO.getAvailableProductDTO toGetAvailableProductDTO(
+    public static DealResponseDTO.getProducPreviewtDTO toGetProductPreviewDTO(
             Item item, ItemImage itemImage){
-        return DealResponseDTO.getAvailableProductDTO.builder()
+        return DealResponseDTO.getProducPreviewtDTO.builder()
                 .itemId(item.getId())
                 .itemType(item.getItemType())
                 .itemName(item.getProductName())

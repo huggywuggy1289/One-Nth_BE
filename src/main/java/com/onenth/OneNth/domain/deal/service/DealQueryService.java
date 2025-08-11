@@ -5,7 +5,6 @@ import com.onenth.OneNth.domain.chat.entity.ChatRoomMember;
 import com.onenth.OneNth.domain.chat.repository.ChatRoomRepository;
 import com.onenth.OneNth.domain.deal.dto.DealResponseDTO;
 import com.onenth.OneNth.domain.deal.entity.DealCompletion;
-import com.onenth.OneNth.domain.deal.entity.DealConfirmation;
 import com.onenth.OneNth.domain.deal.repository.DealCompletionRepository;
 import com.onenth.OneNth.domain.deal.repository.DealConfirmationRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
@@ -20,6 +19,8 @@ import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
 import com.onenth.OneNth.domain.product.entity.review.SharingReview;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
+import com.onenth.OneNth.domain.product.repository.reviewRepository.purchase.PurchaseReviewRepository;
+import com.onenth.OneNth.domain.product.repository.reviewRepository.sharing.SharingReviewRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.handler.ChatHandler;
 import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
@@ -30,10 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,22 +49,24 @@ public class DealQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final DealConfirmationRepository dealConfirmationRepository;
     private final DealCompletionRepository dealCompletionRepository;
+    private final PurchaseReviewRepository purchaseReviewRepository;
+    private final SharingReviewRepository sharingReviewRepository;
 
-    public List<DealResponseDTO.getAvailableProductDTO> getAvailableProducts(Long memberId) {
+    public List<DealResponseDTO.getProducPreviewtDTO> getAvailableProducts(Long memberId) {
         Member member = findMemberById(memberId);
 
         List<PurchaseItem> purchaseItems = purchaseItemRepository.findByMemberAndStatus(member, Status.DEFAULT);
         List<SharingItem> sharingItems = sharingItemRepository.findByMemberAndStatus(member, Status.DEFAULT);
 
-        List<DealResponseDTO.getAvailableProductDTO> availableProductDTOs = new ArrayList<>();
+        List<DealResponseDTO.getProducPreviewtDTO> availableProductDTOs = new ArrayList<>();
 
         purchaseItems.stream()
                 .filter(item -> item.getItemImages() != null && !item.getItemImages().isEmpty())
-                .forEach(item -> availableProductDTOs.add(toGetAvailableProductDTO(item, item.getItemImages().get(0))));
+                .forEach(item -> availableProductDTOs.add(toGetProductPreviewDTO(item, item.getItemImages().get(0))));
 
         sharingItems.stream()
                 .filter(item -> item.getItemImages() != null && !item.getItemImages().isEmpty())
-                .forEach(item -> availableProductDTOs.add(toGetAvailableProductDTO(item, item.getItemImages().get(0))));
+                .forEach(item -> availableProductDTOs.add(toGetProductPreviewDTO(item, item.getItemImages().get(0))));
 
         return availableProductDTOs;
     }
@@ -149,6 +149,51 @@ public class DealQueryService {
                 .purchaseDealHistory(toDealHistoryDetailDTO(purchaseTotalDealCount,purchaseTotalDealAmount))
                 .shareDealHistory(toDealHistoryDetailDTO(shareTotalDealCount,shareTotalDealAmount))
                 .build();
+    }
+
+    public List<DealResponseDTO.getProducPreviewtDTO> getMyDealItems(Long memberId, String reviewStatus) {
+        Member targetMember = findMemberById(memberId);
+        List<DealCompletion> dealCompletions = dealCompletionRepository.findBySellerOrBuyer(targetMember, targetMember);
+
+        if(reviewStatus.equals("all")) {
+            return dealCompletions.stream()
+                    .map(DealCompletion::getDealConfirmation)
+                    .map(dc -> {
+                        Item item = getProductWithImages(dc.getItemType(), dc.getProductId());
+                        ItemImage firstImage = item.getItemImages().isEmpty() ? null : item.getItemImages().get(0);
+                        return toGetProductPreviewDTO(item, firstImage);
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            List<PurchaseItem> purchaseReviews = purchaseReviewRepository.findByMember(targetMember).stream()
+                    .map(PurchaseReview::getPurchaseItem).toList();
+            List<SharingItem> sharingReviews = sharingReviewRepository.findByMember(targetMember).stream()
+                    .map(SharingReview::getSharingItem).toList();
+
+            Set<Long> reviewedPurchaseItemIds = purchaseReviews.stream()
+                    .map(PurchaseItem::getId)
+                    .collect(Collectors.toSet());
+            Set<Long> reviewedSharingItemIds = sharingReviews.stream()
+                    .map(SharingItem::getId)
+                    .collect(Collectors.toSet());
+
+            return dealCompletions.stream()
+                    .map(DealCompletion::getDealConfirmation)
+                    .filter(dc -> {
+                        if ("PURCHASE".equals(dc.getItemType())) {
+                            return !reviewedPurchaseItemIds.contains(dc.getProductId());
+                        } else if ("SHARING".equals(dc.getItemType())) {
+                            return !reviewedSharingItemIds.contains(dc.getProductId());
+                        }
+                        return true;
+                    })
+                    .map(dc -> {
+                        Item item = getProductWithImages(dc.getItemType(), dc.getProductId());
+                        ItemImage firstImage = item.getItemImages().isEmpty() ? null : item.getItemImages().get(0);
+                        return toGetProductPreviewDTO(item, firstImage);
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     private int calculateTotalReviewCount(List<SharingItem> sharingItems, List<PurchaseItem> purchaseItems) {

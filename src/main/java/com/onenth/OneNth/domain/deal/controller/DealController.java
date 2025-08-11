@@ -104,10 +104,10 @@ public class DealController {
     """
     )
     @GetMapping("/available-products")
-    public ApiResponse<List<DealResponseDTO.getAvailableProductDTO>> getAvailableProducts(
+    public ApiResponse<List<DealResponseDTO.getProducPreviewtDTO>> getAvailableProducts(
             @AuthUser Long memberId
     ) {
-            List<DealResponseDTO.getAvailableProductDTO> result = dealQueryService.getAvailableProducts(memberId);
+            List<DealResponseDTO.getProducPreviewtDTO> result = dealQueryService.getAvailableProducts(memberId);
             return ApiResponse.onSuccess(result);
     }
 
@@ -125,6 +125,27 @@ public class DealController {
     ) {
         DealResponseDTO.GetMyDealHistoryDTO result
                 = dealQueryService.getMyDealHistory(memberId);
+        return ApiResponse.onSuccess(result);
+    }
+
+
+    @Operation(
+            summary = "내가 거래한 상품 목록 조회 API",
+            description = """
+        내가 거래했던 상품들의 목록을 조회합니다.
+        - 로그인한 사용자의 거래 내역에 해당하는 상품들을 반환합니다.
+        - 상품별 대표 이미지와 기본 정보가 포함됩니다.
+        - reviewStatus 파라미터로 리뷰 상태를 필터링할 수 있습니다.
+          - 예: 'all' (전체), 'pending' (리뷰 대기)
+        """
+    )
+    @GetMapping("/my-history/items")
+    public ApiResponse<List<DealResponseDTO.getProducPreviewtDTO>> getMyDealItems(
+            @AuthUser Long memberId,
+            @RequestParam("reviewStatus") String reviewStatus
+    ) {
+        List<DealResponseDTO.getProducPreviewtDTO> result
+                = dealQueryService.getMyDealItems(memberId, reviewStatus);
         return ApiResponse.onSuccess(result);
     }
 }

@@ -12,7 +12,7 @@ public class DealResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class getAvailableProductDTO{
+    public static class getProducPreviewtDTO{
         private Long itemId;
         private ItemType itemType;
         private String itemName;
