@@ -75,6 +75,7 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     private PostListResponseDTO toPostListDTO(Post post, Long memberId) {
         boolean scrapStatus = ScrapRepository.existsByPostIdAndMemberId(post.getId(), memberId);
+        List<String> imageUrls = imageRepository.findUrlsByPost(post);
 
         return PostListResponseDTO.builder()
                 .postId(post.getId())
@@ -84,6 +85,7 @@ public class PostQueryServiceImpl implements PostQueryService {
                 .likeCount(post.getLike().size())
                 .viewCount(post.getViewCount())
                 .scrapStatus(scrapStatus)
+                .imageUrls(imageUrls)
                 .createdAt(post.getCreatedAt().toString())
                 .build();
     }
@@ -100,10 +102,12 @@ public class PostQueryServiceImpl implements PostQueryService {
         int likeCount = (int) LikeRepository.countByPost(post);
         boolean scrapStatus = ScrapRepository.existsByPostIdAndMemberId(postId, memberId);
         List<String> imageUrls = imageRepository.findUrlsByPost(post);
+        String profileImageUrl = post.getMember().getProfileImageUrl();
 
         return PostDetailResponseDTO.builder()
                 .postId(post.getId().toString())
                 .nickname(post.getMember().getNickname())
+                .profileImageUrl(profileImageUrl)
                 .regionName(post.getRegion() != null ? post.getRegion().getRegionName() : null)
                 .title(post.getTitle())
                 .content(post.getContent())
