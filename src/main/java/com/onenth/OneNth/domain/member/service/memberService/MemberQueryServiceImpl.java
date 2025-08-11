@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.member.service.memberService;
 
 import com.onenth.OneNth.domain.member.converter.MemberConverter;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
+import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.post.entity.Like;
 import com.onenth.OneNth.domain.post.entity.Post;
@@ -9,16 +10,14 @@ import com.onenth.OneNth.domain.post.entity.Scrap;
 import com.onenth.OneNth.domain.post.repository.likeRepository.LikeRepository;
 import com.onenth.OneNth.domain.post.repository.PostRepository;
 import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.awt.print.Pageable;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -72,5 +71,12 @@ public class MemberQueryServiceImpl implements MemberQueryService {
 
         return postPreviews;
 
+    }
+
+    @Override
+    public MemberResponseDTO.MemberProfilePreviewDTO getMemberProfilePreview(Long memberId) {
+        Member member =  memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        return new MemberResponseDTO.MemberProfilePreviewDTO(member.getId(), member.getName(), member.getProfileImageUrl());
     }
 }

@@ -250,6 +250,14 @@ public class MemberRestController {
         return ApiResponse.onSuccess(response);
     }
 
-
-
+    @Operation(
+            summary = "ID로 사용자 정보 조회 API",
+            description = "특정 사용자의 ID로 해당 사용자의 닉네임, 프로필 사진을 조회합니다."
+    )
+    @GetMapping("/{memberId}/profile")
+    public ApiResponse<MemberResponseDTO.MemberProfilePreviewDTO> getMemberProfileInfo(
+            @PathVariable("memberId") Long memberId){
+        MemberResponseDTO.MemberProfilePreviewDTO response = memberQueryService.getMemberProfilePreview(memberId);
+        return ApiResponse.onSuccess(response);
+    }
 }

@@ -1,6 +1,10 @@
 package com.onenth.OneNth.domain.deal.dto;
 
-import lombok.*;
+import com.onenth.OneNth.domain.product.entity.enums.ItemType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class DealResponseDTO {
 
@@ -8,21 +12,44 @@ public class DealResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DealConfirmationResponseDTO {
-        private Long dealConfirmationFormId;
-        private String writerName;
+    public static class getProducPreviewtDTO{
+        private Long itemId;
+        private ItemType itemType;
         private String itemName;
-        private String content = "거래확정 폼 작성 됨";
+        private String itemImageUrl;
     }
 
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DealCompletionResponseDTO {
-        private Long dealCompletionFormId;
-        private String writerName;
+    public static class GetDealConfirmationDTO{
+        private Long dealConfirmationId;
+        private Long itemId;
+        private ItemType itemType;
         private String itemName;
-        private String content = "거래완료 폼이 작성 됨";
+        private String itemImageUrl;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GetMyDealHistoryDTO{
+        private Integer totalReviewCount;
+        private Double totalReviewRating;
+        private Integer savedAmount;
+        private DealHistoryDetailDTO totalDealHistory;
+        private DealHistoryDetailDTO purchaseDealHistory;
+        private DealHistoryDetailDTO shareDealHistory;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DealHistoryDetailDTO{
+        private Integer totalDealCount;
+        private Integer totalDealAmount ;
     }
 }
