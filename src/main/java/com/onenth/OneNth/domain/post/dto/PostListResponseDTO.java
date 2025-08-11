@@ -3,6 +3,8 @@ package com.onenth.OneNth.domain.post.dto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @Builder
 public class PostListResponseDTO {
@@ -13,5 +15,6 @@ public class PostListResponseDTO {
     private int likeCount;         // 공감 수
     private int viewCount;         // 조회 수
     private boolean scrapStatus;   // 현재 로그인한 사용자의 스크랩 여부
+    private List<String> imageUrls;
     private String createdAt;
 }

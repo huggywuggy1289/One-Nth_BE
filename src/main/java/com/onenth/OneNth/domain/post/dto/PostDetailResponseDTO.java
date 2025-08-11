@@ -12,6 +12,7 @@ public class PostDetailResponseDTO {
 
     private String postId;
     private String nickname;
+    private String profileImageUrl;
     private String regionName;
     private String title;
     private String content;
