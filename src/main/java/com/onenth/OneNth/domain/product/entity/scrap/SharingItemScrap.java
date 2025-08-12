@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.product.entity.scrap;
 
+import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import jakarta.persistence.*;
 
@@ -15,7 +16,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "sharing_item_scrap")
-public class SharingItemScrap {
+public class SharingItemScrap extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,5 +30,5 @@ public class SharingItemScrap {
     @JoinColumn(name = "sharing_item_id", nullable = false)
     private SharingItem sharingItem;
 
-    private LocalDateTime createdAt;
+//    private LocalDateTime createdAt;
 }

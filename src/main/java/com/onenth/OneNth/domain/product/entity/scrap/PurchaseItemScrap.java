@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.product.entity.scrap;
 
+import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import jakarta.persistence.*;
 
@@ -15,7 +16,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "purchase_item_scrap")
-public class PurchaseItemScrap {
+public class PurchaseItemScrap extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +30,11 @@ public class PurchaseItemScrap {
     @JoinColumn(name = "purchase_item_id", nullable = false)
     private PurchaseItem purchaseItem;
 
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+//    private LocalDateTime createdAt;
+//
+//    @PrePersist
+//    public void onCreate() {
+//        this.createdAt = LocalDateTime.now();
+//    }
 }
 

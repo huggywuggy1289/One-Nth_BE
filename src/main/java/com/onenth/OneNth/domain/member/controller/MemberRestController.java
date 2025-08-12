@@ -260,4 +260,49 @@ public class MemberRestController {
         MemberResponseDTO.MemberProfilePreviewDTO response = memberQueryService.getMemberProfilePreview(memberId);
         return ApiResponse.onSuccess(response);
     }
+
+    /**
+     * 마이페이지 - 내가 작성한 같이사요/함께나눠요 통합 미리보기 조회 (최신순, 페이징)
+     */
+    @Operation(
+            summary = "마이페이지 - 내가 작성한 아이템(같이사요/함께나눠요) 통합 조회",
+            description = "사용자가 작성한 같이사요(PURCHASE)와 함께나눠요(SHARE)를 최신순으로 통합 조회합니다. 페이지 번호와 사이즈를 쿼리스트링으로 전달하세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true),
+            @Parameter(name = "size", description = "페이지 당 미리보기 개수", example = "10", required = true)
+    })
+    @GetMapping("/mypage/items")
+    public ApiResponse<MemberResponseDTO.ItemPreviewListDTO> getMyItems(
+            @Parameter(hidden = true) @AuthUser Long memberId,
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "size", defaultValue = "10") Integer size
+    ) {
+        return ApiResponse.onSuccess(memberQueryService.getMyAllItems(memberId, page, size));
+    }
+
+    @Operation(
+            summary = "마이페이지 - 내가 스크랩한 아이템(같이사요/함께나눠요) 통합 조회",
+            description = "사용자가 스크랩한 같이사요(PURCHASE)와 함께나눠요(SHARE)를 스크랩 시각 기준 최신순으로 통합 조회합니다. 페이지 번호와 사이즈를 쿼리스트링으로 전달하세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true),
+            @Parameter(name = "size", description = "페이지 당 미리보기 개수", example = "10", required = true)
+    })
+    @GetMapping("/mypage/scrapped-items")
+    public ApiResponse<MemberResponseDTO.ItemPreviewListDTO> getMyScrappedItems(
+            @Parameter(hidden = true) @AuthUser Long memberId,
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "size", defaultValue = "10") Integer size
+    ) {
+        return ApiResponse.onSuccess(memberQueryService.getMyScrappedItems(memberId, page, size));
+    }
 }
