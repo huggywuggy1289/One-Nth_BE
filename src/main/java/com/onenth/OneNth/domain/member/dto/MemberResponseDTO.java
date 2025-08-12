@@ -73,7 +73,7 @@ public class MemberResponseDTO {
         String placeName;
         Double latitude;
         Double longitude;
-        String regionName;
+        //String regionName;
         Integer commentCount;
         Integer likeCount;
         Integer viewCount;
