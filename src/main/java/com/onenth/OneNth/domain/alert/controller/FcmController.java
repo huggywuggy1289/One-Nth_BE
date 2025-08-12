@@ -1,7 +1,7 @@
 package com.onenth.OneNth.domain.alert.controller;
 
-import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
-import com.onenth.OneNth.domain.alert.service.AlertService;
+import com.onenth.OneNth.domain.alert.dto.FcmRequestDTO;
+import com.onenth.OneNth.domain.alert.service.FcmService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/fcm")
 @RequiredArgsConstructor
 @Tag(name = "FCM 관련 API")
-public class AlertController {
+public class FcmController {
 
-    private final AlertService alertService;
+    private final FcmService FCMService;
 
     @Operation(
             summary = "FCM 토큰 등록 API",
@@ -25,8 +25,8 @@ public class AlertController {
     @PostMapping("/token")
     public ApiResponse<String> registerFcmToken(
             @AuthUser Long memberId,
-            @RequestBody AlertRequestDTO.FcmTokenRequestDTO request) {
-        alertService.registerFcmToken(memberId, request);
+            @RequestBody FcmRequestDTO.FcmTokenRequestDTO request) {
+        FCMService.registerFcmToken(memberId, request);
         return ApiResponse.onSuccess("토큰 갱신이 완료되었습니다");
     }
 
@@ -38,9 +38,9 @@ public class AlertController {
     @DeleteMapping("/token")
     public ApiResponse<String> deleteFcmToken(
             @AuthUser Long memberId,
-            @RequestBody AlertRequestDTO.FcmTokenRequestDTO request
+            @RequestBody FcmRequestDTO.FcmTokenRequestDTO request
     ) {
-        alertService.deleteFcmToken(memberId, request);
+        FCMService.deleteFcmToken(memberId, request);
         return ApiResponse.onSuccess("토큰 삭제가 완료되었습니다");
     }
 
@@ -53,7 +53,7 @@ public class AlertController {
     public ApiResponse<String> sendTestNotification(
             @AuthUser Long memberId
     ) {
-        alertService.testNotification(memberId);
+        FCMService.testNotification(memberId);
         return ApiResponse.onSuccess("푸시 알림 테스트 완료");
     }
 }

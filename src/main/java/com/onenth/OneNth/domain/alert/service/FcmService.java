@@ -1,6 +1,6 @@
 package com.onenth.OneNth.domain.alert.service;
 
-import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
+import com.onenth.OneNth.domain.alert.dto.FcmRequestDTO;
 import com.onenth.OneNth.domain.alert.entity.FcmToken;
 import com.onenth.OneNth.domain.alert.fcm.FcmClient;
 import com.onenth.OneNth.domain.alert.repository.FcmTokenRepository;
@@ -13,13 +13,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AlertService {
+public class FcmService {
 
     private final FcmTokenRepository fcmTokenRepository;
     private final MemberRepository memberRepository;
     private final FcmClient fcmClient;
 
-    public void registerFcmToken(Long memberId, AlertRequestDTO.FcmTokenRequestDTO request) {
+    public void registerFcmToken(Long memberId, FcmRequestDTO.FcmTokenRequestDTO request) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -40,7 +40,7 @@ public class AlertService {
         }
     }
 
-    public void deleteFcmToken(Long memberId, AlertRequestDTO.FcmTokenRequestDTO request) {
+    public void deleteFcmToken(Long memberId, FcmRequestDTO.FcmTokenRequestDTO request) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 

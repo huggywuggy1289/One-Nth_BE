@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class AlertRequestDTO {
+public class FcmRequestDTO {
 
     @Getter
     @NoArgsConstructor
