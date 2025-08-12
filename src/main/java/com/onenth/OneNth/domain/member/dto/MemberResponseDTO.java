@@ -1,5 +1,6 @@
 package com.onenth.OneNth.domain.member.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -117,6 +118,39 @@ public class MemberResponseDTO {
     @AllArgsConstructor
     public static class TokenReissueResultDTO {
         String accessToken;
+    }
+
+    // 미리보기 하나
+    @Getter
+    @Builder
+    @AllArgsConstructor @NoArgsConstructor
+    public static class ItemPreviewDTO {
+        private Long itemId;             // 공통 ID
+        private String itemType;         // "PURCHASE" | "SHARE" (또는 "같이사요" | "함께나눠요")
+        private String productName;      // Purchase: name / Sharing: title
+        private Integer price;           // 현재 노출 가격 (필수)
+        private Integer quantity;        // SharingItem만 값 존재 (없으면 null)
+        private Integer originalPrice;   // PurchaseItem의 원래 구매가 등 (없으면 null)
+        private String createdTime;      // 상대시간 문자열
+        @JsonIgnore
+        private LocalDateTime createdAt; // 정렬용(응답에 노출X)
+        @JsonIgnore
+        private LocalDateTime scrappedAt; // 스크랩 시각(정렬용)
+    }
+
+    // 목록 + 페이지 정보
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ItemPreviewListDTO {
+        private List<ItemPreviewDTO> items;
+
+        private Integer page;       // 1-base
+        private Integer size;
+        private Long totalCount;    // 대략 합계(정확 합계 원하면 둘 다 count 쿼리)
+        private Boolean hasNext;
+
     }
 
 }
