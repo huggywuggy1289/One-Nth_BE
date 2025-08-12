@@ -82,4 +82,13 @@ public class MapResponseDTO {
         private Integer regionId;
         private String regionName;
     }
+
+    @Getter
+    @Builder
+    public static class GetCoordinatesByNameResponseDTO {
+        private Integer regionId;
+        private String regionName;
+        private Double latitude;
+        private Double longitude;
+    }
 }

@@ -163,4 +163,21 @@ public class MapController {
     ) {
         return ApiResponse.onSuccess(mapRegionService.getRegionByCoordinates(lat, lng));
     }
+
+    @Operation(
+            summary = "regionName 기반으로 해당 지역의 대표 좌표를 보내주는 API\n",
+            description = "지역 이름를 요청으로 받아 지역의 대표 좌표를 응답으로 보내주는 API입니다.\n" +
+                    "응답으로 regionId와 regionName, 위도와 경도를 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 지역 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REGION001", description = "존재하지 않는 지역입니다.", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 에러, 관리자에게 문의 바랍니다", content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    @GetMapping("/regions/center")
+    public ApiResponse<MapResponseDTO.GetCoordinatesByNameResponseDTO> getRegionCoordinatesByName(
+            @RequestParam String regionName
+    ) {
+        return ApiResponse.onSuccess(mapRegionService.getRegionCoordinatesByName(regionName));
+    }
 }
