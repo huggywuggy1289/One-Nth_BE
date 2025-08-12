@@ -33,7 +33,7 @@ public class MemberAlertSetting extends BaseEntity {
         switch (alertType) {
             case CHAT -> chatAlerts = true;
             case REVIEW -> reviewAlerts = true;
-            case SCRAP -> scrapAlerts = true;
+/*            case SCRAP -> scrapAlerts = true;*/
         }
     }
 
@@ -41,7 +41,7 @@ public class MemberAlertSetting extends BaseEntity {
         switch (alertType) {
             case CHAT -> chatAlerts = false;
             case REVIEW -> reviewAlerts = false;
-            case SCRAP -> scrapAlerts = false;
+/*            case SCRAP -> scrapAlerts = false;*/
         }
     }
 

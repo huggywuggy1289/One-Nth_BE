@@ -5,10 +5,10 @@ import com.onenth.OneNth.domain.member.settings.alert.generalAlert.dto.GeneralAl
 
 public interface GeneralAlertCommandService {
 
-    GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO setScrapAlertStatus(
+/*    GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO setScrapAlertStatus(
             Long userId,
             GeneralAlertRequestDTO.SetScrapAlertStatusRequestDTO request
-    );
+    );*/
 
     GeneralAlertResponseDTO.SetReviewAlertStatusResponseDTO setReviewAlertStatus(
             Long userId,

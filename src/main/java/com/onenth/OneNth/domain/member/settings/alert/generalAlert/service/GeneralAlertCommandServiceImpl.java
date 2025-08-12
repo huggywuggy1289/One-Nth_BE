@@ -15,11 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -30,7 +25,7 @@ public class GeneralAlertCommandServiceImpl implements GeneralAlertCommandServic
     private final ProductKeywordAlertRepository productKeywordAlertRepository;
     private final RegionKeywordAlertRepository regionKeywordAlertRepository;
 
-    @Override
+/*    @Override
     public GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO setScrapAlertStatus(
             Long userId,
             GeneralAlertRequestDTO.SetScrapAlertStatusRequestDTO request
@@ -48,7 +43,7 @@ public class GeneralAlertCommandServiceImpl implements GeneralAlertCommandServic
         }
 
         return GeneralAlertConverter.toSetScrapAlertStatusResponseDTO(memberAlertSetting);
-    }
+    }*/
 
     @Override
     public GeneralAlertResponseDTO.SetReviewAlertStatusResponseDTO setReviewAlertStatus(
