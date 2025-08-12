@@ -209,11 +209,11 @@ public class MemberConverter {
     public static MemberResponseDTO.ItemPreviewDTO fromPurchase(PurchaseItem pi) {
         return MemberResponseDTO.ItemPreviewDTO.builder()
                 .itemId(pi.getId())
-                .itemType("PURCHASE") // or "같이사요"
+                .itemType("같이 사요")
                 .productName(pi.getProductName()) // = name
                 .price(pi.getPrice())
-                .quantity(null)                   // Purchase에는 별도 수량 필드 없음
-                .originalPrice(pi.getPrice())     // 정의에 따라: 원가가 이 값이면 그대로, 아니면 null
+                .quantity(1)                // Purchase에는 별도 수량 필드 없음
+                .originalPrice(pi.getPrice())     // 정의에 따라
                 .createdTime(formatRelativeTime(pi.getCreatedAt()))
                 .createdAt(pi.getCreatedAt())
                 .build();
@@ -222,11 +222,11 @@ public class MemberConverter {
     public static MemberResponseDTO.ItemPreviewDTO fromSharing(SharingItem si) {
         return MemberResponseDTO.ItemPreviewDTO.builder()
                 .itemId(si.getId())
-                .itemType("SHARE") // or "함께나눠요"
+                .itemType("함께 나눠요") // or "함께나눠요"
                 .productName(si.getProductName()) // = title
                 .price(si.getPrice())
                 .quantity(si.getQuantity())       // Sharing에는 수량 존재
-                .originalPrice(null)              // 정의되면 세팅, 없으면 null
+                .originalPrice(si.getPrice())   // 정의에 따라 세팅
                 .createdTime(formatRelativeTime(si.getCreatedAt()))
                 .createdAt(si.getCreatedAt())
                 .build();
@@ -237,11 +237,11 @@ public class MemberConverter {
         PurchaseItem pi = scrap.getPurchaseItem();
         return MemberResponseDTO.ItemPreviewDTO.builder()
                 .itemId(pi.getId())
-                .itemType("PURCHASE")
+                .itemType("같이 사요")
                 .productName(pi.getProductName())
                 .price(pi.getPrice())
-                .quantity(null)
-                .originalPrice(null) // 정의에 따라 세팅
+                .quantity(1)
+                .originalPrice(pi.getPrice()) // 정의에 따라 세팅
                 .createdTime(formatRelativeTime(pi.getCreatedAt()))
                 .createdAt(pi.getCreatedAt())
                 .scrappedAt(scrap.getCreatedAt())
@@ -252,11 +252,11 @@ public class MemberConverter {
         SharingItem si = scrap.getSharingItem();
         return MemberResponseDTO.ItemPreviewDTO.builder()
                 .itemId(si.getId())
-                .itemType("SHARE")
+                .itemType("함께 나눠요")
                 .productName(si.getProductName())
                 .price(si.getPrice())
                 .quantity(si.getQuantity())
-                .originalPrice(null) // 정의에 따라 세팅
+                .originalPrice(si.getPrice()) // 정의에 따라 세팅
                 .createdTime(formatRelativeTime(si.getCreatedAt()))
                 .createdAt(si.getCreatedAt())
                 .scrappedAt(scrap.getCreatedAt())
