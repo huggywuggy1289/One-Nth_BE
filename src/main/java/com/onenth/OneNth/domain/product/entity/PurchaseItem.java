@@ -80,6 +80,9 @@ public class PurchaseItem extends BaseEntity implements Item {
     @Column
     private Double longitude;
 
+    @Column(length = 1024)
+    private String purchaseUrl; // 구매 url
+
     public void setStatus(Status status){
         this.status = status;
     }
