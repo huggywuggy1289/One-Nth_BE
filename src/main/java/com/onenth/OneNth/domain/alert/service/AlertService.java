@@ -1,0 +1,41 @@
+package com.onenth.OneNth.domain.alert.service;
+
+import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
+import com.onenth.OneNth.domain.alert.entity.FcmToken;
+import com.onenth.OneNth.domain.alert.repository.FcmTokenRepository;
+import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AlertService {
+
+    private final FcmTokenRepository fcmTokenRepository;
+    private final MemberRepository memberRepository;
+
+    public void registerFcmToken(Long memberId, AlertRequestDTO.FcmTokenRequestDTO request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        FcmToken fcmToken = fcmTokenRepository.findByMember(member)
+                .orElse(null);
+
+        if (fcmToken == null) {
+            fcmToken = FcmToken.builder()
+                    .member(member)
+                    .fcmToken(request.getFcmToken())
+                    .build();
+            fcmTokenRepository.save(fcmToken);
+
+        } else if (!fcmToken.getFcmToken().equals(request.getFcmToken())) {
+            // 토큰 변경 시에만 업데이트
+            fcmToken.setFcmToken(request.getFcmToken());
+            fcmTokenRepository.save(fcmToken);
+        }
+    }
+
+}
