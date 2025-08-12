@@ -306,6 +306,7 @@ public class SharingItemService {
 
         Member member = item.getMember();
         boolean isVerified = true;
+        String profileImageUrl = member.getProfileImageUrl(); // +
         String regionName = item.getRegion().getRegionName();
 
         if (item.getStatus() == Status.COMPLETED) {
@@ -336,6 +337,8 @@ public class SharingItemService {
                 .imageUrls(imageUrls)
                 .tags(tags)
                 .writerNickname(member.getNickname())
+                .writerProfileImageUrl(profileImageUrl) // +
+                .writerVerified(isVerified) // +
                 .latitude(item.getLatitude())
                 .longitude(item.getLongitude())
                 .status(item.getStatus().name())
