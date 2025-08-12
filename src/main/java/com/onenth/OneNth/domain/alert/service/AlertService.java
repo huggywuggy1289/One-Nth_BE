@@ -40,6 +40,18 @@ public class AlertService {
         }
     }
 
+    public void deleteFcmToken(Long memberId, AlertRequestDTO.FcmTokenRequestDTO request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        FcmToken fcmToken = fcmTokenRepository.findByMember(member)
+                .orElse(null);
+
+        if (fcmToken != null && fcmToken.getFcmToken().equals(request.getFcmToken())) {
+            fcmTokenRepository.delete(fcmToken);
+        }
+    }
+
     public void testNotification(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
