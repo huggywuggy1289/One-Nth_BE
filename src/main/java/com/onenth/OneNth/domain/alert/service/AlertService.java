@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.alert.service;
 
 import com.onenth.OneNth.domain.alert.dto.AlertRequestDTO;
 import com.onenth.OneNth.domain.alert.entity.FcmToken;
+import com.onenth.OneNth.domain.alert.fcm.FcmClient;
 import com.onenth.OneNth.domain.alert.repository.FcmTokenRepository;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
@@ -16,6 +17,7 @@ public class AlertService {
 
     private final FcmTokenRepository fcmTokenRepository;
     private final MemberRepository memberRepository;
+    private final FcmClient fcmClient;
 
     public void registerFcmToken(Long memberId, AlertRequestDTO.FcmTokenRequestDTO request) {
         Member member = memberRepository.findById(memberId)
@@ -38,4 +40,16 @@ public class AlertService {
         }
     }
 
+    public void testNotification(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()-> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        FcmToken fcmToken = fcmTokenRepository.findByMember(member)
+                .orElse(null);
+
+        String title = "Notification Test";
+        String body = "Test";
+
+        fcmClient.sendNotification(fcmToken.getFcmToken(), title, body);
+    }
 }

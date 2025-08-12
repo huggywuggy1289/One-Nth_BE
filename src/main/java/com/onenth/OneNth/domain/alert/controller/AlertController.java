@@ -32,4 +32,16 @@ public class AlertController {
         alertService.registerFcmToken(memberId, request);
         return ApiResponse.onSuccess("토큰 갱신이 완료되었습니다");
     }
+
+    @Operation(
+            summary = "푸시 알림 테스트 발송",
+            description = "사용자 계정에 등록된 FCM 토큰으로 테스트 푸시 알림을 하나 발송합니다."
+    )
+    @PostMapping("/test")
+    public ApiResponse<String> sendTestNotification(
+            @AuthUser Long memberId
+    ) {
+        alertService.testNotification(memberId);
+        return ApiResponse.onSuccess("푸시 알림 테스트 완료");
+    }
 }
