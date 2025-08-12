@@ -139,6 +139,7 @@ public class PurchaseItemService {
                 .expirationDate(dto.getExpirationDate())
                 .price(dto.getPrice())
                 .status(Status.DEFAULT)
+                .purchaseUrl(dto.getPurchaseUrl()) // +
                 .member(member)
                 .region(region)
                 .tags(new ArrayList<>())
@@ -324,7 +325,7 @@ public class PurchaseItemService {
         }
 
         boolean isVerified = true;
-        String profileImageUrl = null;
+        String profileImageUrl = member.getProfileImageUrl(); // +
 
         List<String> imageUrls = itemImageRepository.findByPurchaseItemId(groupPurchaseId)
                 .stream()
@@ -334,7 +335,7 @@ public class PurchaseItemService {
         return PurchaseItemResponseDTO.GetPurchaseItemResponseDTO.builder()
                 .title(item.getName())
                 .imageUrls(imageUrls)
-                .purchaseUrl(item.getPurchaseLocation())
+                .purchaseUrl(item.getPurchaseUrl()) // +
                 .expirationDate(
                         item.getItemCategory() == ItemCategory.FOOD
                                 ? item.getExpirationDate()
