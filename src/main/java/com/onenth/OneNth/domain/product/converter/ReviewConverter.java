@@ -40,6 +40,8 @@ public class ReviewConverter {
                 .itemType(itemType)
                 .itemId(itemId)
                 .reviewerId(review.getMember().getId())
+                .reviewerNickName(review.getMember().getNickname())
+                .reviewerProfileImageUrl(review.getMember().getProfileImageUrl())
                 .reviewTargetId(targetUserId)
                 .content(review.getContent())
                 .createdAt(review.getCreatedAt())
@@ -50,9 +52,11 @@ public class ReviewConverter {
 
     public static ReviewResponseDTO.getReviewListDTO toGetReviewListDTO(
             List<ReviewResponseDTO.getReviewDTO> getReviewDTOList
-            , Long memberId) {
+            , Member member) {
         return ReviewResponseDTO.getReviewListDTO.builder()
-                .memberId(memberId)
+                .memberId(member.getId())
+                .memberNickName(member.getNickname())
+                .profileImageUrl(member.getProfileImageUrl())
                 .reviewList(getReviewDTOList)
                 .build();
     }

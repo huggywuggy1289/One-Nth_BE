@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.product.entity;
 
 import com.onenth.OneNth.domain.common.BaseEntity;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
+import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
@@ -79,6 +80,9 @@ public class PurchaseItem extends BaseEntity implements Item {
     @Column
     private Double longitude;
 
+    @Column(length = 1024)
+    private String purchaseUrl; // 구매 url
+
     public void setStatus(Status status){
         this.status = status;
     }
@@ -93,5 +97,10 @@ public class PurchaseItem extends BaseEntity implements Item {
 
     public String getProductName(){
         return this.name;
+    }
+
+    @Override
+    public ItemType getItemType() {
+        return ItemType.PURCHASE;
     }
 }

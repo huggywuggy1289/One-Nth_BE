@@ -37,6 +37,8 @@ public class ReviewResponseDTO {
         private Long itemId;
         private LocalDateTime createdAt;
         private Long reviewerId;
+        private String reviewerNickName;
+        private String reviewerProfileImageUrl;
         private Long reviewTargetId;
         private String content;
         private BigDecimal rate;
@@ -49,6 +51,8 @@ public class ReviewResponseDTO {
     @Builder
     public static class getReviewListDTO{
         private Long memberId;
+        private String memberNickName;
+        private String profileImageUrl;
         private List<getReviewDTO> reviewList;
     }
 

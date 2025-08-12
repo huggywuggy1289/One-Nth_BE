@@ -1,13 +1,17 @@
 package com.onenth.OneNth.domain.deal.controller;
 
 import com.onenth.OneNth.domain.deal.dto.DealRequestDTO;
+import com.onenth.OneNth.domain.deal.dto.DealResponseDTO;
 import com.onenth.OneNth.domain.deal.service.DealCommandService;
+import com.onenth.OneNth.domain.deal.service.DealQueryService;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "거래 관련 API", description = " API")
 @RestController
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class DealController {
 
     private final DealCommandService dealCommandService;
+    private final DealQueryService dealQueryService;
 
     @Operation(
             summary = "거래 확정 폼 발행 API",
@@ -71,21 +76,76 @@ public class DealController {
         return ApiResponse.onSuccess("거래취소가 완료되었습니다.");
     }
 
-/*    @Operation(
+    @Operation(
             summary = "거래 확정 폼 조회 API",
             description = """
-    발행된 거래확정 폼들에 대한 상품 목록을 조회합니다.
+    상대 사용자와의 거래에서 발행된 거래확정 폼을 조회합니다.
     - 거래완료 폼 작성 시 필요한 거래확정 폼의 Id 및 상품 정보를 얻기 위한 의도로 만들어졌습니다.(드롭박스)
-    - 현재 사용자가 거래완료폼 작성이 가능한 거래확정폼들의 리스트를 조회합니다.
-    - roomName에 현재 채팅방 roomName을 넣어야합니다.
+    - 현재 사용자가 거래완료 폼 작성이 가능한 거래확정 폼들의 리스트 및 상품정보를 조회합니다.
+    - roomName에 현재 거래가 진행 중인 채팅방 roomName을 넣어야합니다.
     """
     )
-    @DeleteMapping("{roomName}/confirmation")
-    public ApiResponse<String> cancelDeal(
+    @GetMapping("/confirmation/{roomName}")
+    public ApiResponse<List<DealResponseDTO.GetDealConfirmationDTO>> cancelDeal(
             @AuthUser Long memberId,
             @PathVariable("roomName") String roomName
     ) {
-        // 서비스, 응답 DTO
-        return ApiResponse.onSuccess("거래취소가 완료되었습니다.");
-    }*/
+        List<DealResponseDTO.GetDealConfirmationDTO> result
+                = dealQueryService.getDealConfirmations(memberId,roomName);
+        return ApiResponse.onSuccess(result);
+    }
+
+    @Operation(
+            summary = "거래가 가능한 상품(판매자) 조회 API",
+            description = """
+    거래가 가능한 상품 목록을 조회합니다.
+    - 거래확정 폼 작성 시, 내 상품 중 상대방과 거래 시작이 가능한 상품 정보를 얻기 위한 의도로 만들어졌습니다.(드롭박스)
+    - 현재 사용자가 거래확정 폼 작성이 가능한 상품들의 목록들을 조회합니다.
+    """
+    )
+    @GetMapping("/available-products")
+    public ApiResponse<List<DealResponseDTO.getProducPreviewtDTO>> getAvailableProducts(
+            @AuthUser Long memberId
+    ) {
+            List<DealResponseDTO.getProducPreviewtDTO> result = dealQueryService.getAvailableProducts(memberId);
+            return ApiResponse.onSuccess(result);
+    }
+
+    @Operation(
+            summary = "내 거래 내역 조회 API",
+            description = """
+    N원 아꼈어요 페이지의 내 거래 내역 정보를 조회합니다.
+    - N분의 1 거래 횟수, 리뷰 총점 및 평균
+    - 같이사요, 함께 나눠요 거래 수 및 금액을 조회합니다
+    """
+    )
+    @GetMapping("/my-history")
+    public ApiResponse<DealResponseDTO.GetMyDealHistoryDTO> getMyDealHistory(
+            @AuthUser Long memberId
+    ) {
+        DealResponseDTO.GetMyDealHistoryDTO result
+                = dealQueryService.getMyDealHistory(memberId);
+        return ApiResponse.onSuccess(result);
+    }
+
+
+    @Operation(
+            summary = "내가 거래한 상품 목록 조회 API",
+            description = """
+        내가 거래했던 상품들의 목록을 조회합니다.
+        - 로그인한 사용자의 거래 내역에 해당하는 상품들을 반환합니다.
+        - 상품별 대표 이미지와 기본 정보가 포함됩니다.
+        - reviewStatus 파라미터로 리뷰 상태를 필터링할 수 있습니다.
+          - 예: 'all' (전체), 'pending' (리뷰 대기)
+        """
+    )
+    @GetMapping("/my-history/items")
+    public ApiResponse<List<DealResponseDTO.getProducPreviewtDTO>> getMyDealItems(
+            @AuthUser Long memberId,
+            @RequestParam("reviewStatus") String reviewStatus
+    ) {
+        List<DealResponseDTO.getProducPreviewtDTO> result
+                = dealQueryService.getMyDealItems(memberId, reviewStatus);
+        return ApiResponse.onSuccess(result);
+    }
 }

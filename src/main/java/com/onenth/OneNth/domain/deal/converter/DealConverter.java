@@ -1,17 +1,20 @@
 package com.onenth.OneNth.domain.deal.converter;
 
 import com.onenth.OneNth.domain.deal.dto.DealRequestDTO;
+import com.onenth.OneNth.domain.deal.dto.DealResponseDTO;
 import com.onenth.OneNth.domain.deal.entity.CancelledDeal;
 import com.onenth.OneNth.domain.deal.entity.DealCompletion;
 import com.onenth.OneNth.domain.deal.entity.DealConfirmation;
 import com.onenth.OneNth.domain.deal.entity.enums.CancelReason;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.product.entity.Item;
+import com.onenth.OneNth.domain.product.entity.ItemImage;
 
 public class DealConverter {
 
     public static DealConfirmation toDealConfirmation(
             DealRequestDTO.DealConfirmationRequestDTO request,
-            Member member) {
+            Member seller, Member buyer) {
         return DealConfirmation.builder()
                 .tradeDate(request.getDealDate())
                 .tradePrice(request.getPurchasePrice())
@@ -19,17 +22,19 @@ public class DealConverter {
                 .tradeType(request.getTradeType())
                 .itemType(request.getItemType())
                 .productId(request.getItemId())
-                .member(member)
+                .seller(seller)
+                .buyer(buyer)
                 .build();
     }
 
     public static DealCompletion toDealCompletion(
             DealRequestDTO.DealCompletionRequestDTO request,
-            Member member, DealConfirmation dealConfirmation
+            Member seller, Member buyer, DealConfirmation dealConfirmation
     ){
         return DealCompletion.builder()
                 .dealConfirmation(dealConfirmation)
-                .member(member)
+                .seller(seller)
+                .buyer(buyer)
                 .tradeDate(request.getDealDate())
                 .tradePrice(request.getTradePrice())
                 .tradeCount(request.getTradeCount())
@@ -43,6 +48,35 @@ public class DealConverter {
                 .cancelReason(cancelReason)
                 .productId(dealConfirmation.getProductId())
                 .itemType(dealConfirmation.getItemType())
+                .build();
+    }
+
+    public static DealResponseDTO.getProducPreviewtDTO toGetProductPreviewDTO(
+            Item item, ItemImage itemImage){
+        return DealResponseDTO.getProducPreviewtDTO.builder()
+                .itemId(item.getId())
+                .itemType(item.getItemType())
+                .itemName(item.getProductName())
+                .itemImageUrl(itemImage != null ? itemImage.getUrl() : null)
+                .build();
+    }
+
+    public static DealResponseDTO.GetDealConfirmationDTO toGetDealConfirmationDTO(
+            Item item, ItemImage itemImage, Long dealConfirmationId){
+        return DealResponseDTO.GetDealConfirmationDTO.builder()
+                .dealConfirmationId(dealConfirmationId)
+                .itemId(item.getId())
+                .itemType(item.getItemType())
+                .itemName(item.getProductName())
+                .itemImageUrl(itemImage != null ? itemImage.getUrl() : null)
+                .build();
+    }
+
+    public static DealResponseDTO.DealHistoryDetailDTO toDealHistoryDetailDTO(
+            Integer totalDealCount, Integer totalDealAmount){
+        return DealResponseDTO.DealHistoryDetailDTO.builder()
+                .totalDealCount(totalDealCount)
+                .totalDealAmount(totalDealAmount)
                 .build();
     }
 }

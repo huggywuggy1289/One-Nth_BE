@@ -22,13 +22,19 @@ public class QSharingItemScrap extends EntityPathBase<SharingItemScrap> {
 
     public static final QSharingItemScrap sharingItemScrap = new QSharingItemScrap("sharingItemScrap");
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+    public final com.onenth.OneNth.domain.common.QBaseEntity _super = new com.onenth.OneNth.domain.common.QBaseEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final com.onenth.OneNth.domain.member.entity.QMember member;
 
     public final com.onenth.OneNth.domain.product.entity.QSharingItem sharingItem;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QSharingItemScrap(String variable) {
         this(SharingItemScrap.class, forVariable(variable), INITS);

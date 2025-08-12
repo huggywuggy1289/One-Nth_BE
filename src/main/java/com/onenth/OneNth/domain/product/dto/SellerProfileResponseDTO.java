@@ -40,4 +40,15 @@ public class SellerProfileResponseDTO {
         private PurchaseMethod purchaseMethod;
         private String thumbnailUrl;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class TradeHistoryResponseDTO {
+        private Long userId;
+        private Integer reviewCount;
+        private Double totalRating;
+        private Integer totalDealsCount;
+    }
 }

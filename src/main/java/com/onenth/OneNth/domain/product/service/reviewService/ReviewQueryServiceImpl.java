@@ -59,7 +59,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
         }
 
         getReviewDTOList.sort(Comparator.comparing(ReviewResponseDTO.getReviewDTO::getCreatedAt).reversed());
-        return ReviewConverter.toGetReviewListDTO(getReviewDTOList, targetMember.getId());
+        return ReviewConverter.toGetReviewListDTO(getReviewDTOList, targetMember);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
             }
         }
         getReviewDTOList.sort(Comparator.comparing(ReviewResponseDTO.getReviewDTO::getCreatedAt).reversed());
-        return ReviewConverter.toGetReviewListDTO(getReviewDTOList, targetMember.getId());
+        return ReviewConverter.toGetReviewListDTO(getReviewDTOList, targetMember);
     }
 
     private ReviewResponseDTO.getReviewDTO toReviewDTO(Review review, ItemType itemType, Long targetUserId) {

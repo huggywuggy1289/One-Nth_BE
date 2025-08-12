@@ -10,6 +10,10 @@ import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
 import com.onenth.OneNth.domain.post.entity.Like;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
+import com.onenth.OneNth.domain.product.entity.SharingItem;
+import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
+import com.onenth.OneNth.domain.product.entity.scrap.SharingItemScrap;
 import com.onenth.OneNth.domain.region.entity.Region;
 import org.springframework.data.domain.Page;
 
@@ -110,8 +114,6 @@ public class MemberConverter {
                 .placeName(scrappedPost.getPost().getPlaceName())
                 .latitude(scrappedPost.getPost().getLatitude())
                 .longitude(scrappedPost.getPost().getLongitude())
-                .regionName(scrappedPost.getPost().getRegion().getRegionName())
-                .commentCount(scrappedPost.getPost().getPostComment().size())
                 .likeCount(scrappedPost.getPost().getLike().size())
                 .viewCount(0)
                 .createdTime(formatRelativeTime(scrappedPost.getPost().getCreatedAt()))
@@ -144,7 +146,6 @@ public class MemberConverter {
                 .placeName(likedPost.getPost().getPlaceName())
                 .latitude(likedPost.getPost().getLatitude())
                 .longitude(likedPost.getPost().getLongitude())
-                .regionName(likedPost.getPost().getRegion().getRegionName())
                 .commentCount(likedPost.getPost().getPostComment().size())
                 .likeCount(likedPost.getPost().getLike().size())
                 .viewCount(0)
@@ -198,11 +199,67 @@ public class MemberConverter {
                 .placeName(myPost.getPlaceName())
                 .latitude(myPost.getLatitude())
                 .longitude(myPost.getLongitude())
-                .regionName(myPost.getRegion().getRegionName())
                 .commentCount(myPost.getPostComment().size())
                 .likeCount(myPost.getLike().size())
                 .viewCount(0)
                 .createdTime(formatRelativeTime(myPost.getCreatedAt()))
+                .build();
+    }
+
+    public static MemberResponseDTO.ItemPreviewDTO fromPurchase(PurchaseItem pi) {
+        return MemberResponseDTO.ItemPreviewDTO.builder()
+                .itemId(pi.getId())
+                .itemType("같이 사요")
+                .productName(pi.getProductName()) // = name
+                .price(pi.getPrice())
+                .quantity(1)                // Purchase에는 별도 수량 필드 없음
+                .originalPrice(pi.getPrice())     // 정의에 따라
+                .createdTime(formatRelativeTime(pi.getCreatedAt()))
+                .createdAt(pi.getCreatedAt())
+                .build();
+    }
+
+    public static MemberResponseDTO.ItemPreviewDTO fromSharing(SharingItem si) {
+        return MemberResponseDTO.ItemPreviewDTO.builder()
+                .itemId(si.getId())
+                .itemType("함께 나눠요") // or "함께나눠요"
+                .productName(si.getProductName()) // = title
+                .price(si.getPrice())
+                .quantity(si.getQuantity())       // Sharing에는 수량 존재
+                .originalPrice(si.getPrice())   // 정의에 따라 세팅
+                .createdTime(formatRelativeTime(si.getCreatedAt()))
+                .createdAt(si.getCreatedAt())
+                .build();
+    }
+
+
+    public static MemberResponseDTO.ItemPreviewDTO fromPurchaseScrap(PurchaseItemScrap scrap) {
+        PurchaseItem pi = scrap.getPurchaseItem();
+        return MemberResponseDTO.ItemPreviewDTO.builder()
+                .itemId(pi.getId())
+                .itemType("같이 사요")
+                .productName(pi.getProductName())
+                .price(pi.getPrice())
+                .quantity(1)
+                .originalPrice(pi.getPrice()) // 정의에 따라 세팅
+                .createdTime(formatRelativeTime(pi.getCreatedAt()))
+                .createdAt(pi.getCreatedAt())
+                .scrappedAt(scrap.getCreatedAt())
+                .build();
+    }
+
+    public static MemberResponseDTO.ItemPreviewDTO fromSharingScrap(SharingItemScrap scrap) {
+        SharingItem si = scrap.getSharingItem();
+        return MemberResponseDTO.ItemPreviewDTO.builder()
+                .itemId(si.getId())
+                .itemType("함께 나눠요")
+                .productName(si.getProductName())
+                .price(si.getPrice())
+                .quantity(si.getQuantity())
+                .originalPrice(si.getPrice()) // 정의에 따라 세팅
+                .createdTime(formatRelativeTime(si.getCreatedAt()))
+                .createdAt(si.getCreatedAt())
+                .scrappedAt(scrap.getCreatedAt())
                 .build();
     }
 }

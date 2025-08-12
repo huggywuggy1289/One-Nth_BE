@@ -2,6 +2,7 @@ package com.onenth.OneNth.domain.deal.service;
 
 import com.onenth.OneNth.domain.chat.dto.ChatMessageDTO;
 import com.onenth.OneNth.domain.chat.entity.ChatRoom;
+import com.onenth.OneNth.domain.chat.entity.ChatRoomMember;
 import com.onenth.OneNth.domain.chat.repository.ChatRoomRepository;
 import com.onenth.OneNth.domain.deal.converter.DealConverter;
 import com.onenth.OneNth.domain.deal.dto.DealRequestDTO;
@@ -37,7 +38,6 @@ public class DealCommandService {
     private final ChatRoomRepository chatRoomRepository;
 
     private final SharingItemRepository sharingItemRepository;
-
     private final PurchaseItemRepository purchaseItemRepository;
     private final DealConfirmationRepository dealConfirmationRepository;
     private final DealCompletionRepository dealCompletionRepository;
@@ -48,7 +48,7 @@ public class DealCommandService {
     @Transactional
     public void createDealConfirmation(
             Long memberId, DealRequestDTO.DealConfirmationRequestDTO request, String roomName) {
-        Member member = findMemberById(memberId);
+        Member seller = findMemberById(memberId);
         Item item = getProduct(request.getItemType(), request.getItemId());
 
         boolean exists = dealConfirmationRepository.existsByProductIdAndItemType(
@@ -56,7 +56,17 @@ public class DealCommandService {
         if (exists) {
             throw new DealHandler(ErrorStatus.DEAL_CONFIRMATION_ALREADY_EXISTS);
         }
-        DealConfirmation result = DealConverter.toDealConfirmation(request, member);
+
+        ChatRoom chatRoom = chatRoomRepository.findByName(roomName)
+                .orElseThrow(() -> new ChatHandler(ErrorStatus.CHAT_ROOM_NOT_FOUND));
+
+        Member buyer = chatRoom.getChatRoomMembers().stream()
+                .map(ChatRoomMember::getMember)
+                .filter(member -> !member.getId().equals(seller.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ChatHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        DealConfirmation result = DealConverter.toDealConfirmation(request, seller, buyer);
         dealConfirmationRepository.save(result);
 
         item.setStatus(Status.IN_PROGRESS);
@@ -64,7 +74,7 @@ public class DealCommandService {
         ChatMessageDTO.DealConfirmationResponseDTO messageDTO =
                 ChatMessageDTO.DealConfirmationResponseDTO.builder()
                         .dealConfirmationFormId(result.getId())
-                        .sendMemberId(member.getId())
+                        .sendMemberId(seller.getId())
                         .itemName(item.getProductName())
                         .build();
 
@@ -74,10 +84,12 @@ public class DealCommandService {
 
     @Transactional
     public void createDealCompletion(Long memberId, DealRequestDTO.DealCompletionRequestDTO request, String roomName) {
-        Member member = findMemberById(memberId);
+        Member buyer = findMemberById(memberId);
 
         DealConfirmation dealConfirmation = dealConfirmationRepository.findById(request.getDealConfirmationId())
                 .orElseThrow(() -> new DealHandler(ErrorStatus.DEAL_CONFIRMATION_NOT_FOUND));
+
+        Member seller = dealConfirmation.getSeller();
 
         Item item = getProduct(dealConfirmation.getItemType(), dealConfirmation.getProductId());
 
@@ -88,7 +100,7 @@ public class DealCommandService {
         if (exists) {
             throw new DealHandler(ErrorStatus.DEAL_COMPLETION_ALREADY_EXISTS);
         }
-        DealCompletion result = DealConverter.toDealCompletion(request, member, dealConfirmation);
+        DealCompletion result = DealConverter.toDealCompletion(request, seller, buyer, dealConfirmation);
         dealCompletionRepository.save(result);
 
         item.setStatus(Status.COMPLETED);
@@ -99,7 +111,7 @@ public class DealCommandService {
         ChatMessageDTO.DealCompletionResponseDTO messageDTO =
                 ChatMessageDTO.DealCompletionResponseDTO.builder()
                         .dealCompletionFormId(result.getId())
-                        .sendMemberId(member.getId())
+                        .sendMemberId(buyer.getId())
                         .itemName(item.getProductName())
                         .build();
 

@@ -138,7 +138,7 @@ public class PostRestController {
             summary = "게시글 목록 조회 API",
             description = """
     게시판 종류(postType), 지역명(regionName), 키워드(keyword)를 이용한 게시글 목록 조회 API입니다.
-    응답으로 '게시글Id', '제목', '본문 미리보기(최대 50자)', '댓글수', '좋아요수', '조회수', '스크랩 상태', '생성 시간'을 제공합니다.
+    응답으로 '게시글Id', '제목', '본문 미리보기(최대 50자)', '댓글수', '좋아요수', '조회수', '스크랩 상태', '게시글 이미지 URL', '생성 시간'을 제공합니다.
     
     - postType은 필수입니다: 'LIFE_TIP', 'DISCOUNT', 'RESTAURANT'
     - regionName와 keyword는 선택입니다. (단 지역명의 경우, LIFE_TIP에서는 무시됩니다)
@@ -174,7 +174,7 @@ public class PostRestController {
     @Operation(
             summary = "게시글 상세 조회 API",
             description = """
-    postId를 이용한 게시글의 상세 정보 조회 API입니다. 응답으로 'postId', '작성자 닉네임', '지역명'(LIFE_TIP의 경우, null), '제목', '내용', '이미지 url', '스크랩 상태', '공감,댓글,조회수', '생성시간'을 제공합니다.
+    postId를 이용한 게시글의 상세 정보 조회 API입니다. 응답으로 'postId', '작성자 닉네임', '작성자 프로필 사진', '지역명'(LIFE_TIP의 경우, null), '제목', '내용', '이미지 url', '스크랩 상태', '공감,댓글,조회수', '생성시간'을 제공합니다.
     
     - 쿼리파라미터 postId에 게시글 ID를 전달합니다.
     """
