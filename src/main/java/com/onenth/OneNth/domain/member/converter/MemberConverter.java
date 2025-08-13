@@ -10,6 +10,7 @@ import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
 import com.onenth.OneNth.domain.post.entity.Like;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
+import com.onenth.OneNth.domain.product.entity.ItemImage;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
@@ -111,6 +112,7 @@ public class MemberConverter {
                 .postId(scrappedPost.getPost().getId())
                 .postType(scrappedPost.getPost().getPostType().toString())
                 .postTitle(scrappedPost.getPost().getTitle())
+                .content(scrappedPost.getPost().getContent())
                 .placeName(scrappedPost.getPost().getPlaceName())
                 .latitude(scrappedPost.getPost().getLatitude())
                 .longitude(scrappedPost.getPost().getLongitude())
@@ -143,6 +145,7 @@ public class MemberConverter {
                 .postId(likedPost.getPost().getId())
                 .postType(likedPost.getPost().getPostType().toString())
                 .postTitle(likedPost.getPost().getTitle())
+                .content(likedPost.getPost().getContent())
                 .placeName(likedPost.getPost().getPlaceName())
                 .latitude(likedPost.getPost().getLatitude())
                 .longitude(likedPost.getPost().getLongitude())
@@ -196,6 +199,7 @@ public class MemberConverter {
                 .postId(myPost.getId())
                 .postType(myPost.getPostType().toString())
                 .postTitle(myPost.getTitle())
+                .content(myPost.getContent())
                 .placeName(myPost.getPlaceName())
                 .latitude(myPost.getLatitude())
                 .longitude(myPost.getLongitude())
@@ -215,6 +219,7 @@ public class MemberConverter {
                 .quantity(1)                // Purchase에는 별도 수량 필드 없음
                 .originalPrice(pi.getPrice())     // 정의에 따라
                 .createdTime(formatRelativeTime(pi.getCreatedAt()))
+                .imageUrl(getFirstImageUrl(pi.getItemImages()))
                 .createdAt(pi.getCreatedAt())
                 .build();
     }
@@ -228,6 +233,7 @@ public class MemberConverter {
                 .quantity(si.getQuantity())       // Sharing에는 수량 존재
                 .originalPrice(si.getPrice())   // 정의에 따라 세팅
                 .createdTime(formatRelativeTime(si.getCreatedAt()))
+                .imageUrl(getFirstImageUrl(si.getItemImages()))
                 .createdAt(si.getCreatedAt())
                 .build();
     }
@@ -243,6 +249,7 @@ public class MemberConverter {
                 .quantity(1)
                 .originalPrice(pi.getPrice()) // 정의에 따라 세팅
                 .createdTime(formatRelativeTime(pi.getCreatedAt()))
+                .imageUrl(getFirstImageUrl(pi.getItemImages()))
                 .createdAt(pi.getCreatedAt())
                 .scrappedAt(scrap.getCreatedAt())
                 .build();
@@ -258,8 +265,16 @@ public class MemberConverter {
                 .quantity(si.getQuantity())
                 .originalPrice(si.getPrice()) // 정의에 따라 세팅
                 .createdTime(formatRelativeTime(si.getCreatedAt()))
+                .imageUrl(getFirstImageUrl(si.getItemImages()))
                 .createdAt(si.getCreatedAt())
                 .scrappedAt(scrap.getCreatedAt())
                 .build();
+    }
+
+    private static String getFirstImageUrl(List<ItemImage> images) {
+        if (images != null && !images.isEmpty()) {
+            return images.get(0).getUrl();
+        }
+        return null;
     }
 }

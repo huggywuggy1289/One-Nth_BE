@@ -37,6 +37,7 @@ public interface PurchaseItemRepository  extends JpaRepository<PurchaseItem, Lon
 
     @Query("""
         select p from PurchaseItem p
+        left join fetch p.itemImages
         where p.member.id = :memberId
         order by p.createdAt desc
     """)
