@@ -399,4 +399,23 @@ public class PurchaseItemService {
         scrapRepository.delete(scrap);
         log.info("스크랩 삭제 완료: userId={}, itemId={}", userId, purchaseItemId);
     }
+
+    // 등록 상품 삭제
+    @Transactional
+    public void delete(Long itemId, Long userId) {
+        var item = purchaseItemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 상품입니다."));
+        if (!item.getMember().getId().equals(userId)) throw new IllegalArgumentException("본인 상품만 삭제할 수 있습니다.");
+
+         scrapRepository.deleteByPurchaseItemId(itemId);
+         itemImageRepository.deleteByPurchaseItemId(itemId);
+
+        purchaseItemRepository.delete(item);
+    }
+
+    private String extractKey(String url) {
+        if (url == null) return null;
+        int i = url.indexOf(".amazonaws.com/");
+        return (i > -1) ? url.substring(i + ".amazonaws.com/".length()) : null;
+    }
 }

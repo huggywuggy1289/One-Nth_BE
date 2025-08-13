@@ -139,4 +139,17 @@ public class SharingItemController {
         sharingItemService.removeScrap(sharingItemId, userId);
         return ApiResponse.onSuccess(null);
     }
+
+    @Operation(
+            summary = "함께나눠요 등록상품 삭제",
+            description = "특정 함께나눠요 상품을 삭제합니다."
+    )
+    @DeleteMapping("/{sharingItemId}")
+    public ApiResponse<Void> delete(
+            @PathVariable("sharingItemId") Long sharingItemId,
+            @AuthUser Long userId
+    ) {
+        sharingItemService.delete(sharingItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
 }
