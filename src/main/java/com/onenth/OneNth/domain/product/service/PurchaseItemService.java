@@ -93,7 +93,6 @@ public class PurchaseItemService {
                 throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
             }
 
-            // 1) 주소 → 좌표 (지오코딩)
             geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation()); // ★ 재선언 금지: 할당만
             if (geo == null) {
                 throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
@@ -101,13 +100,11 @@ public class PurchaseItemService {
             lat = geo.getLatitude();
             lng = geo.getLongitude();
 
-            // 2) 좌표 → 행정동명 (역지오코딩)
             String legalDong = geoCodingService.getRegionNameByCoordinates(lat, lng);
             if (legalDong == null || legalDong.isBlank()) {
                 throw new IllegalArgumentException("해당 좌표의 행정동을 확인할 수 없습니다.");
             }
 
-            // 3) 우리 Region 매핑 (정확 매핑 우선, 실패 시 Containing 보완)
             region = regionRepository.findByRegionName(legalDong)
                     .orElseGet(() -> regionRepository.findByRegionNameContaining(legalDong)
                             .stream().findFirst()
