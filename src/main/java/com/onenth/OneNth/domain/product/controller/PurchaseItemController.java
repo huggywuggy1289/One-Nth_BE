@@ -143,4 +143,18 @@ public class PurchaseItemController {
         purchaseItemService.changeItemStatus(purchaseItemId,memberId,status);
         return ApiResponse.onSuccess("상품 상태 전환이 완료되었습니다.");
     }
+
+    @Operation(
+            summary = "같이 사요 등록상품 삭제",
+            description = """
+    특정 같이사요 상품을 삭제합니다."""
+    )
+    @DeleteMapping("/{groupPurchaseId}")
+    public ApiResponse<Void> delete(
+            @PathVariable("groupPurchaseId") Long purchaseItemId,
+            @AuthUser Long userId
+    ) {
+        purchaseItemService.delete(purchaseItemId, userId);
+        return ApiResponse.onSuccess(null);
+    }
 }

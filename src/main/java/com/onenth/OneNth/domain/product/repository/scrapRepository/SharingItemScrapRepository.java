@@ -6,6 +6,7 @@ import com.onenth.OneNth.domain.product.entity.scrap.SharingItemScrap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -32,4 +33,8 @@ public interface SharingItemScrapRepository extends JpaRepository<SharingItemScr
 
     @Query("select count(s) from SharingItemScrap s where s.member.id = :memberId")
     long countByMemberId(@Param("memberId") Long memberId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from SharingItemScrap s where s.sharingItem.id = :itemId")
+    int deleteBySharingItemId(@Param("itemId") Long itemId);
 }

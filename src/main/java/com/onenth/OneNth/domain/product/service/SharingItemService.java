@@ -11,6 +11,7 @@ import com.onenth.OneNth.domain.product.dto.SharingItemListDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemRequestDTO;
 import com.onenth.OneNth.domain.product.dto.SharingItemResponseDTO;
 import com.onenth.OneNth.domain.product.entity.ItemImage;
+import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemCategory;
 import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
@@ -403,5 +404,27 @@ public class SharingItemService {
 
         scrapRepository.delete(scrap);
         log.info("스크랩 삭제 완료: userId={}, itemId={}", userId, purchaseItemId);
+    }
+
+    // 등록 상품 삭제
+    @Transactional
+    public void delete(Long itemId, Long userId) {
+        var item = sharingItemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 상품입니다."));
+
+        if (!item.getMember().getId().equals(userId)) {
+            throw new IllegalArgumentException("본인 상품만 삭제할 수 있습니다.");
+        }
+
+        scrapRepository.deleteBySharingItemId(itemId);
+        itemImageRepository.deleteBySharingItemId(itemId);
+
+        sharingItemRepository.delete(item);
+    }
+
+    private String extractKey(String url) {
+        if (url == null) return null;
+        int i = url.indexOf(".amazonaws.com/");
+        return (i > -1) ? url.substring(i + ".amazonaws.com/".length()) : null;
     }
 }

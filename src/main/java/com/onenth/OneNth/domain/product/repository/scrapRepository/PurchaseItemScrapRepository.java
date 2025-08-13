@@ -6,6 +6,7 @@ import com.onenth.OneNth.domain.product.entity.scrap.PurchaseItemScrap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -33,4 +34,8 @@ public interface PurchaseItemScrapRepository extends JpaRepository<PurchaseItemS
 
     @Query("select count(s) from PurchaseItemScrap s where s.member.id = :memberId")
     long countByMemberId(@Param("memberId") Long memberId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from PurchaseItemScrap s where s.purchaseItem.id = :itemId")
+    int deleteByPurchaseItemId(@Param("itemId") Long itemId);
 }
