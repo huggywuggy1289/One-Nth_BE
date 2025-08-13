@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.product.converter.ReviewConverter;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
+import com.onenth.OneNth.domain.product.entity.Item;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.SharingItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
@@ -74,12 +75,19 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
 
         Long itemId = review.getItemId();
 
+        Item item = switch (itemType) {
+            case SHARE -> sharingItemRepository.findById(itemId)
+                    .orElseThrow(() -> new SharingItemHandler(ErrorStatus.SHARING_ITEM_NOT_FOUND));
+            case PURCHASE -> purchaseItemRepository.findById(itemId)
+                    .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.PURCHASE_ITEM_NOT_FOUND));
+        };
+
         List<ReviewResponseDTO.getImageDetail> imageDetailList
                 = review.getReviewImages().stream()
                 .map(ReviewConverter::toGetImageDetail)
                 .collect(Collectors.toList());
 
-        return ReviewConverter.toGetMyReviewDTO(review, imageDetailList, itemType, userId, itemId);
+        return ReviewConverter.toGetMyReviewDTO(review, imageDetailList, itemType, userId, itemId, item);
     }
 
     @Override
@@ -118,6 +126,14 @@ public class ReviewQueryServiceImpl implements ReviewQueryService{
                 .map(ReviewImage::getImageUrl)
                 .collect(Collectors.toList());
         Long itemId = review.getItemId();
-        return ReviewConverter.toGetReviewDTO(review, imageList, itemType, targetUserId, itemId);
+
+        Item item = switch (itemType) {
+            case SHARE -> sharingItemRepository.findById(itemId)
+                    .orElseThrow(() -> new SharingItemHandler(ErrorStatus.SHARING_ITEM_NOT_FOUND));
+            case PURCHASE -> purchaseItemRepository.findById(itemId)
+                    .orElseThrow(() -> new PurchasingItemHandler(ErrorStatus.PURCHASE_ITEM_NOT_FOUND));
+        };
+
+        return ReviewConverter.toGetReviewDTO(review, imageList, itemType, targetUserId, itemId, item);
     }
 }

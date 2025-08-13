@@ -35,6 +35,7 @@ public class ReviewResponseDTO {
         private Long reviewId;
         private ItemType itemType;
         private Long itemId;
+        private String itemTitle;
         private LocalDateTime createdAt;
         private Long reviewerId;
         private String reviewerNickName;
@@ -64,6 +65,7 @@ public class ReviewResponseDTO {
         private Long reviewId;
         private ItemType itemType;
         private Long itemId;
+        private String itemTitle;
         private LocalDateTime createdAt;
         private Long reviewerId;
         private Long reviewTargetId;
