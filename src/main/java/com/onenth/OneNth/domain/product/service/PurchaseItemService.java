@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,18 +85,34 @@ public class PurchaseItemService {
 
         GeoCodingResult geo = null;
         Region region;
+        Double lat = null, lng = null;
 
         // 장소입력 유효성
         if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
             if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
                 throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
             }
-            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
-            if (geo == null) throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
 
-            region = regionRepository.findByRegionNameContaining(dto.getPurchaseLocation())
-                    .stream().findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다."));
+            // 1) 주소 → 좌표 (지오코딩)
+            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation()); // ★ 재선언 금지: 할당만
+            if (geo == null) {
+                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+            }
+            lat = geo.getLatitude();
+            lng = geo.getLongitude();
+
+            // 2) 좌표 → 행정동명 (역지오코딩)
+            String legalDong = geoCodingService.getRegionNameByCoordinates(lat, lng);
+            if (legalDong == null || legalDong.isBlank()) {
+                throw new IllegalArgumentException("해당 좌표의 행정동을 확인할 수 없습니다.");
+            }
+
+            // 3) 우리 Region 매핑 (정확 매핑 우선, 실패 시 Containing 보완)
+            region = regionRepository.findByRegionName(legalDong)
+                    .orElseGet(() -> regionRepository.findByRegionNameContaining(legalDong)
+                            .stream().findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("입력 주소에 해당하는 지역 정보를 찾을 수 없습니다.")));
+
         } else { // ONLINE
             if (dto.getPurchaseLocation() != null && !dto.getPurchaseLocation().isBlank()) {
                 throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
@@ -112,7 +129,9 @@ public class PurchaseItemService {
                 mainRegion.setLongitude(g.getLongitude());
                 regionRepository.save(mainRegion);
             }
-            region = mainRegion;          // ★ ONLINE region 확정
+            region = mainRegion;
+            lat = mainRegion.getLatitude();
+            lng = mainRegion.getLongitude();
         }
 
         // 태그 유효성 검사 및 저장
@@ -145,6 +164,12 @@ public class PurchaseItemService {
                 .tags(new ArrayList<>())
                 .build();
         purchaseItem.getTags().addAll(tagEntities);
+
+        if (lat == null || lng == null) {
+            throw new IllegalStateException("좌표 계산에 실패했습니다.");
+        }
+        purchaseItem.setLatitude(lat);
+        purchaseItem.setLongitude(lng);
 
         // ONLINE이면 대표지역 위도경도 설정
         if (dto.getPurchaseMethod().equals(PurchaseMethod.ONLINE)) {
