@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.product.converter;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
+import com.onenth.OneNth.domain.product.entity.Item;
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
 import com.onenth.OneNth.domain.product.entity.review.PurchaseReview;
@@ -34,11 +35,12 @@ public class ReviewConverter {
     }
 
     public static ReviewResponseDTO.getReviewDTO toGetReviewDTO(
-            Review review, List<String> imageUrl, ItemType itemType, Long targetUserId, Long itemId) {
+            Review review, List<String> imageUrl, ItemType itemType, Long targetUserId, Long itemId, Item item) {
         return ReviewResponseDTO.getReviewDTO.builder()
                 .reviewId(review.getId())
                 .itemType(itemType)
                 .itemId(itemId)
+                .itemTitle(item.getProductName())
                 .reviewerId(review.getMember().getId())
                 .reviewerNickName(review.getMember().getNickname())
                 .reviewerProfileImageUrl(review.getMember().getProfileImageUrl())
@@ -69,12 +71,14 @@ public class ReviewConverter {
     }
 
     public static ReviewResponseDTO.getMyReviewDTO toGetMyReviewDTO(
-            Review review, List<ReviewResponseDTO.getImageDetail> image, ItemType itemType, Long targetUserId, Long itemId
+            Review review, List<ReviewResponseDTO.getImageDetail> image,
+            ItemType itemType, Long targetUserId, Long itemId, Item item
     ){
         return ReviewResponseDTO.getMyReviewDTO.builder()
                 .reviewId(review.getId())
                 .itemType(itemType)
                 .itemId(itemId)
+                .itemTitle(item.getProductName())
                 .reviewerId(review.getMember().getId())
                 .reviewTargetId(targetUserId)
                 .content(review.getContent())
