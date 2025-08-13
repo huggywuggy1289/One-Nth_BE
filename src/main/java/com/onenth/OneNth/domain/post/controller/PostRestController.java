@@ -55,7 +55,7 @@ public class PostRestController {
     // multipart/form-data 요청 처리 (이미지 첨부 가능)
     @PostMapping(value = "/{postType}", consumes = "multipart/form-data")
     public ApiResponse<PostSaveResponseDTO> saveMultipart(
-            @PathVariable PostType postType,
+            @PathVariable("postType") PostType postType,
             @AuthUser Long memberId,
             @RequestPart("post") PostSaveRequestDTO requestDto,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
@@ -66,7 +66,7 @@ public class PostRestController {
     // application/json 요청 처리 (이미지 없이 JSON 데이터만)
     @PostMapping(value = "/{postType}", consumes = "application/json")
     public ApiResponse<PostSaveResponseDTO> saveJson(
-            @PathVariable PostType postType,
+            @PathVariable("postType") PostType postType,
             @AuthUser Long memberId,
             @RequestBody PostSaveRequestDTO requestDto
     ) {

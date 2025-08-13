@@ -53,6 +53,7 @@ public interface SharingItemRepository extends JpaRepository<SharingItem, Long>,
 
     @Query("""
         select s from SharingItem s
+        left join fetch s.itemImages
         where s.member.id = :memberId
         order by s.createdAt desc
     """)

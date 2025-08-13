@@ -34,7 +34,7 @@ public class PostCommentRestController {
     """)
     @PostMapping
     public ApiResponse<PostCommentResponseDTO> createComment(
-            @PathVariable Long postId,
+            @PathVariable("postId") Long postId,
             @AuthUser Long memberId,
             @RequestBody PostCommentSaveRequestDTO requestDTO
     ) {

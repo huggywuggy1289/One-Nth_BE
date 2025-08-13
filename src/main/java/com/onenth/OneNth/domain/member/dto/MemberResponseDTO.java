@@ -71,6 +71,7 @@ public class MemberResponseDTO {
         Long postId;
         String postType;
         String postTitle;
+        String content;
         String placeName;
         Double latitude;
         Double longitude;
@@ -98,21 +99,6 @@ public class MemberResponseDTO {
         Boolean isSuccess;
     }
 
-//    @Builder
-//    @Getter
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    public static class likedPostListDTO {
-//
-//    }
-//
-//    @Builder
-//    @Getter
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    public static class likedPostPreviewDTO {
-//
-//    }
     @Getter
     @Builder
     @AllArgsConstructor
@@ -132,6 +118,8 @@ public class MemberResponseDTO {
         private Integer quantity;        // SharingItem만 값 존재 (없으면 null)
         private Integer originalPrice;   // PurchaseItem의 원래 구매가 등 (없으면 null)
         private String createdTime;      // 상대시간 문자열
+        private String imageUrl;
+
         @JsonIgnore
         private LocalDateTime createdAt; // 정렬용(응답에 노출X)
         @JsonIgnore
