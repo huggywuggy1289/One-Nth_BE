@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,18 +85,31 @@ public class PurchaseItemService {
 
         GeoCodingResult geo = null;
         Region region;
+        Double lat = null, lng = null;
 
         // 장소입력 유효성
         if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
             if (dto.getPurchaseLocation() == null || dto.getPurchaseLocation().isBlank()) {
                 throw new IllegalArgumentException("오프라인 구매는 거래 장소를 반드시 입력해야 합니다.");
             }
-            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation());
-            if (geo == null) throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
 
-            region = regionRepository.findByRegionNameContaining(dto.getPurchaseLocation())
-                    .stream().findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다."));
+            geo = geoCodingService.getCoordinatesFromAddress(dto.getPurchaseLocation()); // ★ 재선언 금지: 할당만
+            if (geo == null) {
+                throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
+            }
+            lat = geo.getLatitude();
+            lng = geo.getLongitude();
+
+            String legalDong = geoCodingService.getRegionNameByCoordinates(lat, lng);
+            if (legalDong == null || legalDong.isBlank()) {
+                throw new IllegalArgumentException("해당 좌표의 행정동을 확인할 수 없습니다.");
+            }
+
+            region = regionRepository.findByRegionName(legalDong)
+                    .orElseGet(() -> regionRepository.findByRegionNameContaining(legalDong)
+                            .stream().findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("입력 주소에 해당하는 지역 정보를 찾을 수 없습니다.")));
+
         } else { // ONLINE
             if (dto.getPurchaseLocation() != null && !dto.getPurchaseLocation().isBlank()) {
                 throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
@@ -112,7 +126,9 @@ public class PurchaseItemService {
                 mainRegion.setLongitude(g.getLongitude());
                 regionRepository.save(mainRegion);
             }
-            region = mainRegion;          // ★ ONLINE region 확정
+            region = mainRegion;
+            lat = mainRegion.getLatitude();
+            lng = mainRegion.getLongitude();
         }
 
         // 태그 유효성 검사 및 저장
@@ -146,37 +162,13 @@ public class PurchaseItemService {
                 .build();
         purchaseItem.getTags().addAll(tagEntities);
 
-        // ONLINE이면 대표지역 위도경도 설정
-        if (dto.getPurchaseMethod().equals(PurchaseMethod.ONLINE)) {
-            Region mainRegion = memberRegionRepository.findByMemberId(userId)
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("대표 지역이 없습니다."))
-                    .getRegion();
-
-            if (mainRegion.getLatitude() == null || mainRegion.getLongitude() == null) {
-                GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(mainRegion.getRegionName());
-                if (regionGeo == null) {
-                    throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
-                }
-
-                mainRegion.setLatitude(regionGeo.getLatitude());
-                mainRegion.setLongitude(regionGeo.getLongitude());
-                regionRepository.save(mainRegion);
-            }
-
-            purchaseItem.setLatitude(mainRegion.getLatitude());
-            purchaseItem.setLongitude(mainRegion.getLongitude());
-        } else {
-        if (geo == null) {
-            throw new IllegalArgumentException("OFFLINE 주소에서 위도/경도를 가져올 수 없습니다.");
+        if (lat == null || lng == null) {
+            throw new IllegalStateException("좌표 계산에 실패했습니다.");
         }
+        purchaseItem.setLatitude(lat);
+        purchaseItem.setLongitude(lng);
 
-        purchaseItem.setLatitude(geo.getLatitude());
-        purchaseItem.setLongitude(geo.getLongitude());
-    }
-
-    // 폼 최종저장
+        // 폼 최종저장
         purchaseItemRepository.save(purchaseItem);
 
         // 이미지 유효성 검사

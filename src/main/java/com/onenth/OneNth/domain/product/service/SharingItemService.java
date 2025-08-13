@@ -76,8 +76,9 @@ public class SharingItemService {
 
         Member member = Member.builder().id(userId).build();
 
-        GeoCodingResult geo = null;
+        GeoCodingResult geo = null;   // 재선언 금지: 한 번만 선언
         Region region;
+        Double lat = null, lng = null;
 
         // 장소입력 유효성
         if (dto.getPurchaseMethod() == PurchaseMethod.OFFLINE) {
@@ -89,12 +90,20 @@ public class SharingItemService {
             if (geo == null) {
                 throw new IllegalArgumentException("유효한 주소를 입력해주세요.");
             }
+            lat = geo.getLatitude();
+            lng = geo.getLongitude();
 
-            region = regionRepository.findByRegionNameContaining(dto.getSharingLocation())
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다."));
-        } else {
+            String legalDong = geoCodingService.getRegionNameByCoordinates(lat, lng);
+            if (legalDong == null || legalDong.isBlank()) {
+                throw new IllegalArgumentException("해당 좌표의 행정동을 확인할 수 없습니다.");
+            }
+
+            region = regionRepository.findByRegionName(legalDong)
+                    .orElseGet(() -> regionRepository.findByRegionNameContaining(legalDong)
+                            .stream().findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("입력한 주소에 해당하는 지역 정보를 찾을 수 없습니다.")));
+
+        } else { // ONLINE
             if (dto.getSharingLocation() != null && !dto.getSharingLocation().isBlank()) {
                 throw new IllegalArgumentException("온라인 구매는 거래 장소를 입력할 수 없습니다.");
             }
@@ -104,6 +113,19 @@ public class SharingItemService {
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("회원의 대표지역이 설정되지 않았습니다."))
                     .getRegion();
+
+            if (region.getLatitude() == null || region.getLongitude() == null) {
+                GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(region.getRegionName());
+                if (regionGeo == null) {
+                    throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
+                }
+                region.setLatitude(regionGeo.getLatitude());
+                region.setLongitude(regionGeo.getLongitude());
+                regionRepository.save(region);
+            }
+
+            lat = region.getLatitude();
+            lng = region.getLongitude();
         }
 
         // 태그 유효성 검사 및 저장
@@ -153,26 +175,11 @@ public class SharingItemService {
                 .build();
         sharingItem.getTags().addAll(tagEntities);
 
-        // ONLINE이면 대표지역 위도경도 설정
-        if (dto.getPurchaseMethod() == PurchaseMethod.ONLINE) {
-            if (region.getLatitude() == null || region.getLongitude() == null) {
-                GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(region.getRegionName());
-                if (regionGeo == null) {
-                    throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
-                }
-
-                region.setLatitude(regionGeo.getLatitude());
-                region.setLongitude(regionGeo.getLongitude());
-                regionRepository.save(region);
-            }
-
-            sharingItem.setLatitude(region.getLatitude());
-            sharingItem.setLongitude(region.getLongitude());
-
-        } else {
-            sharingItem.setLatitude(geo.getLatitude());
-            sharingItem.setLongitude(geo.getLongitude());
+        if (lat == null || lng == null) {
+            throw new IllegalStateException("좌표 계산에 실패했습니다.");
         }
+        sharingItem.setLatitude(lat);
+        sharingItem.setLongitude(lng);
 
         sharingItemRepository.save(sharingItem);
 
