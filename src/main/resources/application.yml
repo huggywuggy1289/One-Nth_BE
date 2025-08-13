@@ -59,6 +59,10 @@ jwt:
       access: 14400000 # 4시간
       refresh: 1209600000 # 2주 (예시)
 
+firebase:
+  admin:
+    service-account-path: ${FIREBASE_ADMIN_SERVICE_ACCOUNT_PATH}
+
 cloud:
   aws:
     s3:

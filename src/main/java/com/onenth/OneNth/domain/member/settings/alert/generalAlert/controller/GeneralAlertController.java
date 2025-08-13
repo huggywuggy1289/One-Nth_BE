@@ -26,7 +26,7 @@ public class GeneralAlertController {
     private final GeneralAlertCommandService generalAlertCommandService;
     private final GeneralAlertQueryService generalAlertQueryService;
 
-    @Operation(
+/*    @Operation(
             summary =  "스크랩 알림 on/off API",
             description = "사용자 설정 중 스크랩 알림 설정 on/off API입니다. 응답으로 alertType(스크랩)과 enabled(활성 여부)을 반환합니다."
     )
@@ -42,7 +42,7 @@ public class GeneralAlertController {
             @Valid @RequestBody GeneralAlertRequestDTO.SetScrapAlertStatusRequestDTO request
     ) {
         return ApiResponse.onSuccess(generalAlertCommandService.setScrapAlertStatus(userId, request));
-    }
+    }*/
 
     @Operation(
             summary =  "리뷰 알림 on/off API",

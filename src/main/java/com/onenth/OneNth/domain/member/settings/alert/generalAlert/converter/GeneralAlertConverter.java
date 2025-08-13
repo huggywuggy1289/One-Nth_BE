@@ -13,12 +13,12 @@ import java.util.List;
 
 public class GeneralAlertConverter {
 
-    public static GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO toSetScrapAlertStatusResponseDTO(MemberAlertSetting memberAlertSetting) {
+/*    public static GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO toSetScrapAlertStatusResponseDTO(MemberAlertSetting memberAlertSetting) {
         return GeneralAlertResponseDTO.SetScrapAlertStatusResponseDTO.builder()
                 .alertType(AlertType.SCRAP)
                 .enabled(memberAlertSetting.isScrapAlerts())
                 .build();
-    }
+    }*/
 
     public static GeneralAlertResponseDTO.SetReviewAlertStatusResponseDTO toSetReviewAlertStatusResponseDTO(MemberAlertSetting memberAlertSetting) {
         return GeneralAlertResponseDTO.SetReviewAlertStatusResponseDTO.builder()
@@ -46,12 +46,14 @@ public class GeneralAlertConverter {
 
     public static GeneralAlertResponseDTO.GeneralAlertSummary toGeneralAlertSummary(AlertType alertType, MemberAlertSetting memberAlertSetting) {
 
-        if (alertType == AlertType.SCRAP) {
+/*        if (alertType == AlertType.SCRAP) {
             return GeneralAlertResponseDTO.GeneralAlertSummary.builder()
                     .alertType(alertType)
                     .enabled(memberAlertSetting.isScrapAlerts())
                     .build();
-        } else if (alertType == AlertType.REVIEW) {
+        }*/
+
+        if (alertType == AlertType.REVIEW) {
             return GeneralAlertResponseDTO.GeneralAlertSummary.builder()
                     .alertType(alertType)
                     .enabled(memberAlertSetting.isReviewAlerts())

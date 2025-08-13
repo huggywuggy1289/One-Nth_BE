@@ -26,6 +26,8 @@ public class QAlert extends EntityPathBase<Alert> {
 
     public final EnumPath<AlertType> alertType = createEnum("alertType", AlertType.class);
 
+    public final NumberPath<Long> contentId = createNumber("contentId", Long.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -33,9 +35,13 @@ public class QAlert extends EntityPathBase<Alert> {
 
     public final BooleanPath isRead = createBoolean("isRead");
 
+    public final EnumPath<com.onenth.OneNth.domain.product.entity.enums.ItemType> itemType = createEnum("itemType", com.onenth.OneNth.domain.product.entity.enums.ItemType.class);
+
     public final com.onenth.OneNth.domain.member.entity.QMember member;
 
     public final StringPath message = createString("message");
+
+    public final StringPath title = createString("title");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;

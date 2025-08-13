@@ -25,6 +25,17 @@ jobs:
           echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
         shell: bash
 
+      - name: Create Firebase directory
+        run: mkdir -p src/main/resources/firebase
+
+      - name: Write Firebase service key file
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "one-nth-firebase-adminsdk-fbsvc-e17dc2af6f.json"
+          json: ${{ secrets.FIREBASE_ADMIN_SA_KEY }}
+          dir: 'src/main/resources/firebase/'
+
       - name: Grant execute permission for gradle
         run: chmod +x ./gradlew
         shell: bash
