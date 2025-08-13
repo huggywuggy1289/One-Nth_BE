@@ -168,37 +168,7 @@ public class PurchaseItemService {
         purchaseItem.setLatitude(lat);
         purchaseItem.setLongitude(lng);
 
-        // ONLINE이면 대표지역 위도경도 설정
-        if (dto.getPurchaseMethod().equals(PurchaseMethod.ONLINE)) {
-            Region mainRegion = memberRegionRepository.findByMemberId(userId)
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("대표 지역이 없습니다."))
-                    .getRegion();
-
-            if (mainRegion.getLatitude() == null || mainRegion.getLongitude() == null) {
-                GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(mainRegion.getRegionName());
-                if (regionGeo == null) {
-                    throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
-                }
-
-                mainRegion.setLatitude(regionGeo.getLatitude());
-                mainRegion.setLongitude(regionGeo.getLongitude());
-                regionRepository.save(mainRegion);
-            }
-
-            purchaseItem.setLatitude(mainRegion.getLatitude());
-            purchaseItem.setLongitude(mainRegion.getLongitude());
-        } else {
-        if (geo == null) {
-            throw new IllegalArgumentException("OFFLINE 주소에서 위도/경도를 가져올 수 없습니다.");
-        }
-
-        purchaseItem.setLatitude(geo.getLatitude());
-        purchaseItem.setLongitude(geo.getLongitude());
-    }
-
-    // 폼 최종저장
+        // 폼 최종저장
         purchaseItemRepository.save(purchaseItem);
 
         // 이미지 유효성 검사

@@ -181,27 +181,6 @@ public class SharingItemService {
         sharingItem.setLatitude(lat);
         sharingItem.setLongitude(lng);
 
-        // ONLINE이면 대표지역 위도경도 설정
-        if (dto.getPurchaseMethod() == PurchaseMethod.ONLINE) {
-            if (region.getLatitude() == null || region.getLongitude() == null) {
-                GeoCodingResult regionGeo = geoCodingService.getCoordinatesFromAddress(region.getRegionName());
-                if (regionGeo == null) {
-                    throw new IllegalStateException("대표 지역의 위도/경도 정보를 찾을 수 없습니다.");
-                }
-
-                region.setLatitude(regionGeo.getLatitude());
-                region.setLongitude(regionGeo.getLongitude());
-                regionRepository.save(region);
-            }
-
-            sharingItem.setLatitude(region.getLatitude());
-            sharingItem.setLongitude(region.getLongitude());
-
-        } else {
-            sharingItem.setLatitude(geo.getLatitude());
-            sharingItem.setLongitude(geo.getLongitude());
-        }
-
         sharingItemRepository.save(sharingItem);
 
         imageFiles.stream()
