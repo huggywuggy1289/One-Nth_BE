@@ -21,5 +21,9 @@ public class PostDetailResponseDTO {
     private int likeCount;
     private boolean scrapStatus;
     private int viewCount;
+    private List<String> tags;
+    private String address;
+    private String placeName;
+    private String link;
     private LocalDateTime createdAt;
 }

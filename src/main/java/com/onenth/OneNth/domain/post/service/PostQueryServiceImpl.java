@@ -9,6 +9,7 @@ import com.onenth.OneNth.domain.post.repository.commentRepository.CommentReposit
 import com.onenth.OneNth.domain.post.repository.imageRepository.ImageRepository;
 import com.onenth.OneNth.domain.post.repository.likeRepository.LikeRepository;
 import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
+import com.onenth.OneNth.domain.post.repository.tagRepository.PostTagRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class PostQueryServiceImpl implements PostQueryService {
     private final CommentRepository CommentRepository;
     private final LikeRepository LikeRepository;
     private final ScrapRepository ScrapRepository;
+    private final PostTagRepository PostTagRepository;
 
     @Override
     public Page<PostListResponseDTO> getPostList(
@@ -103,8 +105,9 @@ public class PostQueryServiceImpl implements PostQueryService {
         boolean scrapStatus = ScrapRepository.existsByPostIdAndMemberId(postId, memberId);
         List<String> imageUrls = imageRepository.findUrlsByPost(post);
         String profileImageUrl = post.getMember().getProfileImageUrl();
+        List<String> tags = PostTagRepository.findTagNamesByPostId(post.getId());
 
-        return PostDetailResponseDTO.builder()
+        PostDetailResponseDTO.PostDetailResponseDTOBuilder builder = PostDetailResponseDTO.builder()
                 .postId(post.getId().toString())
                 .nickname(post.getMember().getNickname())
                 .profileImageUrl(profileImageUrl)
@@ -117,6 +120,16 @@ public class PostQueryServiceImpl implements PostQueryService {
                 .scrapStatus(scrapStatus)
                 .viewCount(post.getViewCount())
                 .createdAt(post.getCreatedAt())
-                .build();
+                .tags(tags);
+
+        // 타입별 추가 정보
+        if (post.getPostType() == PostType.DISCOUNT || post.getPostType() == PostType.RESTAURANT) {
+            builder.address(post.getAddress())
+                    .placeName(post.getPlaceName());
+        } else if (post.getPostType() == PostType.LIFE_TIP) {
+            builder.link(post.getLink());
+        }
+
+        return builder.build();
     }
 }
