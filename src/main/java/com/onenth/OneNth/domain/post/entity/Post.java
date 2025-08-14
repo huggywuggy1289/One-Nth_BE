@@ -6,7 +6,6 @@ import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
