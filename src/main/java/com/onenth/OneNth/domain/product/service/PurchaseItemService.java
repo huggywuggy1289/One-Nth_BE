@@ -37,10 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.onenth.OneNth.domain.product.dto.PurchaseItemListDTO.toStatusLabel;
@@ -245,37 +242,35 @@ public class PurchaseItemService {
             // 지역명 검색 (모든 지역)
             items = purchaseItemRepository.findByRegionsName(keyword);
         }
-        System.out.println("keyword: [" + keyword + "]");
 
         List<PurchaseItemScrap> scraps = scrapRepository.findByUserId(userId);
-
-        // 디버깅
-        System.out.println("스크랩 수: " + scraps.size());
-        for (PurchaseItemScrap scrap : scraps) {
-            System.out.println("스크랩된 아이템 ID: " + scrap.getPurchaseItem().getId());
-        }
 
         Set<Long> bookmarkedIds = scraps.stream()
                 .map(scrap -> scrap.getPurchaseItem().getId())
                 .collect(Collectors.toSet());
 
-        log.info("유저 {}의 북마크 목록: {}", userId, bookmarkedIds);
+        if (items.isEmpty()) return List.of();
 
-        return PurchaseItemConverter.toPurchaseItemListDTOs(items, bookmarkedIds);
+        List<Long> ids = items.stream().map(PurchaseItem::getId).toList();
+        Map<Long, List<String>> imageMap = itemImageRepository
+                .findByPurchaseItemIdInAndItemType(ids, ItemType.PURCHASE)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        img -> img.getPurchaseItem().getId(),
+                        Collectors.mapping(ItemImage::getUrl, Collectors.toList())
+                ));
+
+        return PurchaseItemConverter.toPurchaseItemListDTOs(items, bookmarkedIds, imageMap);
     }
 
     // 상품명 검색++++
     @Transactional(readOnly = true)
     public List<PurchaseItemListDTO> searchByTitleInUserRegions(String keyword, Long userId) {
 
-        log.info("검색 요청 - keyword: {}, userId: {}", keyword, userId);
-
         List<Integer> regionIds = memberRegionRepository.findByMemberId(userId)
                 .stream()
                 .map(r -> r.getRegion().getId())
                 .toList();
-
-        log.info("사용자 설정 지역 ID 목록: {}", regionIds);
 
         List<PurchaseItem> items = purchaseItemRepository.searchByTitleAndRegion(keyword, regionIds);
 
@@ -284,10 +279,22 @@ public class PurchaseItemService {
                 .map(s -> s.getPurchaseItem().getId())
                 .collect(Collectors.toSet());
 
-        return items.stream()
+        if (items.isEmpty()) return List.of();
+
+        List<Long> ids = items.stream().map(PurchaseItem::getId).toList();
+        Map<Long, List<String>> imageMap = itemImageRepository
+                .findByPurchaseItemIdInAndItemType(ids, ItemType.PURCHASE)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        img -> img.getPurchaseItem().getId(),
+                        Collectors.mapping(ItemImage::getUrl, Collectors.toList())
+                ));
+
+        items = items.stream()
                 .filter(i -> i.getStatus() != Status.COMPLETED)
-                .map(item -> PurchaseItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
                 .toList();
+
+        return PurchaseItemConverter.toPurchaseItemListDTOs(items, bookmarkedIds, imageMap);
     }
 
     private boolean isCategory(String keyword) {

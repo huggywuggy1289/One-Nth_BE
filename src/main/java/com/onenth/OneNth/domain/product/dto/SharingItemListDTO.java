@@ -1,10 +1,13 @@
 package com.onenth.OneNth.domain.product.dto;
 
 import com.onenth.OneNth.domain.product.entity.SharingItem;
+import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 
 @Getter
@@ -24,6 +27,10 @@ public class SharingItemListDTO {
 
     private String status;
     private String statusLabel;
+
+    // +
+    private PurchaseMethod purchaseMethod;
+    private List<String> imageUrls;
 
     public static SharingItemListDTO fromEntity(SharingItem entity, boolean isBookmarked) {
         return SharingItemListDTO.builder()
