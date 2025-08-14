@@ -243,19 +243,22 @@ public class SharingItemService {
 
         List<SharingItemScrap> scraps = scrapRepository.findByUserId(userId);
 
-        // 디버깅
-        System.out.println("스크랩 수: " + scraps.size());
-        for (SharingItemScrap scrap : scraps) {
-            System.out.println("스크랩된 아이템 ID: " + scrap.getSharingItem().getId());
-        }
-
         Set<Long> bookmarkedIds = scraps.stream()
                 .map(s -> s.getSharingItem().getId())
                 .collect(Collectors.toSet());
 
-        log.info("유저 {}의 북마크 목록: {}", userId, bookmarkedIds);
+        if (items.isEmpty()) return List.of();
 
-        return SharingItemConverter.toSharingItemListDTOs(items, bookmarkedIds);
+        List<Long> ids = items.stream().map(SharingItem::getId).toList();
+        Map<Long, List<String>> imageMap = itemImageRepository
+                .findBySharingItemIdInAndItemType(ids, ItemType.SHARE)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        img -> img.getSharingItem().getId(),
+                        Collectors.mapping(ItemImage::getUrl, Collectors.toList())
+                ));
+
+        return SharingItemConverter.toSharingItemListDTOs(items, bookmarkedIds, imageMap);
     }
 
     // 상품명 검색++++
@@ -285,11 +288,23 @@ public class SharingItemService {
                 .map(s -> s.getSharingItem().getId())
                 .collect(Collectors.toSet());
 
-        // 3. 거래 완료 제외 후 DTO 변환
-        return items.stream()
+        if (items.isEmpty()) return List.of();
+
+        List<Long> ids = items.stream().map(SharingItem::getId).toList();
+        Map<Long, List<String>> imageMap = itemImageRepository
+                .findBySharingItemIdInAndItemType(ids, ItemType.SHARE
+                )
+                .stream()
+                .collect(Collectors.groupingBy(
+                        img -> img.getSharingItem().getId(),
+                        Collectors.mapping(ItemImage::getUrl, Collectors.toList())
+                ));
+
+        items = items.stream()
                 .filter(i -> i.getStatus() != Status.COMPLETED)
-                .map(item -> SharingItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
                 .toList();
+
+        return SharingItemConverter.toSharingItemListDTOs(items, bookmarkedIds, imageMap);
     }
 
 

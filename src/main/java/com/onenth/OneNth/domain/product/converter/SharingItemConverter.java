@@ -10,6 +10,7 @@ import com.onenth.OneNth.domain.product.entity.enums.Status;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class SharingItemConverter {
@@ -42,10 +43,41 @@ public class SharingItemConverter {
                 .build();
     }
 
-    public static List<SharingItemListDTO> toSharingItemListDTOs(List<SharingItem> items, Set<Long> bookmarkedIds) {
+    public static List<SharingItemListDTO> toSharingItemListDTOs(
+            List<SharingItem> items,
+            Set<Long> bookmarkedIds
+    ) {
         return items.stream()
                 .filter(i -> i.getStatus() != Status.COMPLETED)
                 .map(item -> SharingItemListDTO.fromEntity(item, bookmarkedIds.contains(item.getId())))
+                .toList();
+    }
+
+    // ✅ 신규 오버로드: 이미지/구매방식/상태까지 포함
+    // imageMap: key = sharingItemId, value = 이미지 URL 리스트
+    public static List<SharingItemListDTO> toSharingItemListDTOs(
+            List<SharingItem> items,
+            Set<Long> bookmarkedIds,
+            Map<Long, List<String>> imageMap
+    ) {
+        return items.stream()
+                .filter(i -> i.getStatus() != Status.COMPLETED)
+                .map(item -> {
+                    List<String> urls = imageMap.getOrDefault(item.getId(), java.util.List.of());
+
+                    return SharingItemListDTO.builder()
+                            .id(item.getId())
+                            .category(item.getItemCategory().name())
+                            .title(item.getTitle())
+                            .price(String.valueOf(item.getPrice()))
+                            .purchaseMethod(item.getPurchaseMethod())  // ONLINE / OFFLINE
+                            .imageUrls(urls)
+                            .status(item.getStatus().name())
+                            .bookmarked(bookmarkedIds.contains(item.getId()))
+                            .latitude(item.getLatitude())
+                            .longitude(item.getLongitude())
+                            .build();
+                })
                 .toList();
     }
 }

@@ -1,11 +1,14 @@
 package com.onenth.OneNth.domain.product.dto;
 
 import com.onenth.OneNth.domain.product.entity.PurchaseItem;
+import com.onenth.OneNth.domain.product.entity.enums.PurchaseMethod;
 import com.onenth.OneNth.domain.product.entity.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,6 +27,11 @@ public class PurchaseItemListDTO {
 
     private String status;
     private String statusLabel;
+
+    // +
+    private PurchaseMethod purchaseMethod;
+    private List<String> imageUrls;
+
 
     public static PurchaseItemListDTO fromEntity(PurchaseItem entity) {
         return fromEntity(entity, false); // 기본값 false로 위임
