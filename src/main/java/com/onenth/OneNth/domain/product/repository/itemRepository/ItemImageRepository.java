@@ -28,4 +28,6 @@ public interface ItemImageRepository extends JpaRepository<ItemImage, Long> {
             Collection<Long> purchaseItemIds,
             ItemType itemType
     );
+
+    List<ItemImage> findBySharingItemIdInAndItemType(Collection<Long> ids, ItemType itemType);
 }
