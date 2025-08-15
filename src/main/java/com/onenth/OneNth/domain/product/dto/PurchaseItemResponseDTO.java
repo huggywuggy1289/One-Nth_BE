@@ -30,6 +30,7 @@ public class PurchaseItemResponseDTO {
     @AllArgsConstructor
     @Builder
     public static class GetPurchaseItemResponseDTO {
+        private Long id;
         private String title;
         private List<String> imageUrls;
         private String purchaseUrl;
