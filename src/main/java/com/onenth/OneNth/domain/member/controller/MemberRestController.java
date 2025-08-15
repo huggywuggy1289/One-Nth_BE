@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -259,6 +258,18 @@ public class MemberRestController {
             @PathVariable("memberId") Long memberId){
         MemberResponseDTO.MemberProfilePreviewDTO response = memberQueryService.getMemberProfilePreview(memberId);
         return ApiResponse.onSuccess(response);
+    }
+
+    @Operation(
+            summary = "사용자 차단 API",
+            description = "차단하고 싶은 사용자의 ID로 사용자를 차단합니다."
+    )
+    @PostMapping("/block/{targetMemberId}")
+    public ApiResponse<String> blockMember(
+            @AuthUser Long memberId,
+            @PathVariable("targetMemberId") Long targetMemberId){
+        memberCommandService.blockMember(memberId,targetMemberId);
+        return ApiResponse.onSuccess("사용자 차단이 완료되었습니다.");
     }
 
     /**

@@ -29,4 +29,7 @@ public interface MemberCommandService {
 
     //회원탈퇴 구현(soft delete)
     void withdrawMember(Long memberId);
+
+    //회원 차단
+    void blockMember(Long memberId, Long targetmemberId);
 }

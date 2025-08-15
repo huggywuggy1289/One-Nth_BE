@@ -96,7 +96,7 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     public MemberResponseDTO.MemberProfilePreviewDTO getMemberProfilePreview(Long memberId) {
         Member member =  memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        return new MemberResponseDTO.MemberProfilePreviewDTO(member.getId(), member.getName(), member.getProfileImageUrl());
+        return new MemberResponseDTO.MemberProfilePreviewDTO(member.getId(), member.getNickname(), member.getProfileImageUrl());
     }
 
     public MemberResponseDTO.ItemPreviewListDTO getMyAllItems(Long memberId, Integer page, Integer size) {

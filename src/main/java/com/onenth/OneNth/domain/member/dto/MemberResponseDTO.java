@@ -17,7 +17,7 @@ public class MemberResponseDTO {
     @AllArgsConstructor
     public static class MemberProfilePreviewDTO {
         private Long memberId;
-        private String mame;
+        private String nickname;
         private String profileImageUrl;
     }
 

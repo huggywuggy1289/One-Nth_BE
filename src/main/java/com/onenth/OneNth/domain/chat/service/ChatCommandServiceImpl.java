@@ -11,6 +11,9 @@ import com.onenth.OneNth.domain.chat.repository.ChatRoomMemberRepository;
 import com.onenth.OneNth.domain.chat.repository.ChatRoomRepository;
 import com.onenth.OneNth.domain.chat.dto.ChatMessageDTO;
 import com.onenth.OneNth.domain.member.entity.Member;
+import com.onenth.OneNth.domain.member.entity.Report;
+import com.onenth.OneNth.domain.member.entity.enums.ReportType;
+import com.onenth.OneNth.domain.member.repository.ReportRepository;
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
 import com.onenth.OneNth.global.apiPayload.exception.handler.ChatHandler;
@@ -32,6 +35,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
     private final ChatMessageRepository chatMessageRepository;
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final ReportRepository reportRepository;
 
     public ChatResponseDTO.ChatRoomResponseDTO getChatRoomName(Long memberId, Long targetMemberId, ChatRoomType chatRoomType) {
         if (memberId == targetMemberId) {
@@ -51,6 +55,8 @@ public class ChatCommandServiceImpl implements ChatCommandService {
                     ChatRoom newChatRoom = chatRoomRepository.save(ChatRoom.builder()
                             .name(chatRoomName)
                             .chatRoomType(chatRoomType)
+                            .member1(member)
+                            .member2(targetMember)
                             .build());
 
                     Stream.of(member, targetMember)
@@ -96,6 +102,25 @@ public class ChatCommandServiceImpl implements ChatCommandService {
 
         messagingTemplate.convertAndSend(
                 "/sub/chat-rooms/" + chatRoom.getName(), chatMessageDTO);
+    }
+
+    @Override
+    @Transactional
+    public void reportMember(Long memberId, Long chatRoomId, ReportType reportType) {
+        Member reporter = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new ChatHandler(ErrorStatus.CHAT_ROOM_NOT_FOUND));
+
+        Member reported = chatRoom.getMember1().getId().equals(memberId) 
+                ? chatRoom.getMember2() 
+                : chatRoom.getMember1();
+
+        reportRepository.save(Report.builder()
+                        .reportType(reportType)
+                        .reporter(reporter)
+                        .reported(reported).build());
     }
 
     private String generateChatRoomName(Long id1, Long id2, ChatRoomType type) {
