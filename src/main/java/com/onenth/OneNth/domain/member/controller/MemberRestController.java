@@ -260,6 +260,18 @@ public class MemberRestController {
         return ApiResponse.onSuccess(response);
     }
 
+    @Operation(
+            summary = "사용자 차단 API",
+            description = "차단하고 싶은 사용자의 ID로 사용자를 차단합니다."
+    )
+    @PostMapping("/block/{targetMemberId}")
+    public ApiResponse<String> blockMember(
+            @AuthUser Long memberId,
+            @PathVariable("targetMemberId") Long targetMemberId){
+        memberCommandService.blockMember(memberId,targetMemberId);
+        return ApiResponse.onSuccess("사용자 차단이 완료되었습니다.");
+    }
+
     /**
      * 마이페이지 - 내가 작성한 같이사요/함께나눠요 통합 미리보기 조회 (최신순, 페이징)
      */

@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.member.service.memberService;
 import com.onenth.OneNth.domain.member.converter.MemberConverter;
 import com.onenth.OneNth.domain.member.dto.MemberRequestDTO;
 import com.onenth.OneNth.domain.member.dto.MemberResponseDTO;
+import com.onenth.OneNth.domain.member.entity.Block;
 import com.onenth.OneNth.domain.member.entity.Member;
 import com.onenth.OneNth.domain.member.entity.MemberAlertSetting;
 import com.onenth.OneNth.domain.member.entity.enums.MemberStatus;
@@ -10,6 +11,7 @@ import com.onenth.OneNth.domain.member.settings.alert.generalAlert.repository.Me
 import com.onenth.OneNth.domain.member.repository.memberRepository.MemberRepository;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailService;
 import com.onenth.OneNth.domain.member.service.EmailVerificationService.EmailVerificationService;
+import com.onenth.OneNth.domain.member.settings.block.repository.BlockRepository;
 import com.onenth.OneNth.domain.post.entity.Like;
 import com.onenth.OneNth.domain.post.entity.Post;
 import com.onenth.OneNth.domain.post.entity.Scrap;
@@ -18,6 +20,8 @@ import com.onenth.OneNth.domain.post.repository.likeRepository.LikeRepository;
 import com.onenth.OneNth.domain.post.repository.scrapRepository.ScrapRepository;
 import com.onenth.OneNth.domain.region.entity.Region;
 import com.onenth.OneNth.domain.region.repository.RegionRepository;
+import com.onenth.OneNth.global.apiPayload.code.status.ErrorStatus;
+import com.onenth.OneNth.global.apiPayload.exception.handler.MemberHandler;
 import com.onenth.OneNth.global.configuration.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,6 +46,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final PostRepository postRepository;
     private final ScrapRepository scrapRepository;
     private final LikeRepository likeRepository;
+    private final BlockRepository blockRepository;
     private final MemberAlertSettingRepository memberAlertSettingRepository;
     @Override
     public MemberResponseDTO.SignupResultDTO signupMember(MemberRequestDTO.SignupDTO request) {
@@ -213,5 +218,21 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
         member.setStatus(MemberStatus.INACTIVE);
         member.setInactiveDate(LocalDateTime.now());
+    }
+
+    @Transactional
+    @Override
+    public void blockMember(Long memberId, Long targetmemberId) {
+        if (memberId.equals(targetmemberId)) {
+            throw new MemberHandler(ErrorStatus.MEMBER_CANNOT_BLOCK_SELF);
+        }
+        
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member blockedMember = memberRepository.findById(targetmemberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        blockRepository.save(Block.builder()
+                        .member(member)
+                        .blockedMember(blockedMember).build());
     }
 }
