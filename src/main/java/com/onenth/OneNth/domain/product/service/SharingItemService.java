@@ -348,7 +348,7 @@ public class SharingItemService {
                 .toList();
 
         return SharingItemResponseDTO.GetResponse.builder()
-                .id(item.getMember().getId())
+                .writerid(item.getMember().getId())
 //                .id(item.getId())
                 .title(item.getTitle())
                 .quantity(item.getQuantity())

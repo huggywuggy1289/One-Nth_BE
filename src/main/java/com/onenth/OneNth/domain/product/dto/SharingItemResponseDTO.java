@@ -26,7 +26,7 @@ public class SharingItemResponseDTO {
     @AllArgsConstructor
     @Builder
     public static class GetResponse {
-        private Long id;
+        private Long writerid;
         private String title;
         private Integer quantity;
         private Integer price;
