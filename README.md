@@ -1,5 +1,3 @@
-<img width="4328" height="1488" alt="image 16" src="https://github.com/user-attachments/assets/d9cba231-6146-42ce-bc3c-427cadb98c20" />
-
 # 🛒 N분의1 - BACKEND
 > 1인 가구의 소비 효울성을 높이는 거래 & 정보 플랫폼 **백엔드 레포지토리** </br>
 `UMC 8th`
