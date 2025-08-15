@@ -4,6 +4,7 @@ import com.onenth.OneNth.domain.chat.dto.ChatResponseDTO;
 import com.onenth.OneNth.domain.chat.entity.enums.ChatRoomType;
 import com.onenth.OneNth.domain.chat.service.ChatCommandService;
 import com.onenth.OneNth.domain.chat.service.ChatQueryService;
+import com.onenth.OneNth.domain.member.entity.enums.ReportType;
 import com.onenth.OneNth.global.apiPayload.ApiResponse;
 import com.onenth.OneNth.global.auth.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -90,5 +91,18 @@ public class ChatController {
             @PathVariable("chatRoomId") Long chatRoomId) {
         chatCommandService.leaveChatRoom(memberId, chatRoomId);
         return ApiResponse.onSuccess("채팅방에서 나갔습니다.");
+    }
+
+    @Operation(
+            summary = "사용자 신고 API",
+            description = "현재 채팅방의 ID를 통해 상대방 사용자를 신고합니다."
+    )
+    @PostMapping("/reports/{chatRoomId}")
+    public ApiResponse<String> reportMember(
+            @AuthUser Long memberId,
+            @PathVariable("chatRoomId") Long chatRoomId,
+            @RequestParam("reportType") ReportType reportType){
+        chatCommandService.reportMember(memberId, chatRoomId, reportType);
+        return ApiResponse.onSuccess("신고가 완료되었습니다.");
     }
 }
