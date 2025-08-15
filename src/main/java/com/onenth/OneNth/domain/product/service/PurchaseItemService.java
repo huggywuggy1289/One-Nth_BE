@@ -332,7 +332,7 @@ public class PurchaseItemService {
                 .toList();
 
         return PurchaseItemResponseDTO.GetPurchaseItemResponseDTO.builder()
-                .id(item.getMember().getId())
+                .writerid(item.getMember().getId())
                 .title(item.getName())
                 .imageUrls(imageUrls)
                 .purchaseUrl(item.getPurchaseUrl()) // +
