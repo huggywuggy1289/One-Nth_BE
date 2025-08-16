@@ -30,6 +30,8 @@ public enum ErrorStatus implements BaseErrorCode {
     EXCEED_REVIEW_IMAGE_LIMIT(HttpStatus.BAD_REQUEST, "REVIEW_4001", "리뷰 이미지는 3장까지 업로드 가능합니다."),
     REVIEW_CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, "REVIEW_4002", "리뷰 내용을 입력해주세요."),
     REVIEW_RATE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "REVIEW_4003", "평점은 0.5 이상 5 이하이어야 합니다."),
+    REVIEW_SELF_PRODUCT_FORBIDDEN(HttpStatus.BAD_REQUEST, "REVIEW_4004", "내 상품에는 리뷰를 달 수 없습니다."),
+    REVIEW_ITEM_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "REVIEW_4005", "거래 완료가 되지 않은 상품은 리뷰 작성이 불가능합니다."),
 
     // 지역 관련
     REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "REGION001", "존재하지 않는 지역입니다."),
@@ -52,6 +54,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // 채팅 관련
     CHAT_ROOM_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "CHAT_ROOM001", "자기 자신과의 채팅방 생성은 불가능합니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHAT_ROOM002", "채팅방이 존재하지 않습니다."),
+    CHAT_ROOM_TIP_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHAT_ROOM3", "꿀팁 N분의1 채팅방에선 거래가 불가능합니다."),
 
     //게시글 관련
     NOT_FOUND_POST(HttpStatus.NOT_FOUND, "POST_001", "게시글을 찾을 수 없습니다."),

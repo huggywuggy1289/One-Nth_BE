@@ -7,6 +7,7 @@ import com.onenth.OneNth.domain.product.dto.ReviewRequestDTO;
 import com.onenth.OneNth.domain.product.dto.ReviewResponseDTO;
 import com.onenth.OneNth.domain.product.entity.*;
 import com.onenth.OneNth.domain.product.entity.enums.ItemType;
+import com.onenth.OneNth.domain.product.entity.enums.Status;
 import com.onenth.OneNth.domain.product.entity.review.*;
 import com.onenth.OneNth.domain.product.repository.itemRepository.purchase.PurchaseItemRepository;
 import com.onenth.OneNth.domain.product.repository.itemRepository.sharing.SharingItemRepository;
@@ -53,6 +54,14 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         Member reviewer = findMemberById(memberId);
         SharingItem item = sharingItemRepository.findById(targetSharingItemId)
                 .orElseThrow(() -> new SharingItemHandler(ErrorStatus.SHARING_ITEM_NOT_FOUND));
+
+        if(!item.getStatus().equals(Status.COMPLETED)){
+            throw new SharingItemHandler((ErrorStatus.REVIEW_ITEM_NOT_COMPLETED));
+        }
+
+        if (item.getMember().getId().equals(reviewer.getId())) {
+            throw new SharingItemHandler(ErrorStatus.REVIEW_SELF_PRODUCT_FORBIDDEN);
+        }
 
         SharingReview review = ReviewConverter.toSharingReview(request, reviewer, item);
         sharingReviewRepository.save(review);

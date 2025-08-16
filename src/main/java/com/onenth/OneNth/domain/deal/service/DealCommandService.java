@@ -3,6 +3,7 @@ package com.onenth.OneNth.domain.deal.service;
 import com.onenth.OneNth.domain.chat.dto.ChatMessageDTO;
 import com.onenth.OneNth.domain.chat.entity.ChatRoom;
 import com.onenth.OneNth.domain.chat.entity.ChatRoomMember;
+import com.onenth.OneNth.domain.chat.entity.enums.ChatRoomType;
 import com.onenth.OneNth.domain.chat.repository.ChatRoomRepository;
 import com.onenth.OneNth.domain.deal.converter.DealConverter;
 import com.onenth.OneNth.domain.deal.dto.DealRequestDTO;
@@ -59,6 +60,10 @@ public class DealCommandService {
 
         ChatRoom chatRoom = chatRoomRepository.findByName(roomName)
                 .orElseThrow(() -> new ChatHandler(ErrorStatus.CHAT_ROOM_NOT_FOUND));
+
+        if(chatRoom.getChatRoomType().equals(ChatRoomType.TIP_SHARE)){
+            throw new DealHandler(ErrorStatus.CHAT_ROOM_TIP_NOT_FOUND);
+        }
 
         Member buyer = chatRoom.getChatRoomMembers().stream()
                 .map(ChatRoomMember::getMember)
